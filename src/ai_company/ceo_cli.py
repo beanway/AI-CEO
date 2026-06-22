@@ -6,56 +6,47 @@ import argparse
 import sys
 
 from ai_company.config import get_settings
-from ai_company.models.company import ProjectsFile
+from ai_company.services.company_service import CompanyService, format_projects_message
 from ai_company.store.company_store import CompanyStore
 from ai_company.workspace import ensure_workspace
 
 
-def _store() -> CompanyStore:
+def _service() -> CompanyService:
     settings = get_settings()
-    return CompanyStore(settings.workspace_root)
+    ensure_workspace(settings.workspace_root)
+    store = CompanyStore(settings.workspace_root)
+    return CompanyService(settings.workspace_root, store)
 
 
 def cmd_init_workspace() -> int:
     settings = get_settings()
     ensure_workspace(settings.workspace_root)
+    CompanyService(
+        settings.workspace_root, CompanyStore(settings.workspace_root)
+    ).bootstrap_default_project_if_needed()
     print(f"已建立沙盒：{settings.workspace_root}")
     return 0
 
 
 def cmd_projects() -> int:
-    store = _store()
-    store.ensure_company_dirs()
-    data = store.load_projects()
-    if not data.projects:
-        print("（尚無專案）")
-        print(f"active: {data.active_project_id or '—'}")
-        return 0
-    for p in data.projects:
-        mark = " *" if p.id == data.active_project_id else ""
-        print(f"  {p.id}{mark}  {p.name}  [{p.status}]")
-    print(f"\nactive_project_id: {data.active_project_id or '—'}")
+    company = _service()
+    print(format_projects_message(company.list_projects()))
     return 0
 
 
 def cmd_switch(project_id: str) -> int:
-    store = _store()
-    store.ensure_company_dirs()
-    data = store.load_projects()
-    ids = {p.id for p in data.projects}
-    if project_id not in ids:
-        print(f"錯誤：找不到專案 id={project_id!r}", file=sys.stderr)
-        if ids:
-            print(f"可用：{', '.join(sorted(ids))}", file=sys.stderr)
+    company = _service()
+    try:
+        rec = company.set_active_project(project_id)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
         return 1
-    data.active_project_id = project_id
-    store.save_projects(data)
-    print(f"已切換 active 專案 → {project_id}")
+    print(f"已切換 active 專案 → {rec.id}（{rec.name}）")
     return 0
 
 
 def cmd_global() -> int:
-    store = _store()
+    store = CompanyStore(get_settings().workspace_root)
     store.ensure_company_dirs()
     skills = store.load_global_skills()
     config = store.load_global_config()

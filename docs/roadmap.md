@@ -9,7 +9,7 @@
 
 | 項目 | 狀態 | 備註 |
 |------|------|------|
-| 雙 Bot Router 骨架 | 已存在 | 尚未接 Gemini／新目錄模型 |
+| 雙 Bot Router 骨架 | 已存在 | 管理者 Bot：`/projects`、`/switch` |
 | `company_workspace` 扁平目錄 | 已存在 | **與設計衝突**，待遷移 |
 | `_company` 索引（projects / global YAML） | 已實作 | `CompanyStore` + `init-workspace` |
 | Harness 設計 | 已文件化 | 待實作 |
@@ -20,7 +20,7 @@
 ## Phase A1 — CEO（全公司）
 
 - [x] `_company/projects.json`、`global_skills.yaml`、`global_config.yaml`
-- [ ] `/projects`、`/switch`、active 專案
+- [x] `/projects`、`/switch`、active 專案
 - [ ] CEO Session（Gemini 或階段性 Fake 後端）
 - [ ] `/newproject` 建殼（專案目錄 + PM Session 索引，**不含** Worker 編制）
 
