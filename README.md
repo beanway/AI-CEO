@@ -18,6 +18,9 @@ cp .env.example .env
 
 python -m ai_company.main init-workspace
 python -m ai_company.main run
+
+# 或使用互動選單（本機 CEO CLI + 啟動 Bot）
+./run.sh
 ```
 
 > 注意：`company_workspace` 目錄模型將依 Harness 設計遷移為 `projects/<id>/`；目前程式仍為過渡骨架。

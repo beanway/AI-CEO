@@ -1,0 +1,20 @@
+---
+description: Python Router、服務層與沙盒路徑慣例
+globs: src/**/*.py
+alwaysApply: false
+---
+
+# Python 實作慣例
+
+- 路徑解析以 `company_workspace/projects/<project_id>/` 為準；`_company/` 存索引與 Session。
+- 檔案 I/O 與 `subprocess` 經 **SandboxRunner / ToolPolicy**（設計中或實作中），禁止硬編碼 repo 根下扁平 `company_workspace/shared`。
+- 雙 Telegram Bot 分流：管理者 = CEO/PM；執行者 = 通知（排程在專案 `task_scheduler` Worker）。
+- 新增模組時保持邊界：`store/`、`services/`、`telegram/` 分層（見歸檔計畫與將來的 Harness Phase A 計畫）。
+
+```python
+# ❌ 假設全公司單一 shared
+root / "shared" / "requirements.md"
+
+# ✅ 專案沙盒
+project_dir(workspace_root, project_id) / "shared" / "requirements.md"
+```

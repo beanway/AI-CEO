@@ -1,13 +1,80 @@
+# --- OS ---
 .DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+*.swp
+*~
+
+# --- Secrets & env ---
 .env
 .env.*
 !.env.example
-node_modules/
+*.pem
+*.key
+credentials.json
+*credentials*.json
+*service-account*.json
+secrets/
+
+# --- Python ---
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
 .venv/
+venv/
+ENV/
+env/
+*.egg
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+pip-log.txt
+pip-delete-this-directory.txt
+*.manifest
+*.spec
+
+# --- Packaging / build ---
 dist/
 build/
+*.whl
+wheelhouse/
+
+# --- Test, lint, type check ---
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+nosetests.xml
+junit.xml
+
+# --- Logs & local runtime ---
+*.log
+*.log.*
+
+# --- Node (若日後有前端或腳本) ---
+node_modules/
+.npm
+.yarn/
+.pnp.*
+*.tsbuildinfo
+
+# --- IDE（保留 .cursor/ 規則與 skills 路徑說明）---
 .idea/
 .vscode/
-*.log
+*.sublime-project
+*.sublime-workspace
+
+# --- Harness 本機沙盒（執行層產物，非框架原始碼）---
+company_workspace/

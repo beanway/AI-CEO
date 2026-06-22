@@ -1,0 +1,2 @@
+default_model: gemini-2.5-flash
+notification_policy: all

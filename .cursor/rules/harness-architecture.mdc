@@ -1,0 +1,20 @@
+---
+description: AI 虛擬公司 Harness 架構、CEO/PM 邊界、文件為準
+alwaysApply: true
+---
+
+# Harness 架構（本 repo）
+
+- **Canonical**：`docs/design/harness-design.md`；摘要 `docs/discussion-outcomes.md`。
+- **CEO**（全公司）：切換專案、`global_skills` / `global_config`；建專案「殼」。
+- **PM**（單專案）：`workers.yaml`、動態 `workers/<id>/`、專案 skill、狀態、維修、Git；建專案「局」。
+- **沙盒**：僅 `company_workspace/projects/<project_id>/`；勿恢復扁平五目錄模型。
+- **執行層**：狀態機一次一 Worker；Worker **不遙控 Cursor IDE**，不修改 `src/` 當作沙盒產物。
+- **Router**：Telegram ↔ Gemini ↔ 工具；PM 高風險 Git / skill 安裝需 TG 核准設計。
+
+## Cursor 在本專案的角色
+
+- **Cursor Agent**：協助編輯 **本框架**（`src/`、`docs/`、設定檔）。
+- **虛擬公司 Worker**：僅在沙盒內由 Router 驅動；與 Cursor skill 目錄分離（執行用 `skills/registry/` + 專案 YAML）。
+
+改架構前先對照 `docs/document-audit.md`，避免與 Harness 設計衝突。
