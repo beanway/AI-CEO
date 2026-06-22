@@ -1,0 +1,96 @@
+# 歷史參考 — 原始匯出全文（Word/Google Doc）
+# 現行設計請見：docs/design/harness-design.md
+# 討論摘要：docs/discussion-outcomes.md
+# ---
+
+AI 虛擬公司架構與實作說明書 (AI Company Framework)
+本文件旨在定義並規劃一個基於 Python + Gemini API + Telegram Bot 的虛擬 AI 軟體公司架構。開發者將透過 Cursor IDE 進行專案實作。本系統採用「管理層併發通訊、執行層狀態機輪流運作」的混合模式，兼顧戰略溝通的即時性與底層開發的 Token 經濟效益與安全性。
+
+一、 系統全局架構 (System Architecture)
+本專案將 AI 系統擬人化為一個完整的公司組織。系統由 Python 後端驅動，作為核心通訊路由器（Router），對上連接 Telegram API 實現雙向互動，對下連接 Gemini API 進行多角色推理與工具調用（Tools/Skills），並在 Mac 本地端建立嚴格的沙盒檔案系統。
+
+二、 核心角色職責與通訊矩陣
+系統區分為「管理層（併發獨立 Session）」與「執行層（狀態機輪流 Session）」兩大層級：
+層級
+角色名稱
+通訊管道 (TG 帳號)
+運作模式與核心職責
+ 
+管理層
+(C-Level & PM)
+CEO (執行長)
+管理者 Bot (帳號 A)
+【併發運行】負責與使用者進行商業模式確認、商業需求對接。可建立新專案並自動生成對應的 PM 角色。支援列出所有專案並切換 Session。
+管理層
+(C-Level & PM)
+PM (專案經理)
+管理者 Bot (帳號 A)
+【併發運行】一個專案擁有一個獨立的 PM Session。擁有 Git 最高權限（分支架構調整、Rollback），在執行高風險操作前，必須透過 TG 按鈕向使用者請示權限（Human-in-the-loop）。
+管理層
+(C-Level & PM)
+營運者 (COO)
+管理者 Bot (帳號 A)
+【併發運行】直屬 CEO（與 PM 平級）。負責監控全公司跨專案的資源與 Token 成本、計算 API 費用、分析系統運作效率。可為 CEO 提供全域財務與效率報表。
+管理層
+(C-Level & PM)
+任務排程者
+執行者 Bot (帳號 B)
+【管理層/執行層橋樑】負責解構 PM 交付的開發計畫，並主動調度底層 Worker 的狀態機運行。負責向使用者發送瑣碎進度通知（例如：任務 1 目前由企劃執行中，驗收條件為 HTML 格式企劃案）。
+執行層
+(Worker 團隊)
+企劃 (Planner)
+執行者 Bot (帳號 B)
+【嚴格單一狀態機迴圈（一次僅運行一個 AI）】
+* 企劃：產出產品規格書與 HTML 企劃案。
+* 後端：開發 API、邏輯代碼，產出 API 說明文件。
+* 前端：開發介面、打包執行檔。
+* QA：讀取共用資料夾內的前後端文件與執行檔，進行自動化黑箱/白箱測試與排錯。
+執行層
+(Worker 團隊)
+後端 (Backend)
+
+執行者 Bot (帳號 B)
+【嚴格單一狀態機迴圈（一次僅運行一個 AI）】
+* 企劃：產出產品規格書與 HTML 企劃案。
+* 後端：開發 API、邏輯代碼，產出 API 說明文件。
+* 前端：開發介面、打包執行檔。
+* QA：讀取共用資料夾內的前後端文件與執行檔，進行自動化黑箱/白箱測試與排錯。
+執行層
+(Worker 團隊)
+前端 (Frontend)
+
+執行者 Bot (帳號 B)
+【嚴格單一狀態機迴圈（一次僅運行一個 AI）】
+* 企劃：產出產品規格書與 HTML 企劃案。
+* 後端：開發 API、邏輯代碼，產出 API 說明文件。
+* 前端：開發介面、打包執行檔。
+* QA：讀取共用資料夾內的前後端文件與執行檔，進行自動化黑箱/白箱測試與排錯。
+執行層
+(Worker 團隊)
+QA (測試工程師)
+
+執行者 Bot (帳號 B)
+【嚴格單一狀態機迴圈（一次僅運行一個 AI）】
+* 企劃：產出產品規格書與 HTML 企劃案。
+* 後端：開發 API、邏輯代碼，產出 API 說明文件。
+* 前端：開發介面、打包執行檔。
+* QA：讀取共用資料夾內的前後端文件與執行檔，進行自動化黑箱/白箱測試與排錯。
+
+三、 檔案系統與權限隔離設計 (Sandbox)
+為了防止 AI 在執行 Terminal 指令時發生安全漏洞、互相覆蓋程式碼或導致 Token 爆炸，Mac 本地端必須建立嚴格的沙盒目錄結構。Python 後端在調用 `subprocess` 執行各 Worker 的 Skill 時，必須動態變更工作目錄（`cwd`）：
+company_workspace/ ├── shared/                       # 【共用資料夾】所有人可讀寫 │   ├── requirements.md           # CEO/PM 產出的商業與專案需求 │   ├── api_docs/                 # 後端產出的說明文件 (供 QA 測試、前端串接) │   └── builds/                   # 前後端編譯或產出的執行檔與產出物 ├── backend_workspace/            # 【後端私有】僅限後端 Worker 讀寫 (存放原始碼) ├── frontend_workspace/           # 【前端私有】僅限前端 Worker 讀寫 (存放原始碼) ├── qa_workspace/                 # 【QA 私有】存放測試腳本與 Log └── pm_workspace/                 # 【PM 私有】存放專案看版狀態與 Git Meta 資訊 
+
+四、 Worker 層級狀態機運作邏輯 (Worker State Machine)
+當管理層（PM）將任務交棒給任務排程者後，系統進入嚴格的單一 AI 運行狀態機。每次只有一個 Worker 被「喚醒」並載入其專屬的 System Instruction 與上下文記憶（Context），完成後釋放，以達到最極致的 Token 節省與故障隔離：
+class WorkerStateMachine:     def __init__(self):         self.current_state = "TASK_SCHEDULER"         self.shared_dir = "./company_workspace/shared"      def run_loop(self, project_goal):         while self.current_state != "PROJECT_DONE":             if self.current_state == "TASK_SCHEDULER":                 # 1. 喚醒任務排程者，評估目前共用資料夾狀態                 next_worker, task_desc, criteria = scheduler_agent.analyze(self.shared_dir)                 # 2. 透過執行者 Bot 發送 TG 通知給使用者                 tg_executor_bot.send(f"通知：任務目前由 {next_worker} 執行中。驗收條件：{criteria}")                 self.current_state = next_worker              elif self.current_state == "PLANNER":                 # 3. 喚醒企劃，活動範圍鎖定在 shared/                 planner_agent.execute_task(task_desc)                 self.current_state = "TASK_SCHEDULER" # 回到排程者進行檢查              elif self.current_state == "BACKEND":                 # 4. 喚醒後端，活動範圍鎖定在 backend_workspace/ 與 shared/                 backend_agent.execute_code_generation(task_desc)                 self.current_state = "TASK_SCHEDULER"              elif self.current_state == "FRONTEND":                 # 5. 喚醒前端，活動範圍鎖定在 frontend_workspace/ 與 shared/                 frontend_agent.execute_ui_generation(task_desc)                 self.current_state = "TASK_SCHEDULER"              elif self.current_state == "QA":                 # 6. 喚醒 QA，讀取 shared/ 內的產出物進行 Self-healing 排錯測試                 success = qa_agent.run_tests()                 if success:                     self.current_state = "PROJECT_DONE"                 else:                     # 如果測試失敗，由 QA 標註錯誤，交回給排程者決定重新指派給後端或前端                     self.current_state = "TASK_SCHEDULER" 
+
+五、 針對 Cursor 的實作引導步驟
+為了讓 Cursor 能夠完美理解並協助你生成這個系統，請遵循以下配置與開發步驟：
+1. 建立 `.cursorrules` 設定檔
+在你的專案根目錄下建立 `.cursorrules` 檔案，將整個 AI 公司的分工原則寫進去。這能確保你在 Cursor 內使用 `Cmd+K` 或 Chat 時，AI 助手不會搞混角色權限。設定檔內容範例：
+你正在協助開發一個虛擬 AI 公司專案。請嚴格遵守以下架構原則： 1. 管理層 (CEO, PM, COO) 使用獨立的 Gemini Chat Session，支援隨時與使用者併發對話。 2. 執行層 (Worker) 採用 State Machine 設計，一次只能喚醒一個 AI 角色。 3. 執行 Terminal 指令的 Skill 必須嚴格綁定 cwd 權限隔離，禁止脫離指定的沙盒資料夾。 4. 所有由 PM 發起的高風險 Git 操作 (如 reset, push -f)，必須實作 Telegram Inline Keyboard 審查機制。 
+2. 開發階段建議流程
+	•	階段一：通訊交換機 (Router) 搭建 在 Cursor 中先撰寫 Python 的 Telegram Bot 基礎代碼，成功申請兩個 Bot Token，並實作能夠依據訊息來源（管理者群/執行者群）分流處理的通訊路由。
+	•	階段二：管理層 Session 管理實作 利用 Gemini SDK 的 `client.chats.create()`，實作 CEO、PM 與營運者（COO）的獨立對話持久化。測試 CEO 能否順利建立新 PM，以及 PM 能否成功拋出 TG 審查按鈕。
+	•	階段三：沙盒環境與狀態機開發 實作 `WorkerStateMachine` 核心邏輯。在本地手動製造一些不完整的檔案放入 `shared/`，測試「任務排程者」能否正確識別並喚醒對應的 Worker。
+	•	階段四：全自動化閉環整合 解鎖 QA 與各 Worker 的 `execute_bash_command` 工具權限。嘗試對 CEO 下達指令：「開發一個自動生成各種主題的影片專案」，觀察整個 AI 公司從管理層對接，到執行層狀態機輪流運作的完整自動化流程。

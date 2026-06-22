@@ -1,0 +1,5 @@
+# 本專案已改用 Cursor Project Rules（推薦）
+# 規則目錄：.cursor/rules/*.mdc
+# 說明：docs/discussion-outcomes.md §9、docs/README.md
+
+請優先遵守 alwaysApply 規則：.cursor/rules/harness-architecture.mdc
