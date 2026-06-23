@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from ai_company.modules.file_store.internal.paths import project_dir
+from ai_company.schemas.workspace_paths import project_dir
 from ai_company.modules.file_store.internal.store import FileStore
 from ai_company.schemas.documents import (
     GlobalConfigFile,

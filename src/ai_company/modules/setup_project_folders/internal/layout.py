@@ -1,12 +1,8 @@
 from pathlib import Path
 
-PROJECTS_DIR = "projects"
+from ai_company.schemas.workspace_paths import project_dir
 
 REQUIREMENTS_TEMPLATE = "# 專案需求\n\n（由 CEO / PM 填寫）\n"
-
-
-def project_dir(workspace_root: Path, project_id: str) -> Path:
-    return workspace_root / PROJECTS_DIR / project_id
 
 
 def ensure_project_tree(project_root: Path) -> None:

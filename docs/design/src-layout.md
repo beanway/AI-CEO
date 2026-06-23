@@ -20,7 +20,7 @@
 
 - `adapters/*` → `schemas`、`work_flow`、`config`（不直接 import `modules`）
 - `work_flow/**` → `modules/*/core`、`schemas`、`work_flow/_shared`
-- `modules/**` → 同模組 `internal/`、`schemas`；**不得** import 其他模組的 `core`
+- `modules/**` → 同模組 `internal/`、`schemas`；**不得** import 其他模組的 `core`（路徑共用見 `schemas/workspace_paths.py`）
 - 改磁碟 JSON/YAML 欄位：先改 `schemas/documents.py` 與模組 README，再改單一 writer 模組
 
 ---
