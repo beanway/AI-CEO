@@ -22,6 +22,7 @@ from ai_company.schemas.commands import (
     ShowGlobalConfigCommand,
     ShowProjectStatusCommand,
     SwitchProjectCommand,
+    ProjectGitCommand,
 )
 from ai_company.schemas.documents import UserMode
 
@@ -205,6 +206,19 @@ def run_add_project_skill(skill_id: str) -> int:
     deps = AppDeps(settings=get_settings())
     result = dispatch(
         AddSkillToProjectCommand(channel=Channel.CLI, skill_id=skill_id),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_project_git(git_argv: list[str]) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        ProjectGitCommand(channel=Channel.CLI, git_argv=git_argv),
         deps,
     )
     if not result.success:

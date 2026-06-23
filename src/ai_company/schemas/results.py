@@ -61,3 +61,10 @@ class AddSkillToProjectResult(FlowResult):
 
 class ShowProjectStatusResult(FlowResult):
     project_id: str | None = None
+
+
+class ProjectGitResult(FlowResult):
+    project_id: str | None = None
+    exit_code: int | None = None
+    stdout: str | None = None
+    stderr: str | None = None

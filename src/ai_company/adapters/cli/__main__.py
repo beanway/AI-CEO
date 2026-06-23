@@ -45,6 +45,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("project-status", help="專案狀態摘要")
     p_ps = sub.add_parser("add-project-skill", help="啟用專案 project_skills")
     p_ps.add_argument("skill_id")
+    p_git = sub.add_parser("project-git", help="在 active 專案沙盒執行 git")
+    p_git.add_argument("git_argv", nargs=argparse.REMAINDER, help="git 子命令與參數")
 
     args = parser.parse_args(argv)
 
@@ -81,6 +83,14 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_project_status()
     if args.command == "add-project-skill":
         return cli_inbound.run_add_project_skill(args.skill_id)
+    if args.command == "project-git":
+        argv = args.git_argv
+        if argv and argv[0] == "--":
+            argv = argv[1:]
+        if not argv:
+            print("用法：project-git -- <git 子命令...>", file=sys.stderr)
+            return 1
+        return cli_inbound.run_project_git(argv)
     return 1
 
 

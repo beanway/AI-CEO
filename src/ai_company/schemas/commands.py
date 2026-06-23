@@ -24,6 +24,7 @@ class CommandType(str, Enum):
     SETUP_WORKERS = "setup_workers"
     ADD_SKILL_TO_PROJECT = "add_skill_to_project"
     SHOW_PROJECT_STATUS = "show_project_status"
+    PROJECT_GIT = "project_git"
 
 
 class Channel(str, Enum):
@@ -125,6 +126,12 @@ class ShowProjectStatusCommand(BaseCommand):
     project_id: str | None = None
 
 
+class ProjectGitCommand(BaseCommand):
+    command_type: Literal[CommandType.PROJECT_GIT] = CommandType.PROJECT_GIT
+    git_argv: list[str] = Field(min_length=1)
+    project_id: str | None = None
+
+
 Command = (
     InitWorkspaceCommand
     | ListProjectsCommand
@@ -139,4 +146,5 @@ Command = (
     | SetupWorkersCommand
     | AddSkillToProjectCommand
     | ShowProjectStatusCommand
+    | ProjectGitCommand
 )
