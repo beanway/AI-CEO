@@ -88,10 +88,43 @@ class ProjectSkillsFile(BaseModel):
     enabled_skill_ids: list[str] = Field(default_factory=list)
 
 
+class ApprovalKind(str, Enum):
+    PROJECT_GIT = "project_git"
+    ADD_SKILL_TO_PROJECT = "add_skill_to_project"
+
+
+class ApprovalStatus(str, Enum):
+    PENDING = "pending"
+    REJECTED = "rejected"
+    COMPLETED = "completed"
+
+
+class PendingApprovalRecord(BaseModel):
+    id: str = Field(min_length=1)
+    kind: ApprovalKind
+    project_id: str = Field(min_length=1)
+    status: ApprovalStatus = ApprovalStatus.PENDING
+    created_at: datetime = Field(default_factory=utc_now)
+    channel: str = "cli"
+    requester_telegram_id: int | None = None
+    git_argv: list[str] | None = None
+    skill_id: str | None = None
+
+
+class PendingApprovalsFile(BaseModel):
+    items: dict[str, PendingApprovalRecord] = Field(default_factory=dict)
+
+
 __all__ = [
+    "ApprovalKind",
+    "ApprovalStatus",
     "GlobalConfigFile",
     "GlobalSkillsFile",
     "NotificationPolicy",
+    "PendingApprovalRecord",
+    "PendingApprovalsFile",
+    "ApprovalKind",
+    "ApprovalStatus",
     "ProjectRecord",
     "ProjectSkillsFile",
     "ProjectsFile",

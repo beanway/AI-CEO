@@ -6,11 +6,15 @@ from pathlib import Path
 
 import yaml
 
+import secrets
+
 from ai_company.schemas.workspace_paths import project_dir
 from ai_company.modules.file_store.internal.store import FileStore
 from ai_company.schemas.documents import (
     GlobalConfigFile,
     GlobalSkillsFile,
+    PendingApprovalRecord,
+    PendingApprovalsFile,
     ProjectRecord,
     ProjectSkillsFile,
     ProjectsFile,
@@ -232,3 +236,41 @@ def resolve_project_id(workspace_root: Path, project_id: str | None) -> str:
     if active is None:
         raise ValueError("尚無 active 專案，請先 /switch 或 /newproject。")
     return active.id
+
+
+def load_pending_approvals(workspace_root: Path) -> PendingApprovalsFile:
+    return _store(workspace_root).load_pending_approvals()
+
+
+def save_pending_approvals(workspace_root: Path, data: PendingApprovalsFile) -> None:
+    _store(workspace_root).save_pending_approvals(data)
+
+
+def create_pending_approval(
+    workspace_root: Path,
+    *,
+    record: PendingApprovalRecord,
+) -> PendingApprovalRecord:
+    store = _store(workspace_root)
+    data = store.load_pending_approvals()
+    approval_id = secrets.token_hex(4)
+    while approval_id in data.items:
+        approval_id = secrets.token_hex(4)
+    stored = record.model_copy(update={"id": approval_id})
+    data.items[approval_id] = stored
+    store.save_pending_approvals(data)
+    return stored
+
+
+def get_pending_approval(
+    workspace_root: Path, approval_id: str
+) -> PendingApprovalRecord | None:
+    return load_pending_approvals(workspace_root).items.get(approval_id)
+
+
+def update_pending_approval(
+    workspace_root: Path, record: PendingApprovalRecord
+) -> None:
+    data = load_pending_approvals(workspace_root)
+    data.items[record.id] = record
+    save_pending_approvals(workspace_root, data)

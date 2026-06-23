@@ -8,6 +8,7 @@ from pathlib import Path
 
 from ai_company.modules.sandbox_runner.internal.tool_policy import (
     ToolPolicyError,
+    is_high_risk_git,
     project_sandbox_root,
     validate_git_argv,
 )
@@ -41,4 +42,4 @@ def run_git_in_project_sandbox(
     )
 
 
-__all__ = ["GitRunResult", "ToolPolicyError", "run_git_in_project_sandbox"]
+__all__ = ["GitRunResult", "ToolPolicyError", "is_high_risk_git", "run_git_in_project_sandbox"]

@@ -57,6 +57,7 @@ class SetupWorkersResult(FlowResult):
 class AddSkillToProjectResult(FlowResult):
     project_id: str | None = None
     skill_id: str | None = None
+    approval_id: str | None = None
 
 
 class ShowProjectStatusResult(FlowResult):
@@ -68,3 +69,10 @@ class ProjectGitResult(FlowResult):
     exit_code: int | None = None
     stdout: str | None = None
     stderr: str | None = None
+    approval_id: str | None = None
+
+
+class ResolveApprovalResult(FlowResult):
+    approval_id: str | None = None
+    approved: bool | None = None
+    exit_code: int | None = None

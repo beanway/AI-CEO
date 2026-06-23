@@ -25,6 +25,7 @@ class CommandType(str, Enum):
     ADD_SKILL_TO_PROJECT = "add_skill_to_project"
     SHOW_PROJECT_STATUS = "show_project_status"
     PROJECT_GIT = "project_git"
+    RESOLVE_APPROVAL = "resolve_approval"
 
 
 class Channel(str, Enum):
@@ -119,6 +120,7 @@ class AddSkillToProjectCommand(BaseCommand):
     command_type: Literal[CommandType.ADD_SKILL_TO_PROJECT] = CommandType.ADD_SKILL_TO_PROJECT
     skill_id: str = Field(min_length=1)
     project_id: str | None = None
+    telegram_user_id: int | None = None
 
 
 class ShowProjectStatusCommand(BaseCommand):
@@ -130,6 +132,14 @@ class ProjectGitCommand(BaseCommand):
     command_type: Literal[CommandType.PROJECT_GIT] = CommandType.PROJECT_GIT
     git_argv: list[str] = Field(min_length=1)
     project_id: str | None = None
+    telegram_user_id: int | None = None
+
+
+class ResolveApprovalCommand(BaseCommand):
+    command_type: Literal[CommandType.RESOLVE_APPROVAL] = CommandType.RESOLVE_APPROVAL
+    approval_id: str = Field(min_length=1)
+    approved: bool
+    telegram_user_id: int | None = None
 
 
 Command = (
@@ -147,4 +157,5 @@ Command = (
     | AddSkillToProjectCommand
     | ShowProjectStatusCommand
     | ProjectGitCommand
+    | ResolveApprovalCommand
 )

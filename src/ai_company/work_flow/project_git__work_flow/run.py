@@ -1,8 +1,14 @@
 from __future__ import annotations
 
 from ai_company.app_deps import AppDeps
-from ai_company.modules.sandbox_runner.core import ToolPolicyError, run_git_in_project_sandbox
-from ai_company.schemas.commands import BaseCommand, CommandType, ProjectGitCommand
+from ai_company.modules.file_store import core as file_store
+from ai_company.modules.sandbox_runner.core import (
+    ToolPolicyError,
+    is_high_risk_git,
+    run_git_in_project_sandbox,
+)
+from ai_company.schemas.commands import BaseCommand, Channel, CommandType, ProjectGitCommand
+from ai_company.schemas.documents import ApprovalKind, PendingApprovalRecord
 from ai_company.schemas.results import ProjectGitResult
 from ai_company.work_flow._shared.pm_project import require_active_project_id
 from ai_company.work_flow.registry import WorkFlowRegistry
@@ -15,6 +21,25 @@ def run(command: BaseCommand, deps: AppDeps) -> ProjectGitResult:
         project_id = require_active_project_id(deps.workspace_root, command.project_id)
     except ValueError as exc:
         return ProjectGitResult(success=False, message=str(exc), error_code="no_project")
+    if command.channel == Channel.TELEGRAM and is_high_risk_git(command.git_argv):
+        record = file_store.create_pending_approval(
+            deps.workspace_root,
+            record=PendingApprovalRecord(
+                id="_",
+                kind=ApprovalKind.PROJECT_GIT,
+                project_id=project_id,
+                channel=command.channel.value,
+                git_argv=list(command.git_argv),
+                requester_telegram_id=command.telegram_user_id,
+            ),
+        )
+        return ProjectGitResult(
+            success=False,
+            message=f"高風險 Git 待核准（id={record.id}）",
+            error_code="approval_required",
+            project_id=project_id,
+            approval_id=record.id,
+        )
     try:
         outcome = run_git_in_project_sandbox(
             deps.workspace_root,

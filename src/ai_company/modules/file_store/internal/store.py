@@ -6,6 +6,8 @@ import yaml
 from ai_company.schemas.documents import (
     GlobalConfigFile,
     GlobalSkillsFile,
+    PendingApprovalRecord,
+    PendingApprovalsFile,
     ProjectsFile,
     SessionRecord,
     UserPrefsFile,
@@ -141,3 +143,15 @@ class FileStore:
 
     def write_text_file(self, path: Path, text: str) -> None:
         self._atomic_write(path, text)
+
+    def load_pending_approvals(self) -> PendingApprovalsFile:
+        path = self.company_dir / "pending_approvals.json"
+        if not path.exists():
+            return PendingApprovalsFile()
+        return PendingApprovalsFile.model_validate_json(path.read_text(encoding="utf-8"))
+
+    def save_pending_approvals(self, data: PendingApprovalsFile) -> None:
+        self._atomic_write(
+            self.company_dir / "pending_approvals.json",
+            data.model_dump_json(indent=2),
+        )
