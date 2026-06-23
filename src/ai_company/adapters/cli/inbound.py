@@ -22,6 +22,7 @@ from ai_company.schemas.commands import (
     ShowGlobalConfigCommand,
     ShowProjectStatusCommand,
     SwitchProjectCommand,
+    PmRepairCommand,
     ProjectGitCommand,
 )
 from ai_company.schemas.documents import UserMode
@@ -219,6 +220,19 @@ def run_project_git(git_argv: list[str]) -> int:
     deps = AppDeps(settings=get_settings())
     result = dispatch(
         ProjectGitCommand(channel=Channel.CLI, git_argv=git_argv),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_pm_repair(*, interrupt: bool) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        PmRepairCommand(channel=Channel.CLI, interrupt=interrupt),
         deps,
     )
     if not result.success:

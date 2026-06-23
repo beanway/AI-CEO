@@ -65,7 +65,7 @@
 |------|------|
 | 架構 **A0**、**A1** | 完成 |
 | **P-A1** CEO 全公司（§六 步驟 1–5） | 完成 |
-| `work_flow` 已註冊 **13** 條 `run.py` flow | 完成 |
+| `work_flow` 已註冊 **16** 條 `run.py` flow | 完成 |
 | `modules`：`file_store`、`setup_workspace`、`setup_project_folders`、`format_messages`、`ai_core`、`settings`、`skill_registry` | 完成（CEO／全公司路徑） |
 | `adapters/telegram`、`adapters/cli` → `dispatch` | 完成 |
 | 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
@@ -73,15 +73,15 @@
 | CLI：對等子命令 + PM（`mode`、`pm-chat`、`setup-workers`、`project-status` 等） | 完成 |
 | **P-A2** PM 建局（mode 路由、`pm_chat`、`workers.yaml`、`project_skills`、狀態 flow） | **完成** |
 | **架構收斂**（§十五）：`setup_workspace`↔`file_store`、`on_text` 直讀 mode | **待做** |
-| **P-A3** Git／維修／TG 核准；**B** 執行層（`execution_store` 實作） | 未做 |
+| **P-A3** Git／維修／TG 核准 | **完成** |
+| **B** 執行層（`execution_store` 佇列 API、`task_scheduler`） | 未做 |
 
 **§三 未完成項（為何／何時）**
 
 | 項目 | 為何未做 | 何時可做 |
 |------|----------|----------|
-| **架構收斂**（§十五 #1–2） | P-A2 先交付產品；`on_text` 直讀 mode、`setup_workspace`↔`file_store` 為過渡取捨 | **P-A3 前**或與 P-A3 第一個 flow 同 PR（§十五 表） |
-| **P-A3** | 需 ToolPolicy、沙盒 Git、TG Inline 核准設計 | P-A2 完成後 **§八** 依序 |
-| **B 執行層** | 依賴 PM 編制與（建議）P-A3 邊界；`execution_store` 現為空殼 | **§九**；可與 P-A3 並行，Git 路徑需時優先 `sandbox_runner` |
+| **架構收斂**（§十五 #1–2） | P-A2 先交付產品；`on_text` 直讀 mode、`setup_workspace`↔`file_store` 為過渡取捨 | **Phase B 前**小步 PR（§十五 表） |
+| **B 執行層** | P-A3 已交付 Git／核准／維修；佇列與排程仍待 **§九** | **§九** |
 
 ---
 
@@ -165,7 +165,7 @@
 | 2 | 高風險 Git / skill 安裝 → **TG Inline 核准** | 未核准不執行 |
 | 3 | 維修 flow 與（未來）execution 狀態協同 | 可先手動中斷 |
 
-- [ ] 步驟 1–3
+- [x] 步驟 1–3
 
 ---
 

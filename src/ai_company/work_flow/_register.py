@@ -10,6 +10,7 @@ from ai_company.work_flow.ceo_chat__work_flow.run import register as register_ce
 from ai_company.work_flow.create_project__work_flow.run import register as register_create_project
 from ai_company.work_flow.init_workspace__work_flow.run import register as register_init_workspace
 from ai_company.work_flow.list_projects__work_flow.run import register as register_list_projects
+from ai_company.work_flow.pm_repair__work_flow.run import register as register_pm_repair
 from ai_company.work_flow.pm_chat__work_flow.run import register as register_pm_chat
 from ai_company.work_flow.project_git__work_flow.run import register as register_project_git
 from ai_company.work_flow.resolve_approval__work_flow.run import (
@@ -39,6 +40,7 @@ register_add_skill_to_company(registry)
 register_update_global_config(registry)
 register_set_user_mode(registry)
 register_pm_chat(registry)
+register_pm_repair(registry)
 register_project_git(registry)
 register_resolve_approval(registry)
 register_setup_workers(registry)

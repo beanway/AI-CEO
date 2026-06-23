@@ -47,6 +47,12 @@ def main(argv: list[str] | None = None) -> int:
     p_ps.add_argument("skill_id")
     p_git = sub.add_parser("project-git", help="在 active 專案沙盒執行 git")
     p_git.add_argument("git_argv", nargs=argparse.REMAINDER, help="git 子命令與參數")
+    p_repair = sub.add_parser("pm-repair", help="PM 維修摘要（可加 --interrupt）")
+    p_repair.add_argument(
+        "--interrupt",
+        action="store_true",
+        help="手動中斷進行中的 execution 狀態",
+    )
 
     args = parser.parse_args(argv)
 
@@ -91,6 +97,8 @@ def main(argv: list[str] | None = None) -> int:
             print("用法：project-git -- <git 子命令...>", file=sys.stderr)
             return 1
         return cli_inbound.run_project_git(argv)
+    if args.command == "pm-repair":
+        return cli_inbound.run_pm_repair(interrupt=args.interrupt)
     return 1
 
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, Field
 
 
 class FlowResult(BaseModel):
@@ -76,3 +76,9 @@ class ResolveApprovalResult(FlowResult):
     approval_id: str | None = None
     approved: bool | None = None
     exit_code: int | None = None
+
+
+class PmRepairResult(FlowResult):
+    project_id: str | None = None
+    running_execution_count: int | None = None
+    interrupted_execution_ids: list[str] = Field(default_factory=list)

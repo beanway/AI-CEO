@@ -16,6 +16,7 @@ from ai_company.schemas.commands import (
     CreateProjectCommand,
     ListProjectsCommand,
     PmChatCommand,
+    PmRepairCommand,
     ProjectGitCommand,
     ResolveApprovalCommand,
     SetUserModeCommand,
@@ -34,7 +35,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "[管理者 Bot · 帳號 A]\n"
         "AI 虛擬公司已連線。\n"
         "指令：/projects、/switch <id>、/newproject <名稱>、/addskill <id>；"
-        "/mode ceo|pm、/status、/setupworkers five|three、/addprojectskill <id>、/git <子命令…>；"
+        "/mode ceo|pm、/status、/repair [interrupt]、/setupworkers five|three、/addprojectskill <id>、/git <子命令…>；"
         "其餘文字依模式由 CEO 或 PM（Gemini）回覆。"
     )
 
@@ -160,6 +161,19 @@ async def cmd_addprojectskill(update: Update, context: ContextTypes.DEFAULT_TYPE
     await reply_with_optional_approval(update, result)
 
 
+async def cmd_repair(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    interrupt = bool(context.args and context.args[0].lower() == "interrupt")
+    deps = AppDeps(settings=settings)
+    result = dispatch(
+        PmRepairCommand(channel=Channel.TELEGRAM, interrupt=interrupt),
+        deps,
+    )
+    await update.message.reply_text(result.message)
+
+
 async def cmd_git(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     settings: Settings = context.application.bot_data["settings"]
     if not await gate_message(update, settings):
@@ -242,6 +256,7 @@ def register_manager_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("switch", cmd_switch))
     app.add_handler(CommandHandler("mode", cmd_mode))
     app.add_handler(CommandHandler("status", cmd_status))
+    app.add_handler(CommandHandler("repair", cmd_repair))
     app.add_handler(CommandHandler("setupworkers", cmd_setupworkers))
     app.add_handler(CommandHandler("addprojectskill", cmd_addprojectskill))
     app.add_handler(CommandHandler("git", cmd_git))

@@ -115,9 +115,28 @@ class PendingApprovalsFile(BaseModel):
     items: dict[str, PendingApprovalRecord] = Field(default_factory=dict)
 
 
+class ExecutionStatus(str, Enum):
+    RUNNING = "running"
+    DONE = "done"
+    FAILED = "failed"
+    INTERRUPTED = "interrupted"
+
+
+class ExecutionStateFile(BaseModel):
+    """Phase B 執行狀態檔（P-A3 維修 flow 可讀寫中斷）。"""
+
+    execution_id: str = Field(min_length=1)
+    project_id: str = Field(min_length=1)
+    worker_id: str | None = None
+    status: ExecutionStatus = ExecutionStatus.RUNNING
+    updated_at: datetime = Field(default_factory=utc_now)
+
+
 __all__ = [
     "ApprovalKind",
     "ApprovalStatus",
+    "ExecutionStateFile",
+    "ExecutionStatus",
     "GlobalConfigFile",
     "GlobalSkillsFile",
     "NotificationPolicy",

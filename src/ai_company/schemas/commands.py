@@ -26,6 +26,7 @@ class CommandType(str, Enum):
     SHOW_PROJECT_STATUS = "show_project_status"
     PROJECT_GIT = "project_git"
     RESOLVE_APPROVAL = "resolve_approval"
+    PM_REPAIR = "pm_repair"
 
 
 class Channel(str, Enum):
@@ -142,6 +143,12 @@ class ResolveApprovalCommand(BaseCommand):
     telegram_user_id: int | None = None
 
 
+class PmRepairCommand(BaseCommand):
+    command_type: Literal[CommandType.PM_REPAIR] = CommandType.PM_REPAIR
+    project_id: str | None = None
+    interrupt: bool = False
+
+
 Command = (
     InitWorkspaceCommand
     | ListProjectsCommand
@@ -158,4 +165,5 @@ Command = (
     | ShowProjectStatusCommand
     | ProjectGitCommand
     | ResolveApprovalCommand
+    | PmRepairCommand
 )
