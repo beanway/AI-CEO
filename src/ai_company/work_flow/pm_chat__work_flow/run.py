@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from ai_company.app_deps import AppDeps
-from ai_company.models.company import SessionRecord, utc_now
+from ai_company.schemas.documents import SessionRecord, utc_now
 from ai_company.modules.ai_core import core as ai_core
 from ai_company.modules.file_store import core as file_store
 from ai_company.modules.settings import core as app_settings

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ai_company.models.company import ProjectsFile
+from ai_company.schemas.documents import ProjectsFile
 
 
 def format_projects_message(pf: ProjectsFile) -> str:

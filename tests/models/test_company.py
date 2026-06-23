@@ -1,4 +1,4 @@
-from ai_company.models.company import (
+from ai_company.schemas.documents import (
     GlobalConfigFile,
     GlobalSkillsFile,
     ProjectRecord,
