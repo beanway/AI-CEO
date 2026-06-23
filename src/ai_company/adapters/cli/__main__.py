@@ -16,6 +16,8 @@ def main(argv: list[str] | None = None) -> int:
     p_switch = sub.add_parser("switch", help="設定 active 專案（等同 /switch）")
     p_switch.add_argument("project_id", help="專案 id")
     sub.add_parser("global", help="顯示 global_skills / global_config")
+    p_chat = sub.add_parser("ceo-chat", help="CEO 對話一則（等同 TG 文字訊息）")
+    p_chat.add_argument("text", help="使用者訊息")
 
     args = parser.parse_args(argv)
 
@@ -29,6 +31,8 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_switch(args.project_id)
     if args.command == "global":
         return cli_inbound.run_global()
+    if args.command == "ceo-chat":
+        return cli_inbound.run_ceo_chat(args.text)
     return 1
 
 

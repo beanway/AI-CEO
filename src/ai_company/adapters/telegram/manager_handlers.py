@@ -5,9 +5,9 @@ from ai_company.adapters.dispatch import dispatch
 from ai_company.adapters.telegram.gate import gate_message
 from ai_company.app_deps import AppDeps
 from ai_company.config import Settings
-from ai_company.modules.file_store import core as file_store
 from ai_company.schemas.commands import (
     Channel,
+    CeoChatCommand,
     CreateProjectCommand,
     ListProjectsCommand,
     SwitchProjectCommand,
@@ -21,7 +21,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "[管理者 Bot · 帳號 A]\n"
         "AI 虛擬公司已連線。\n"
-        "指令：/projects 列出專案、/switch <id> 切換 active 專案、/newproject <名稱> 建專案殼。"
+        "指令：/projects、/switch <id>、/newproject <名稱>；其餘文字由 CEO（Gemini）回覆。"
     )
 
 
@@ -73,14 +73,15 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not await gate_message(update, settings):
         return
     deps = AppDeps(settings=settings)
-    active = file_store.get_active_project(deps.workspace_root)
-    active_line = (
-        f"active={active.id}（{active.name}）" if active else "active=（無）"
+    result = dispatch(
+        CeoChatCommand(channel=Channel.TELEGRAM, text=update.message.text),
+        deps,
     )
-    await update.message.reply_text(
-        f"[管理者] 已收到訊息。{active_line}\n"
-        "（CEO Session 將於後續階段接上 Gemini。）"
-    )
+    if not result.success:
+        await update.message.reply_text(result.message)
+        return
+    reply = getattr(result, "reply", None) or result.message
+    await update.message.reply_text(reply)
 
 
 def register_manager_handlers(app: Application) -> None:

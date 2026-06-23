@@ -9,6 +9,7 @@ from ai_company.adapters.dispatch import dispatch
 from ai_company.config import get_settings
 from ai_company.schemas.commands import (
     Channel,
+    CeoChatCommand,
     CreateProjectCommand,
     InitWorkspaceCommand,
     ListProjectsCommand,
@@ -66,3 +67,14 @@ def run_global() -> int:
     result = dispatch(ShowGlobalConfigCommand(channel=Channel.CLI), deps)
     print(result.message)
     return 0 if result.success else 1
+
+
+def run_ceo_chat(text: str) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(CeoChatCommand(channel=Channel.CLI, text=text), deps)
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    reply = getattr(result, "reply", None) or result.message
+    print(reply)
+    return 0

@@ -9,7 +9,7 @@
 | [`setup_workspace`](setup_workspace/README.md) | 工作區根目錄建立 | 已建立 |
 | [`setup_project_folders`](setup_project_folders/README.md) | 專案資料夾建立 | 已建立 |
 | [`format_messages`](format_messages/README.md) | 回覆排版 | 已建立 |
-| `ai_core` | AI 供應商與對話 | Phase B+ |
+| `ai_core` | AI 供應商與對話 | Phase A（CEO chat） |
 | `execution_store` | 執行狀態持久化 | Phase B |
 | `sandbox_runner` | 沙盒指令執行 | Phase B |
 | `notify` | 出站通知 | Phase B |

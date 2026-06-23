@@ -26,6 +26,8 @@
 | `init_workspace` | [`init_workspace__work_flow`](init_workspace__work_flow/README.md) | 建立工作區根與預設索引檔 |
 | `list_projects` | [`list_projects__work_flow`](list_projects__work_flow/README.md) | 列出專案與 active |
 | `switch_project` | [`switch_project__work_flow`](switch_project__work_flow/README.md) | 切換 active 專案 |
+| `create_project` | [`create_project__work_flow`](create_project__work_flow/README.md) | CEO 建專案殼 |
+| `ceo_chat` | [`ceo_chat__work_flow`](ceo_chat__work_flow/README.md) | CEO 對話（Gemini／Fake） |
 | `show_global_config` | [`show_global_config__work_flow`](show_global_config__work_flow/README.md) | 顯示 global_skills / global_config |
 
 新增流程：新增目錄 + `run.py` → 在 `_register.py` 呼叫其 `register(registry)`。

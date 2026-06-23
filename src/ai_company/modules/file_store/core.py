@@ -152,3 +152,13 @@ def get_user_mode(workspace_root: Path, tg_user_id: int) -> UserMode:
     if pref is None:
         return UserMode.CEO
     return pref.mode
+
+
+def load_ceo_session(workspace_root: Path) -> SessionRecord | None:
+    store = _store(workspace_root)
+    return store.load_session(store.session_path("ceo"))
+
+
+def save_ceo_session(workspace_root: Path, record: SessionRecord) -> None:
+    store = _store(workspace_root)
+    store.save_session(store.session_path("ceo"), record)

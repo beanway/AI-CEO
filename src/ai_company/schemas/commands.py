@@ -13,6 +13,7 @@ class CommandType(str, Enum):
     LIST_PROJECTS = "list_projects"
     SWITCH_PROJECT = "switch_project"
     CREATE_PROJECT = "create_project"
+    CEO_CHAT = "ceo_chat"
     SHOW_GLOBAL_CONFIG = "show_global_config"
 
 
@@ -46,6 +47,11 @@ class CreateProjectCommand(BaseCommand):
     initial_requirements: str | None = None
 
 
+class CeoChatCommand(BaseCommand):
+    command_type: Literal[CommandType.CEO_CHAT] = CommandType.CEO_CHAT
+    text: str = Field(min_length=1)
+
+
 class ShowGlobalConfigCommand(BaseCommand):
     command_type: Literal[CommandType.SHOW_GLOBAL_CONFIG] = CommandType.SHOW_GLOBAL_CONFIG
 
@@ -55,5 +61,6 @@ Command = (
     | ListProjectsCommand
     | SwitchProjectCommand
     | CreateProjectCommand
+    | CeoChatCommand
     | ShowGlobalConfigCommand
 )

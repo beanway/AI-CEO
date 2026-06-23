@@ -7,7 +7,8 @@ def test_registry_lists_phase_a_flows():
     assert "list_projects__work_flow" in ids
     assert "switch_project__work_flow" in ids
     assert "create_project__work_flow" in ids
-    assert len(flows) >= 5
+    assert "ceo_chat__work_flow" in ids
+    assert len(flows) >= 6
 
 
 def test_dispatch_list_projects(tmp_path):

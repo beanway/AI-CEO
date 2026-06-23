@@ -1,5 +1,6 @@
 """Register all *__work_flow packages via each flow's run.py."""
 
+from ai_company.work_flow.ceo_chat__work_flow.run import register as register_ceo_chat
 from ai_company.work_flow.create_project__work_flow.run import register as register_create_project
 from ai_company.work_flow.init_workspace__work_flow.run import register as register_init_workspace
 from ai_company.work_flow.list_projects__work_flow.run import register as register_list_projects
@@ -12,6 +13,7 @@ from ai_company.work_flow.registry import registry
 register_init_workspace(registry)
 register_list_projects(registry)
 register_create_project(registry)
+register_ceo_chat(registry)
 register_switch_project(registry)
 register_show_global_config(registry)
 

@@ -54,12 +54,12 @@
 
 | 項目 | 狀態 |
 |------|------|
-| `work_flow` + 五條 `run.py` flow | 完成 |
+| `work_flow` + 六條 `run.py` flow | 完成 |
 | `modules/file_store`、`setup_workspace`、`setup_project_folders`、`format_messages` | 完成 |
 | `adapters/telegram`、`adapters/cli` | 完成 |
 | 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
 | TG `/projects`、`/switch`、`/newproject`；CLI；`on_text` 讀 active | 經 dispatch / `file_store` |
-| CEO Gemini、PM、執行層 | 未做 |
+| CEO Gemini（`ceo_chat`）、PM、執行層 | PM／執行層未做 |
 
 ---
 
@@ -101,7 +101,8 @@
 
 - [x] 步驟 1（列表／切換／global 展示）
 - [x] 步驟 2（建專案殼）
-- [ ] 步驟 3–5
+- [x] 步驟 3（CEO Session + `ceo_chat__work_flow`）
+- [ ] 步驟 4–5
 
 ---
 

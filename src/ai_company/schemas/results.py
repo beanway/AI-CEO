@@ -25,5 +25,9 @@ class CreateProjectResult(FlowResult):
     project_id: str | None = None
 
 
+class CeoChatResult(FlowResult):
+    reply: str | None = None
+
+
 class ShowGlobalConfigResult(FlowResult):
     pass
