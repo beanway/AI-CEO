@@ -30,6 +30,13 @@
 
 過渡期：`manager_handlers.on_text` 可暫用 **`file_store.get_user_mode`** 決定 CEO／PM chat（見 §十五）；新指令仍須 `dispatch` + flow。
 
+**§一 與現況（未當成 Phase 勾選，但常漏）**
+
+| 缺口 | 為何未做 | 何時可做 |
+|------|----------|----------|
+| 步驟 5：`adapters/README.md` 路由表未列齊 TG／CLI | 產品迭代快於文件；不擋 dispatch | 下一個改 adapter 或補 TG 指令的 PR 順手更新 |
+| 步驟 8：`harness-design` §10 核取未回寫 | §十四 約定 **以本檔為執行勾選** | 需要對外簽收 Phase A 時回寫，或維持單一真相在本檔 |
+
 ---
 
 ## 二、雙軌階段對照
@@ -47,6 +54,8 @@
 | 6 | — | **B+** Skill 生態 | B 骨架 |
 | 7 | 網頁 adapter | **C** QA 閉環 | B |
 | 8 | — | **二期** COO、評分、Web 產品化 | C |
+
+**§二 尚未進行的列（順序 4–8）**：依賴 P-A2 殼局與（部分）執行層；**刻意排在 P-A1／P-A2 之後**，避免在無沙盒／無 ToolPolicy 時先做 Git 或排程。對照 §八–§十二 勾選項。
 
 ---
 
@@ -66,6 +75,14 @@
 | **架構收斂**（§十五）：`setup_workspace`↔`file_store`、`on_text` 直讀 mode | **待做** |
 | **P-A3** Git／維修／TG 核准；**B** 執行層（`execution_store` 實作） | 未做 |
 
+**§三 未完成項（為何／何時）**
+
+| 項目 | 為何未做 | 何時可做 |
+|------|----------|----------|
+| **架構收斂**（§十五 #1–2） | P-A2 先交付產品；`on_text` 直讀 mode、`setup_workspace`↔`file_store` 為過渡取捨 | **P-A3 前**或與 P-A3 第一個 flow 同 PR（§十五 表） |
+| **P-A3** | 需 ToolPolicy、沙盒 Git、TG Inline 核准設計 | P-A2 完成後 **§八** 依序 |
+| **B 執行層** | 依賴 PM 編制與（建議）P-A3 邊界；`execution_store` 現為空殼 | **§九**；可與 P-A3 並行，Git 路徑需時優先 `sandbox_runner` |
+
 ---
 
 ## 四、架構 A0 — 分層骨架（已完成）
@@ -76,6 +93,8 @@
 - [x] 過渡期與 `telegram/` 路徑說明文件化
 
 **驗收**：`.venv/bin/pytest` 全綠；`./run.sh` / `main init-workspace` 與 list/switch/global 行為正常。
+
+**§四 未完成項**：無（步驟均已勾選）。文中「Phase A 四 flow」為 A0 當時表述；現以 §三 flow 總數為準，不另開架構票。
 
 ---
 
@@ -91,6 +110,8 @@
 | 6 | 刪除舊層；`ceo_cli` → `adapters/cli` | 無 `store/`、`services/` |
 
 - [x] 步驟 1–6
+
+**§五 未完成項**：無。模組遷移與舊層刪除已驗收；後續僅 §十五 #1 的 **模組依賴收斂**（不影響 A1 勾選語意）。
 
 ---
 
@@ -109,6 +130,16 @@
 - [x] 步驟 3（CEO Session + `ceo_chat__work_flow`）
 - [x] 步驟 4（`add_skill_to_company__work_flow`）
 - [x] 步驟 5（`update_global_config__work_flow` + AI 欄位）
+
+**§六 主幹已完成；下列為驗收欄／介面未齊（不推翻上列勾選）**
+
+| 缺口 | 為何未做 | 何時可做 |
+|------|----------|----------|
+| 步驟 1：TG 無 `/global`（global 展示僅 CLI `global`） | MVP 先打通 flow + CLI；列表／切換已在 TG | **P-A1 補齊**小 PR，或下一個動 TG 路由時加 `/global` |
+| 步驟 2：建專案 **回滾** 無專門 pytest | `create_project_shell` 已實作回滾；優先驗成功路徑 | 隨時補 **單元／整合測試**（不擋 Phase A 簽收） |
+| 步驟 4：**移除** 公司級 `global_skills` 無 flow | 規格允許 **手改 YAML**；新增 skill 已覆蓋主路徑 | 營運需要時加 `remove_skill_from_company__work_flow`，或併入 **B+** skill 管理 |
+| 步驟 5：TG 無 `update-global` | 模型／通知政策變更頻率低；CLI + flow 已接 `ai_core` | 同 **TG `/global` 補齊** PR，或維持 CLI／YAML |
+| §一 步驟 5：`adapters/README` 未列全 CEO 指令 | 見 §一 表 | 與 TG 補指令同一輪更新 |
 
 ---
 
