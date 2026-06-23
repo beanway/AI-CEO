@@ -39,8 +39,8 @@
 | 順序 | 架構軌 | 產品軌（Harness） | 依賴 |
 |------|--------|-------------------|------|
 | 0 | **A0** 分層骨架 | — | — |
-| 1 | **A1** 工具模組遷移 | **P-A1** CEO 列表／切換／global（已部分完成） | A0 |
-| 2 | — | **P-A1+** 建殼、CEO Session、global skill | A1 建議先完成 `file_store` |
+| 1 | **A1** 工具模組遷移 | **P-A1** CEO 全公司（§六 已完成） | A0 |
+| 2 | — | **P-A1+** 建殼、CEO Session、global skill | 已完成（併入 §六 2–5） |
 | 3 | — | **P-A2** PM 建局 | A1 |
 | 4 | — | **P-A3** PM Git／維修／TG 核准 | P-A2 |
 | 5 | `execution_store`、`sandbox_runner` | **B** 狀態機、scheduler、notify | P-A2 |
@@ -50,16 +50,20 @@
 
 ---
 
-## 三、現況快照（2026-06-22）
+## 三、現況快照（2026-06-23）
 
 | 項目 | 狀態 |
 |------|------|
-| `work_flow` + 六條 `run.py` flow | 完成 |
-| `modules/file_store`、`setup_workspace`、`setup_project_folders`、`format_messages` | 完成 |
-| `adapters/telegram`、`adapters/cli` | 完成 |
+| 架構 **A0**、**A1** | 完成 |
+| **P-A1** CEO 全公司（§六 步驟 1–5） | 完成 |
+| `work_flow` 已註冊 **8** 條 `run.py` flow | 完成 |
+| `modules`：`file_store`、`setup_workspace`、`setup_project_folders`、`format_messages`、`ai_core`、`settings`、`skill_registry` | 完成（CEO／全公司路徑） |
+| `adapters/telegram`、`adapters/cli` → `dispatch` | 完成 |
 | 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
-| TG `/projects`、`/switch`、`/newproject`；CLI；`on_text` 讀 active | 經 dispatch / `file_store` |
-| CEO Gemini（`ceo_chat`）、PM、執行層 | PM／執行層未做 |
+| TG：`/projects`、`/switch`、`/newproject`、`/addskill`；`on_text` → **`ceo_chat` only** | 完成 |
+| CLI：對等子命令 + `ceo-chat`、`update-global`、`global`、`add-skill` | 完成 |
+| **P-A2** PM 建局（mode 路由、`pm_chat`、`workers.yaml`、`project_skills`、狀態 flow） | **未做**（建殼僅預留 `sessions/pm_<id>.json`；`UserMode` 在 `file_store`，TG 未掛載） |
+| **P-A3** Git／維修／TG 核准；**B** 執行層 | 未做 |
 
 ---
 
