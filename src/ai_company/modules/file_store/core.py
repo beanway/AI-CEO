@@ -33,7 +33,11 @@ def ensure_company_dirs(workspace_root: Path) -> None:
 
 
 def ensure_company_index_files(workspace_root: Path) -> None:
-    _store(workspace_root).ensure_company_index_files()
+    from ai_company.modules.settings.core import default_global_config
+
+    _store(workspace_root).ensure_company_index_files(
+        initial_global_config=default_global_config(),
+    )
 
 
 def load_projects(workspace_root: Path) -> ProjectsFile:

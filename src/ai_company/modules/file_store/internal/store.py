@@ -33,7 +33,7 @@ class FileStore:
         (self.company_dir / "execution").mkdir(exist_ok=True)
         (self.company_dir / "metrics").mkdir(exist_ok=True)
 
-    def ensure_company_index_files(self) -> None:
+    def ensure_company_index_files(self, *, initial_global_config: GlobalConfigFile) -> None:
         projects_path = self.company_dir / "projects.json"
         if not projects_path.exists():
             self.save_projects(ProjectsFile())
@@ -44,9 +44,7 @@ class FileStore:
 
         config_path = self.company_dir / "global_config.yaml"
         if not config_path.exists():
-            from ai_company.modules.settings.core import default_global_config
-
-            self.save_global_config(default_global_config())
+            self.save_global_config(initial_global_config)
         else:
             self._upgrade_global_config_yaml_if_needed()
 
