@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from ai_company.app_deps import AppDeps
-from ai_company.modules.file_store import core as file_store
 from ai_company.schemas.commands import BaseCommand, CommandType, CreateProjectCommand
 from ai_company.schemas.results import CreateProjectResult
+from ai_company.work_flow._shared.create_project_shell import create_project_shell
 from ai_company.work_flow.registry import WorkFlowRegistry
 
 
@@ -18,8 +18,8 @@ def run(command: BaseCommand, deps: AppDeps) -> CreateProjectResult:
             error_code="invalid_name",
         )
     try:
-        rec = file_store.create_project(
-            deps.workspace_root,
+        rec = create_project_shell(
+            deps,
             name,
             initial_requirements=command.initial_requirements,
         )

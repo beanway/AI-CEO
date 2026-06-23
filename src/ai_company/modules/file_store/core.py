@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import secrets
-import shutil
 from pathlib import Path
 
 import yaml
 
+from ai_company.modules.file_store.internal.paths import project_dir
 from ai_company.modules.file_store.internal.store import FileStore
-from ai_company.modules.setup_project_folders.core import ensure_project_tree, project_dir
 from ai_company.schemas.documents import (
     GlobalConfigFile,
     GlobalSkillsFile,
@@ -94,54 +92,45 @@ def get_active_project(workspace_root: Path) -> ProjectRecord | None:
     return next((p for p in pf.projects if p.id == pf.active_project_id), None)
 
 
-def create_project(
-    workspace_root: Path,
-    name: str,
-    *,
-    initial_requirements: str | None = None,
-) -> ProjectRecord:
-    project_id = secrets.token_hex(4)
-    root = project_dir(workspace_root, project_id)
+def add_project_record(workspace_root: Path, record: ProjectRecord) -> str | None:
+    """新增專案索引；若尚無 active 則設為此專案。回傳先前的 active_project_id。"""
     store = _store(workspace_root)
-    session_path: Path | None = None
-    prev_active: str | None = None
-    projects_saved = False
-    try:
-        ensure_project_tree(root)
-        if initial_requirements is not None:
-            (root / "shared" / "requirements.md").write_text(
-                initial_requirements, encoding="utf-8"
-            )
-        pf = store.load_projects()
-        prev_active = pf.active_project_id
-        rec = ProjectRecord(id=project_id, name=name)
-        pf.projects.append(rec)
-        if pf.active_project_id is None:
-            pf.active_project_id = project_id
-        store.save_projects(pf)
-        projects_saved = True
-        session_path = store.session_path(project_id)
-        store.save_session(
-            session_path,
-            SessionRecord(gemini_chat_name="", project_id=project_id),
+    pf = store.load_projects()
+    prev_active = pf.active_project_id
+    pf.projects.append(record)
+    if pf.active_project_id is None:
+        pf.active_project_id = record.id
+    store.save_projects(pf)
+    return prev_active
+
+
+def revert_add_project(
+    workspace_root: Path, project_id: str, prev_active: str | None
+) -> None:
+    store = _store(workspace_root)
+    pf = store.load_projects()
+    pf.projects = [p for p in pf.projects if p.id != project_id]
+    if pf.active_project_id == project_id:
+        remaining = pf.projects
+        pf.active_project_id = (
+            prev_active
+            if prev_active and any(p.id == prev_active for p in remaining)
+            else (remaining[0].id if remaining else None)
         )
-        return rec
-    except Exception:
-        shutil.rmtree(root, ignore_errors=True)
-        if session_path is not None and session_path.exists():
-            session_path.unlink(missing_ok=True)
-        if projects_saved:
-            pf = store.load_projects()
-            pf.projects = [p for p in pf.projects if p.id != project_id]
-            if pf.active_project_id == project_id:
-                remaining = pf.projects
-                pf.active_project_id = (
-                    prev_active
-                    if prev_active and any(p.id == prev_active for p in remaining)
-                    else (remaining[0].id if remaining else None)
-                )
-            store.save_projects(pf)
-        raise
+    store.save_projects(pf)
+
+
+def init_pm_session(workspace_root: Path, project_id: str) -> None:
+    save_pm_session(
+        workspace_root,
+        project_id,
+        SessionRecord(gemini_chat_name="", project_id=project_id),
+    )
+
+
+def delete_pm_session(workspace_root: Path, project_id: str) -> None:
+    path = _store(workspace_root).session_path(project_id)
+    path.unlink(missing_ok=True)
 
 
 def set_user_mode(workspace_root: Path, tg_user_id: int, mode: UserMode) -> None:
