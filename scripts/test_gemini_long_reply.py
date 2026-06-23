@@ -127,7 +127,7 @@ def main() -> int:
     print(f"model: {args.model}")
     print(f"max_output_tokens: {args.max_output_tokens}")
     print(f"thinking_budget: {args.thinking_budget}")
-    print(f"api_key: {'GOOGLE_API_KEY' if os.environ.get('GOOGLE_API_KEY') else 'GEMINI_API_KEY'}（已載入）")
+    print(f"api_key_source: {load_settings().resolved_gemini_api_key_source() or '（無）'}")
     print()
 
     try:

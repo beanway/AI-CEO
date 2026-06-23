@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from ai_company.schemas.ai_generation import AiGenerationSettings
@@ -26,8 +26,14 @@ class AppSettings(BaseSettings):
     telegram_executor_bot_token: str = ""
     telegram_allowed_user_ids: str = ""
 
-    gemini_api_key: str = ""
-    google_api_key: str = ""
+    gemini_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices("GEMINI_API_KEY", "gemini_api_key"),
+    )
+    google_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices("GOOGLE_API_KEY", "google_api_key"),
+    )
 
     company_workspace_root: Path | None = None
 
@@ -38,9 +44,18 @@ class AppSettings(BaseSettings):
         return (Path(__file__).resolve().parents[4] / "company_workspace").resolve()
 
     def resolved_gemini_api_key(self) -> str:
+        """官網：GOOGLE_API_KEY 與 GEMINI_API_KEY 皆可；兩者皆有時 GOOGLE 優先。"""
         if self.google_api_key.strip():
             return self.google_api_key.strip()
         return self.gemini_api_key.strip()
+
+    def resolved_gemini_api_key_source(self) -> str | None:
+        """除錯用：回傳 'google' | 'gemini' | None（不暴露 key 內容）。"""
+        if self.google_api_key.strip():
+            return "google"
+        if self.gemini_api_key.strip():
+            return "gemini"
+        return None
 
     def allowed_user_ids(self) -> set[int]:
         if not self.telegram_allowed_user_ids.strip():

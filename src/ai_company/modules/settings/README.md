@@ -4,7 +4,9 @@
 
 ## 對外接口（`core.py`）
 
-- `load_settings()` → `AppSettings`（含 `resolved_gemini_api_key()`）
+- `load_settings()` → `AppSettings`
+- `resolved_gemini_api_key()`：官網順序 **GOOGLE_API_KEY** → **GEMINI_API_KEY**
+- `resolved_gemini_api_key_source()`：`'google' | 'gemini' | None`（不含 secret）
 - `resolve_model(global_config?)`、`resolve_ai_generation(global_config?)`
 
 ## 呼叫者
