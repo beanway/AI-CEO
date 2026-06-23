@@ -7,6 +7,7 @@
 - `CEO_SYSTEM_INSTRUCTION`：CEO 對話 system prompt
 - `resolve_model(settings, global_config?)`：優先 `global_config.default_model`
 - `get_chat_backend(settings)`：有 `GEMINI_API_KEY` 用 Gemini，否則 Fake
+- `build_generate_content_config`（`internal/generation_config.py`）：`max_output_tokens`、`thinking_budget=0` 等
 
 ## 呼叫者
 
