@@ -28,7 +28,7 @@
 | 7 | **測試**：flow 整合 + 模組單元 | `pytest` |
 | 8 | **文件**：`roadmap` 勾選、`document-audit` 若改契約則更新 | PR 自檢 |
 
-過渡期：`on_text` 可暫用 `file_store.get_active_project`，見 skill「過渡期例外」。
+過渡期：`manager_handlers.on_text` 可暫用 **`file_store.get_user_mode`** 決定 CEO／PM chat（見 §十五）；新指令仍須 `dispatch` + flow。
 
 ---
 
@@ -60,10 +60,11 @@
 | `modules`：`file_store`、`setup_workspace`、`setup_project_folders`、`format_messages`、`ai_core`、`settings`、`skill_registry` | 完成（CEO／全公司路徑） |
 | `adapters/telegram`、`adapters/cli` → `dispatch` | 完成 |
 | 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
-| TG：`/projects`、`/switch`、`/newproject`、`/addskill`；`on_text` → **`ceo_chat` only** | 完成 |
-| CLI：對等子命令 + `ceo-chat`、`update-global`、`global`、`add-skill` | 完成 |
+| TG：`/projects`、`/switch`、`/newproject`、`/addskill`、`/mode`、`/setupworkers`…；`on_text` 依 mode → **`ceo_chat` / `pm_chat`** | 完成 |
+| CLI：對等子命令 + PM（`mode`、`pm-chat`、`setup-workers`、`project-status` 等） | 完成 |
 | **P-A2** PM 建局（mode 路由、`pm_chat`、`workers.yaml`、`project_skills`、狀態 flow） | **完成** |
-| **P-A3** Git／維修／TG 核准；**B** 執行層 | 未做 |
+| **架構收斂**（§十五）：`setup_workspace`↔`file_store`、`on_text` 直讀 mode | **待做** |
+| **P-A3** Git／維修／TG 核准；**B** 執行層（`execution_store` 實作） | 未做 |
 
 ---
 
@@ -84,7 +85,7 @@
 |---|------|------|
 | 1 | `modules/file_store` | `tests/modules/test_file_store*.py` |
 | 2 | `modules/setup_workspace` | `init_workspace__work_flow` |
-| 3 | `modules/setup_project_folders` | 建專案 API 在 `file_store.core` |
+| 3 | `modules/setup_project_folders` | 建殼編排在 `create_project_shell`；專案 YAML 經 `file_store` |
 | 4 | flow 僅用 `modules.*.core` | 無 `legacy_services` |
 | 5 | `adapters/telegram/` | `router` 已切換 |
 | 6 | 刪除舊層；`ceo_cli` → `adapters/cli` | 無 `store/`、`services/` |
@@ -141,7 +142,7 @@
 
 | # | 步驟 | 模組／flow | 驗收 |
 |---|------|------------|------|
-| 1 | **`modules/execution_store`** ← `worker_state` + `execution/*.json` | 單一佇列 | 持久化可恢復 |
+| 1 | **`modules/execution_store`** ← `worker_state` + `execution/*.json` | 單一佇列 | 持久化可恢復（**core 空殼已有**，見 §十五） |
 | 2 | **`modules/sandbox_runner`** + ToolPolicy | scheduler / worker flow | cwd 限沙盒 |
 | 3 | **`task_scheduler`** Worker 排程 | 專案內 Worker 語意 | 下一 Worker 可派工 |
 | 4 | **`modules/notify`** + 執行者 Bot | 進度／失敗通知 | 與管理者 Bot 分離 |
@@ -196,3 +197,27 @@
 | Phase B（Harness 執行） | 第九節 B |
 
 完成各節勾選後，可回寫 harness-design §10 核取方塊或僅以本檔為準（避免雙處維護時建議 **以 roadmap 為執行勾選、harness 為規格**）。
+
+---
+
+## 十五、架構技術債與後續收斂（P-A2 之後）
+
+P-A2 與一輪架構收斂（建殼編排、`schemas/documents`、Phase B 模組空殼）已完成；下列項目 **刻意保留或尚未處理**，開發下一階段前請對照 [`src-layout.md`](design/src-layout.md) 依賴規則。
+
+| # | 項目 | 現狀 | 建議修改方向 | 建議時機 |
+|---|------|------|--------------|----------|
+| 1 | **`modules/setup_workspace` → `modules/file_store`** | `ensure_workspace` 內直接呼叫 `file_store.ensure_company_*` | 改由 **`init_workspace__work_flow`**／`router` 啟動路徑編排兩模組，或抽出共用的 **非 `core` 內部**路徑常數；避免模組互引 `core` | 架構小步（可與 A1 補票併做） |
+| 2 | **TG `on_text` 直讀 `file_store.get_user_mode`** | `adapters/telegram/manager_handlers` 未經 `dispatch` 即分支 CEO／PM chat | 新增 **`route_manager_chat__work_flow`**（或 `GetUserMode` + 內部分派），handler 只送 **單一 Command**；更新 `.cursor/skills/ai-ceo-framework` 過渡期說明 | P-A3 前或與 P-A3 第一個 flow 同 PR |
+| 3 | **`worker_state.py`** | 固定五角色佔位；已標廢止 | 刪除或遷移邏輯至 **`execution_store`** 實作 | **Phase B** §九 步驟 1 |
+| 4 | **Phase B 模組** | `execution_store`、`sandbox_runner`、`notify` 僅空殼 | 依 §九 實作佇列、ToolPolicy、執行者 Bot 通知 | **P-A3** 之後或與 P-A3 並行（Git 需 `sandbox_runner` 時優先） |
+
+**產品優先序（與上表可並行）**
+
+- **P-A3**：專案沙盒 Git、維修 flow、TG Inline 核准（§八）。
+- **Phase B**：`execution_store` 持久化與 `task_scheduler` 排程（§九）；與 harness §7 人機關卡銜接。
+
+**驗收（收斂項）**
+
+- `rg 'from ai_company.modules.file_store' src/ai_company/modules/setup_workspace` 無 `core` 互依，或已文件化例外並有 flow 編排。
+- `manager_handlers.on_text` 僅 `dispatch` 一條 chat 路由 Command。
+- `.venv/bin/pytest -q` 全綠。
