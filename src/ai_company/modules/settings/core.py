@@ -11,6 +11,19 @@ from ai_company.schemas.ai_generation import AiGenerationSettings
 from ai_company.schemas.documents import GlobalConfigFile
 
 DEFAULT_MODEL = "gemini-2.5-flash"
+DEFAULT_MAX_OUTPUT_TOKENS = 8192
+DEFAULT_THINKING_BUDGET = 0
+
+
+def default_global_config() -> GlobalConfigFile:
+    """新建或補齊 `global_config.yaml` 時使用的 CEO 預設。"""
+    return GlobalConfigFile(
+        default_model=DEFAULT_MODEL,
+        max_output_tokens=DEFAULT_MAX_OUTPUT_TOKENS,
+        thinking_budget=DEFAULT_THINKING_BUDGET,
+        include_thoughts=False,
+        temperature=None,
+    )
 
 
 class AppSettings(BaseSettings):
@@ -75,7 +88,11 @@ def resolve_model(global_config: GlobalConfigFile | None = None) -> str:
 
 def resolve_ai_generation(global_config: GlobalConfigFile | None = None) -> AiGenerationSettings:
     if global_config is None:
-        return AiGenerationSettings()
+        return AiGenerationSettings(
+            max_output_tokens=DEFAULT_MAX_OUTPUT_TOKENS,
+            thinking_budget=DEFAULT_THINKING_BUDGET,
+            include_thoughts=False,
+        )
     return AiGenerationSettings(
         max_output_tokens=global_config.max_output_tokens,
         thinking_budget=global_config.thinking_budget,

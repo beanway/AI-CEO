@@ -8,6 +8,7 @@
 - `resolved_gemini_api_key()`：官網順序 **GOOGLE_API_KEY** → **GEMINI_API_KEY**
 - `resolved_gemini_api_key_source()`：`'google' | 'gemini' | None`（不含 secret）
 - `resolve_model(global_config?)`、`resolve_ai_generation(global_config?)`
+- `default_global_config()`：`global_config.yaml` 預設內容（含 `max_output_tokens`、`thinking_budget`）
 
 ## 呼叫者
 

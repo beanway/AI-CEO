@@ -67,10 +67,17 @@ def test_resolve_ai_generation_defaults():
     assert gen.include_thoughts is False
 
 
-def test_global_config_file_ai_fields_defaults():
-    gc = GlobalConfigFile()
-    assert gc.max_output_tokens == 8192
-    assert gc.thinking_budget == 0
+def test_default_global_config_matches_settings():
+    from ai_company.modules.settings.core import (
+        DEFAULT_MAX_OUTPUT_TOKENS,
+        DEFAULT_THINKING_BUDGET,
+        default_global_config,
+    )
+
+    gc = default_global_config()
+    assert gc.max_output_tokens == DEFAULT_MAX_OUTPUT_TOKENS
+    assert gc.thinking_budget == DEFAULT_THINKING_BUDGET
+    assert gc.include_thoughts is False
 
 
 def test_load_settings_reads_dotenv_without_crash():

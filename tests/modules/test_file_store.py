@@ -33,11 +33,46 @@ def test_roundtrip_global_config(tmp_workspace):
     data = GlobalConfigFile(
         default_model="gemini-2.5-pro",
         notification_policy=NotificationPolicy.FAILURES_ONLY,
+        max_output_tokens=4096,
+        thinking_budget=0,
+        include_thoughts=False,
+        temperature=0.2,
     )
     file_store.save_global_config(tmp_workspace, data)
     loaded = file_store.load_global_config(tmp_workspace)
     assert loaded.default_model == "gemini-2.5-pro"
     assert loaded.notification_policy == NotificationPolicy.FAILURES_ONLY
+    assert loaded.max_output_tokens == 4096
+    assert loaded.thinking_budget == 0
+    assert loaded.temperature == 0.2
+
+
+def test_ensure_company_index_files_writes_ai_fields_to_yaml(tmp_workspace):
+    file_store.ensure_company_dirs(tmp_workspace)
+    file_store.ensure_company_index_files(tmp_workspace)
+
+    path = tmp_workspace / "_company" / "global_config.yaml"
+    text = path.read_text(encoding="utf-8")
+    assert "max_output_tokens:" in text
+    assert "thinking_budget:" in text
+    assert "include_thoughts:" in text
+    cfg = file_store.load_global_config(tmp_workspace)
+    assert cfg.max_output_tokens == 8192
+    assert cfg.thinking_budget == 0
+
+
+def test_upgrade_legacy_global_config_yaml(tmp_workspace):
+    file_store.ensure_company_dirs(tmp_workspace)
+    legacy = tmp_workspace / "_company" / "global_config.yaml"
+    legacy.parent.mkdir(parents=True, exist_ok=True)
+    legacy.write_text(
+        "default_model: gemini-2.5-flash\nnotification_policy: all\n",
+        encoding="utf-8",
+    )
+    file_store.ensure_company_index_files(tmp_workspace)
+    text = legacy.read_text(encoding="utf-8")
+    assert "max_output_tokens:" in text
+    assert "thinking_budget:" in text
 
 
 def test_ensure_company_index_files_creates_defaults(tmp_workspace):

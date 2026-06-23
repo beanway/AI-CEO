@@ -11,6 +11,11 @@ from ai_company.schemas.documents import (
     UserPrefsFile,
 )
 
+# 舊版 YAML 若缺下列鍵，載入後會回寫完整檔案
+_GLOBAL_CONFIG_PERSISTED_KEYS = frozenset(
+    {"max_output_tokens", "thinking_budget", "include_thoughts"}
+)
+
 COMPANY_DIR = "_company"
 SESSIONS_DIR = "sessions"
 PROJECTS_DIR = "projects"
@@ -39,7 +44,23 @@ class FileStore:
 
         config_path = self.company_dir / "global_config.yaml"
         if not config_path.exists():
-            self.save_global_config(GlobalConfigFile())
+            from ai_company.modules.settings.core import default_global_config
+
+            self.save_global_config(default_global_config())
+        else:
+            self._upgrade_global_config_yaml_if_needed()
+
+    def _upgrade_global_config_yaml_if_needed(self) -> None:
+        path = self.company_dir / "global_config.yaml"
+        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if raw is None:
+            raw = {}
+        if not isinstance(raw, dict):
+            raw = {}
+        if _GLOBAL_CONFIG_PERSISTED_KEYS.issubset(raw.keys()):
+            return
+        data = GlobalConfigFile.model_validate(raw)
+        self.save_global_config(data)
 
     def _atomic_write(self, path: Path, text: str) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
