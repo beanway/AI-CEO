@@ -14,9 +14,7 @@ AI Harness 框架程式（**非** `company_workspace` 沙盒產物）。
 | 檔案 | 說明 |
 |------|------|
 | `main.py` | `run` / `init-workspace` |
-| `ceo_cli.py` | 本機 CEO CLI（`run.sh`） |
+| `ceo_cli.py` | 轉發至 `python -m ai_company.adapters.cli` |
 | `router.py` | 雙 Telegram Bot |
 
-## 過渡期
-
-`services/`、`store/`、`models/` 仍可能存在；新程式請依 src-layout 放入 `modules/` 與 `work_flow/`。
+持久化模型過渡：`models/company.py`（逐步由 `schemas/documents.py` 對外宣告契約）。

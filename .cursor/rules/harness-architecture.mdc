@@ -20,4 +20,4 @@ alwaysApply: true
 
 改架構前先對照 `docs/document-audit.md`，避免與 Harness 設計衝突。
 
-**程式過渡期**（`services/`/`store/`、`telegram/` 路徑）：見 `docs/plans/phase-a-src-layout.md` A1；新 flow 一律 `*__work_flow/run.py` + `_register.py`。
+**程式過渡期**：`on_text` 暫用 `file_store`；新 flow 一律 `*__work_flow/run.py` + `_register.py`。

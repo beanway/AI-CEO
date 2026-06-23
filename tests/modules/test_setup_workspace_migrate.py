@@ -1,4 +1,4 @@
-from ai_company.services.migrate import migrate_flat_workspace
+from ai_company.modules.setup_workspace.internal.migrate import migrate_flat_workspace
 
 
 def test_migrate_moves_shared(tmp_workspace):

@@ -10,7 +10,6 @@ def project_dir(workspace_root: Path, project_id: str) -> Path:
 
 
 def ensure_project_tree(project_root: Path) -> None:
-    """Harness 專案殼：shared/、pm/（Worker 編制於 Phase A2）。"""
     project_root.mkdir(parents=True, exist_ok=True)
     (project_root / "shared").mkdir(exist_ok=True)
     (project_root / "pm").mkdir(exist_ok=True)

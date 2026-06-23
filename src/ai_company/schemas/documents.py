@@ -8,6 +8,7 @@ then the single writer module (target: modules/file_store).
 from ai_company.models.company import (
     GlobalConfigFile,
     GlobalSkillsFile,
+    NotificationPolicy,
     ProjectRecord,
     ProjectsFile,
     SessionRecord,
@@ -19,6 +20,7 @@ from ai_company.models.company import (
 __all__ = [
     "GlobalConfigFile",
     "GlobalSkillsFile",
+    "NotificationPolicy",
     "ProjectRecord",
     "ProjectsFile",
     "SessionRecord",

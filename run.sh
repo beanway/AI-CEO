@@ -40,21 +40,21 @@ ceo_menu() {
     read -r -p "請選擇: " ceo_choice
     case "${ceo_choice}" in
       1)
-        "$PYTHON" -m ai_company.ceo_cli init-workspace
+        "$PYTHON" -m ai_company.adapters.cli init-workspace
         ;;
       2)
-        "$PYTHON" -m ai_company.ceo_cli projects
+        "$PYTHON" -m ai_company.adapters.cli projects
         ;;
       3)
         read -r -p "專案 id: " pid
         if [[ -z "${pid// }" ]]; then
           echo "已取消。"
         else
-          "$PYTHON" -m ai_company.ceo_cli switch "$pid"
+          "$PYTHON" -m ai_company.adapters.cli switch "$pid"
         fi
         ;;
       4)
-        "$PYTHON" -m ai_company.ceo_cli global
+        "$PYTHON" -m ai_company.adapters.cli global
         ;;
       b | B)
         return 0

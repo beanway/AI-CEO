@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from ai_company.app_deps import AppDeps
+from ai_company.modules.file_store import core as file_store
+from ai_company.modules.setup_workspace import core as setup_workspace
 from ai_company.schemas.commands import BaseCommand, CommandType, ShowGlobalConfigCommand
 from ai_company.schemas.results import ShowGlobalConfigResult
-from ai_company.store.company_store import CompanyStore
-from ai_company.work_flow._shared.legacy_services import ensure_workspace_for_deps
 from ai_company.work_flow.registry import WorkFlowRegistry
 
 
@@ -13,11 +13,9 @@ def run(command: BaseCommand, deps: AppDeps) -> ShowGlobalConfigResult:
         return ShowGlobalConfigResult(
             success=False, message="指令類型錯誤", error_code="bad_command"
         )
-    ensure_workspace_for_deps(deps)
-    store = CompanyStore(deps.workspace_root)
-    store.ensure_company_dirs()
-    skills = store.load_global_skills()
-    config = store.load_global_config()
+    setup_workspace.ensure_workspace(deps.workspace_root)
+    skills = file_store.load_global_skills(deps.workspace_root)
+    config = file_store.load_global_config(deps.workspace_root)
     lines = ["global_skills.yaml"]
     if skills.enabled_skill_ids:
         for sid in skills.enabled_skill_ids:

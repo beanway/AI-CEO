@@ -1,7 +1,10 @@
 import shutil
 from pathlib import Path
 
-from ai_company.services.project_paths import ensure_project_tree, project_dir
+from ai_company.modules.setup_project_folders.internal.layout import (
+    ensure_project_tree,
+    project_dir,
+)
 
 LEGACY_DIRS = (
     "shared",

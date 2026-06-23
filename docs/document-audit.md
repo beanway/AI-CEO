@@ -38,12 +38,13 @@
 
 | 位置 | 現狀 | 設計期望 | 衝突 |
 |------|------|----------|------|
-| `company_workspace/shared/` 等扁平目錄 | 存在 | 應在 `projects/<id>/` 下 | **是** |
-| `src/ai_company/workspace.py` | `ensure_workspace` 建扁平五目錄 | 建 `_company/` + 專案子樹 | **是** |
+| `company_workspace/shared/` 等扁平目錄 | 可能仍存在 | 遷移至 `projects/<id>/`（`setup_workspace`） | **部分** |
+| `modules/setup_workspace` | 已實作 | Harness 工作區根 | **已對齊** |
 | `src/ai_company/worker_state.py` | 固定 `WorkerState` 五角色 | 應讀 `workers.yaml` | **是**（Phase B 前可暫留） |
 | `src/ai_company/router.py` | 管理者指令經 dispatch | Session、完整 CEO/PM | **部分**（Phase A1） |
-| `src/ai_company/work_flow/` | `run.py` + `_register.py` | 全產品 flow | **進行中** |
-| `services/`、`store/` | 過渡期仍使用 | 應遷至 `modules/` | **是（預期）** — 見 `phase-a-src-layout.md` |
+| `src/ai_company/work_flow/` | `run.py` + modules | 全產品 flow | **進行中** |
+| `services/`、`store/` | 已刪除 | — | **已解決** |
+| `modules/file_store` 等 | 已建立 | A1 | **已對齊** |
 | `.cursor/rules`、`ai-ceo-framework` skill | 已對齊 src-layout | — | **已更新** |
 
 ---
@@ -67,5 +68,5 @@
 ## 6. 審查結論
 
 - **文件集中於 `docs/` 後**：單一真相來源為 **`design/harness-design.md`**；無互斥的「現行」規格並存。  
-- **殘留衝突**：主要在 **舊 `services/`/`store/` 與目標 `modules/`** 並存；`company_workspace` 扁平目錄遷移仍可能未完成。  
+- **殘留衝突**：`company_workspace` 扁平目錄遷移、`worker_state` 與動態 `workers.yaml`（Phase B）；框架分層 A1 已完成。  
 - **歷史原文** `original-spec.txt` 僅作對照，不與 Harness 等同。

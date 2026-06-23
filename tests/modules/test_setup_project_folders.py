@@ -1,4 +1,4 @@
-from ai_company.services.project_paths import ensure_project_tree, project_dir
+from ai_company.modules.setup_project_folders.core import ensure_project_tree, project_dir
 
 
 def test_project_tree_creates_shared_requirements(tmp_workspace):

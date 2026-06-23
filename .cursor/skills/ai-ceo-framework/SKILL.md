@@ -25,14 +25,11 @@ description: >-
 
 - 新增產品功能：新增 `work_flow/<slug>__work_flow/run.py`（`run` + `register`），並在 `work_flow/_register.py` 登記。
 
-## 過渡期例外（至 `docs/plans/phase-a-src-layout.md` A1 完成）
+## 過渡期例外（至 P-A1+ 完成）
 
-- `work_flow/_shared/legacy_services.py` 可暫用 `services/`、`store/`。
-- `main.py` / `router.py` 可注入 `CompanyService`（Bot `bot_data`、自由文字 handler）。
-- `telegram/manager_handlers.py` 中尚未接上 flow 的路徑（如 `on_text`）可暫直呼 service。
-- **新功能與新指令**仍須走 `dispatch` + 新 `*__work_flow/run.py`，不得擴大 legacy 直連。
+- `adapters/telegram/manager_handlers.on_text` 可暫用 `file_store.get_active_project`（尚未有 chat flow）。
 
-- **禁止**（目標態，過渡期外）：adapter 或 handler 直接擴充對 `store/` 的業務呼叫（`show_global` 已改走 flow）。
+- **新功能與新指令**仍須 `dispatch` + 新 `*__work_flow/run.py`。
 
 ## 工具模組命名（README 第一行寫中文）
 

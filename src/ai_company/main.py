@@ -2,22 +2,11 @@ import argparse
 import logging
 import sys
 
-from ai_company.app_deps import AppDeps
 from ai_company.adapters.dispatch import dispatch
+from ai_company.app_deps import AppDeps
 from ai_company.config import get_settings
 from ai_company.router import run_dual_bots
 from ai_company.schemas.commands import Channel, InitWorkspaceCommand
-from ai_company.services.company_service import CompanyService
-from ai_company.store.company_store import CompanyStore
-from ai_company.workspace import ensure_workspace
-
-
-def _company_service(settings) -> CompanyService:
-    ensure_workspace(settings.workspace_root)
-    store = CompanyStore(settings.workspace_root)
-    company = CompanyService(settings.workspace_root, store)
-    company.bootstrap_default_project_if_needed()
-    return company
 
 
 def main() -> None:
@@ -48,8 +37,7 @@ def main() -> None:
     try:
         import asyncio
 
-        company = _company_service(settings)
-        asyncio.run(run_dual_bots(settings, company))
+        asyncio.run(run_dual_bots(settings))
     except KeyboardInterrupt:
         sys.exit(0)
 

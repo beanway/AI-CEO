@@ -3,7 +3,7 @@ from typing import Literal
 
 import yaml
 
-from ai_company.models.company import (
+from ai_company.schemas.documents import (
     GlobalConfigFile,
     GlobalSkillsFile,
     ProjectsFile,
@@ -16,7 +16,7 @@ SESSIONS_DIR = "sessions"
 PROJECTS_DIR = "projects"
 
 
-class CompanyStore:
+class FileStore:
     def __init__(self, workspace_root: Path) -> None:
         self.workspace_root = workspace_root
         self.company_dir = workspace_root / COMPANY_DIR
@@ -29,7 +29,6 @@ class CompanyStore:
         (self.company_dir / "metrics").mkdir(exist_ok=True)
 
     def ensure_company_index_files(self) -> None:
-        """建立預設 projects.json / global_*.yaml（僅在檔案不存在時）。"""
         projects_path = self.company_dir / "projects.json"
         if not projects_path.exists():
             self.save_projects(ProjectsFile())

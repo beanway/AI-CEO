@@ -24,11 +24,11 @@
 | 3 | 新增 **`<slug>__work_flow/run.py`**：`run` + `register` | 目錄 `README.md`（中文一句話） |
 | 4 | 在 **`work_flow/_register.py`** 登記 | `registry.list_flows()` 可見 |
 | 5 | **通道**掛載：TG / CLI /（後期）Web | 更新 `adapters/README.md` 路由表 |
-| 6 | 業務 I/O 只經 **工具模組 `core`**（過渡期見 skill 例外） | 不擴大 handler 直連 `store/` |
+| 6 | 業務 I/O 只經 **工具模組 `core`** | flow 不 import `internal/`；handler 見 skill 過渡期 |
 | 7 | **測試**：flow 整合 + 模組單元 | `pytest` |
 | 8 | **文件**：`roadmap` 勾選、`document-audit` 若改契約則更新 | PR 自檢 |
 
-過渡期允許事項（至架構 A1 完成）：見 [`.cursor/skills/ai-ceo-framework/SKILL.md`](../.cursor/skills/ai-ceo-framework/SKILL.md)「過渡期例外」。
+過渡期：`on_text` 可暫用 `file_store.get_active_project`，見 skill「過渡期例外」。
 
 ---
 
@@ -41,7 +41,7 @@
 | 0 | **A0** 分層骨架 | — | — |
 | 1 | **A1** 工具模組遷移 | **P-A1** CEO 列表／切換／global（已部分完成） | A0 |
 | 2 | — | **P-A1+** 建殼、CEO Session、global skill | A1 建議先完成 `file_store` |
-| 3 | 通道遷移 `telegram/` → `adapters/telegram/` | **P-A2** PM 建局 | A1 |
+| 3 | — | **P-A2** PM 建局 | A1 |
 | 4 | — | **P-A3** PM Git／維修／TG 核准 | P-A2 |
 | 5 | `execution_store`、`sandbox_runner` | **B** 狀態機、scheduler、notify | P-A2 |
 | 6 | — | **B+** Skill 生態 | B 骨架 |
@@ -54,13 +54,12 @@
 
 | 項目 | 狀態 |
 |------|------|
-| `work_flow` + `_register.py` + 四條 `run.py` flow | 完成 |
-| `schemas` + `adapters.dispatch` | 完成 |
-| `modules/format_messages` | 完成 |
-| `modules/file_store` 等 | 未遷移（仍 `store/`、`services/`） |
-| TG `/projects`、`/switch`；CLI 對應 | 經 dispatch |
-| `on_text`、Bot `CompanyService` 注入 | 過渡期 |
-| CEO Gemini、建專案、PM、執行層 | 未做 |
+| `work_flow` + 四條 `run.py` flow | 完成 |
+| `modules/file_store`、`setup_workspace`、`setup_project_folders`、`format_messages` | 完成 |
+| `adapters/telegram`、`adapters/cli` | 完成 |
+| 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
+| TG `/projects`、`/switch`；CLI；`on_text` 讀 active | 經 dispatch / `file_store` |
+| CEO Gemini、建專案 flow、PM、執行層 | 未做 |
 
 ---
 
@@ -75,20 +74,18 @@
 
 ---
 
-## 五、架構 A1 — 工具模組與遺留刪除（進行中）
-
-> 逐步拆解見 [`plans/phase-a-src-layout.md`](plans/phase-a-src-layout.md)。
+## 五、架構 A1 — 工具模組與遺留刪除（已完成）
 
 | # | 步驟 | 驗收 |
 |---|------|------|
-| 1 | 建立 `modules/file_store/core` ← `company_store` | 僅此模組寫 `_company` 契約檔；測試遷移 |
-| 2 | 建立 `modules/setup_workspace/core` ← `workspace.py`、`migrate` | `init_workspace__work_flow` 只呼叫 core |
-| 3 | 建立 `modules/setup_project_folders/core` ← `project_paths` | 建殼 flow 可重用 |
-| 4 | 各 flow 改為只 `import modules.*.core`；刪 `legacy_services` | 無 flow 直連 `store` |
-| 5 | 遷移 `telegram/` → `adapters/telegram/` | `router` import 更新 |
-| 6 | 刪 `services/`、`store/`、根層 `workspace.py`；`ceo_cli` 僅保留薄入口 | `document-audit` 更新 |
+| 1 | `modules/file_store` | `tests/modules/test_file_store*.py` |
+| 2 | `modules/setup_workspace` | `init_workspace__work_flow` |
+| 3 | `modules/setup_project_folders` | 建專案 API 在 `file_store.core` |
+| 4 | flow 僅用 `modules.*.core` | 無 `legacy_services` |
+| 5 | `adapters/telegram/` | `router` 已切換 |
+| 6 | 刪除舊層；`ceo_cli` → `adapters/cli` | 無 `store/`、`services/` |
 
-- [ ] 步驟 1–6（總勾選）
+- [x] 步驟 1–6
 
 ---
 

@@ -1,16 +1,16 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
+from ai_company.adapters.dispatch import dispatch
+from ai_company.adapters.telegram.gate import gate_message
 from ai_company.app_deps import AppDeps
 from ai_company.config import Settings
-from ai_company.adapters.dispatch import dispatch
+from ai_company.modules.file_store import core as file_store
 from ai_company.schemas.commands import (
     Channel,
     ListProjectsCommand,
     SwitchProjectCommand,
 )
-from ai_company.services.company_service import CompanyService
-from ai_company.telegram.common import gate_message
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -55,8 +55,8 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     if not await gate_message(update, settings):
         return
-    company: CompanyService = context.application.bot_data["company"]
-    active = company.get_active_project()
+    deps = AppDeps(settings=settings)
+    active = file_store.get_active_project(deps.workspace_root)
     active_line = (
         f"active={active.id}（{active.name}）" if active else "active=（無）"
     )
@@ -66,8 +66,7 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
-def register_manager_handlers(app: Application, company: CompanyService) -> None:
-    app.bot_data["company"] = company
+def register_manager_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("projects", cmd_projects))
     app.add_handler(CommandHandler("switch", cmd_switch))
