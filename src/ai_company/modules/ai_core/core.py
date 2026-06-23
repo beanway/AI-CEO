@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from ai_company.config import Settings
 from ai_company.modules.ai_core.internal.backends import (
     ChatBackend,
     FakeChatBackend,
     GeminiChatBackend,
 )
-from ai_company.schemas.documents import GlobalConfigFile
+from ai_company.modules.settings.core import AppSettings
+from ai_company.schemas.ai_generation import AiGenerationSettings
 
 CEO_SYSTEM_INSTRUCTION = (
     "你是 AI 公司的執行長（CEO）。協助使用者確認商業模式與需求，可建議建立專案。"
@@ -17,35 +17,35 @@ CEO_SYSTEM_INSTRUCTION = (
 )
 
 _backends: dict[str, ChatBackend] = {}
+_generation: AiGenerationSettings = AiGenerationSettings()
 
 
-def resolve_model(
-    settings: Settings,
-    global_config: GlobalConfigFile | None = None,
-) -> str:
-    del settings
-    if global_config is not None and global_config.default_model.strip():
-        return global_config.default_model.strip()
-    return "gemini-2.5-flash"
+def configure_generation(settings: AiGenerationSettings) -> None:
+    """在建立／使用 Gemini chat 前套用（通常由 work_flow 從 global_config 解析）。"""
+    global _generation
+    _generation = settings
 
 
-def get_chat_backend(settings: Settings) -> ChatBackend:
-    key = (
-        f"gemini:{settings.gemini_api_key.strip()[:12]}"
-        if settings.gemini_api_key.strip()
-        else "fake"
-    )
-    backend = _backends.get(key)
+def current_generation() -> AiGenerationSettings:
+    return _generation
+
+
+def get_chat_backend(app_settings: AppSettings) -> ChatBackend:
+    api_key = app_settings.resolved_gemini_api_key()
+    cache_key = f"gemini:{api_key[:12]}" if api_key else "fake"
+    backend = _backends.get(cache_key)
     if backend is not None:
         return backend
-    if settings.gemini_api_key.strip():
-        backend = GeminiChatBackend(settings.gemini_api_key.strip())
+    if api_key:
+        backend = GeminiChatBackend(api_key)
     else:
         backend = FakeChatBackend()
-    _backends[key] = backend
+    _backends[cache_key] = backend
     return backend
 
 
 def reset_chat_backends_for_tests() -> None:
     """僅供 pytest 隔離程序內 singleton。"""
+    global _generation
     _backends.clear()
+    _generation = AiGenerationSettings()

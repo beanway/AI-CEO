@@ -45,6 +45,7 @@
 | `src/ai_company/work_flow/` | `run.py` + modules | 全產品 flow | **進行中** |
 | `services/`、`store/` | 已刪除 | — | **已解決** |
 | `modules/file_store` 等 | 已建立 | A1 | **已對齊** |
+| `modules/settings` | 已建立 | .env + global_config 解析 | **已對齊** |
 | `.cursor/rules`、`ai-ceo-framework` skill | 已對齊 src-layout | — | **已更新** |
 
 ---

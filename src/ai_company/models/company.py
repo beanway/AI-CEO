@@ -54,7 +54,11 @@ class NotificationPolicy(str, Enum):
 
 
 class GlobalConfigFile(BaseModel):
-    """CEO：全專案預設（模型、通知政策）。"""
+    """CEO：全專案預設（模型、通知政策、AI 生成）。"""
 
     default_model: str = "gemini-2.5-flash"
     notification_policy: NotificationPolicy = NotificationPolicy.ALL
+    max_output_tokens: int = Field(default=8192, ge=1)
+    thinking_budget: int = 0
+    include_thoughts: bool = False
+    temperature: float | None = None

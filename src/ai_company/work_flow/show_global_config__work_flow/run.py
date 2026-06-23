@@ -26,6 +26,11 @@ def run(command: BaseCommand, deps: AppDeps) -> ShowGlobalConfigResult:
     lines.append("global_config.yaml")
     lines.append(f"  default_model: {config.default_model}")
     lines.append(f"  notification_policy: {config.notification_policy.value}")
+    lines.append(f"  max_output_tokens: {config.max_output_tokens}")
+    lines.append(f"  thinking_budget: {config.thinking_budget}")
+    lines.append(f"  include_thoughts: {config.include_thoughts}")
+    if config.temperature is not None:
+        lines.append(f"  temperature: {config.temperature}")
     return ShowGlobalConfigResult(success=True, message="\n".join(lines))
 
 

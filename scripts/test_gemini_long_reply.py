@@ -26,22 +26,19 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from google import genai  # noqa: E402
 
+from ai_company.modules.ai_core import core as ai_core  # noqa: E402
 from ai_company.modules.ai_core.internal.generation_config import (  # noqa: E402
     build_generate_content_config,
 )
+from ai_company.modules.settings.core import (  # noqa: E402
+    load_settings,
+    resolve_ai_generation,
+)
+from ai_company.schemas.documents import GlobalConfigFile  # noqa: E402
 
 
 def _resolve_api_key() -> str:
-    key = os.environ.get("GOOGLE_API_KEY", "").strip() or os.environ.get(
-        "GEMINI_API_KEY", ""
-    ).strip()
-    if not key:
-        print(
-            "錯誤：請設定 GEMINI_API_KEY 或 GOOGLE_API_KEY（官網建議用環境變數，勿寫進 git）",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    return key
+    return load_settings().resolved_gemini_api_key()
 
 
 def _load_dotenv() -> None:
@@ -93,6 +90,12 @@ def main() -> int:
     args = parser.parse_args()
 
     api_key = _resolve_api_key()
+    if not api_key:
+        print(
+            "錯誤：請設定 GEMINI_API_KEY 或 GOOGLE_API_KEY（官網建議用環境變數，勿寫進 git）",
+            file=sys.stderr,
+        )
+        sys.exit(1)
     client = genai.Client(api_key=api_key)
 
     system = (
@@ -105,12 +108,19 @@ def main() -> int:
         f"最後用三點條列總結。"
     )
 
+    generation = resolve_ai_generation(
+        GlobalConfigFile(
+            default_model=args.model,
+            max_output_tokens=args.max_output_tokens,
+            thinking_budget=args.thinking_budget,
+            temperature=args.temperature,
+        )
+    )
+    ai_core.configure_generation(generation)
+
     config = build_generate_content_config(
         system_instruction=system,
-        max_output_tokens=args.max_output_tokens,
-        temperature=args.temperature,
-        thinking_budget=args.thinking_budget,
-        include_thoughts=False,
+        generation=generation,
     )
 
     print("── 設定 ──")

@@ -34,9 +34,18 @@ def test_dispatch_ceo_chat_fake(tmp_path):
 
 
 def test_resolve_model_prefers_global_config(tmp_path):
-    from ai_company.config import Settings
+    from ai_company.modules.settings import core as app_settings
     from ai_company.schemas.documents import GlobalConfigFile
 
-    settings = Settings(company_workspace_root=tmp_path)
     gc = GlobalConfigFile(default_model="gemini-2.0-flash")
-    assert ai_core.resolve_model(settings, gc) == "gemini-2.0-flash"
+    assert app_settings.resolve_model(gc) == "gemini-2.0-flash"
+
+
+def test_resolve_ai_generation_from_global_config():
+    from ai_company.modules.settings import core as app_settings
+    from ai_company.schemas.documents import GlobalConfigFile
+
+    gc = GlobalConfigFile(thinking_budget=0, max_output_tokens=4096)
+    gen = app_settings.resolve_ai_generation(gc)
+    assert gen.thinking_budget == 0
+    assert gen.max_output_tokens == 4096

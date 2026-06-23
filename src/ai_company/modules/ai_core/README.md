@@ -1,14 +1,16 @@
 # ai_core
 
-**AI 供應商與對話**：模型解析（`resolve_model`）、Fake／Gemini `ChatBackend`（`get_chat_backend`）。
+**AI 供應商與對話**：Fake／Gemini `ChatBackend`；執行期生成參數由 `configure_generation()` 套用。
 
 ## 對外接口（`core.py`）
 
-- `CEO_SYSTEM_INSTRUCTION`：CEO 對話 system prompt
-- `resolve_model(settings, global_config?)`：優先 `global_config.default_model`
-- `get_chat_backend(settings)`：有 `GEMINI_API_KEY` 用 Gemini，否則 Fake
-- `build_generate_content_config`（`internal/generation_config.py`）：`max_output_tokens`、`thinking_budget=0` 等
+- `CEO_SYSTEM_INSTRUCTION`
+- `configure_generation(AiGenerationSettings)`：建立 chat 前設定（thinking、max_output_tokens 等）
+- `current_generation()`：目前套用中的參數
+- `get_chat_backend(AppSettings)`：有 resolved API key 用 Gemini，否則 Fake
+
+參數來源：`modules/settings` 從 `global_config.yaml` 解析後，由 `ceo_chat__work_flow` 呼叫 `configure_generation`。
 
 ## 呼叫者
 
-僅 `work_flow/*__work_flow/run.py`。
+僅 `work_flow/*__work_flow/run.py`（與診斷腳本）。

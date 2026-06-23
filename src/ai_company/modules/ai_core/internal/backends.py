@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Protocol, runtime_checkable
 
 from ai_company.modules.ai_core.internal.generation_config import build_generate_content_config
+from ai_company.schemas.ai_generation import AiGenerationSettings
 
 
 @runtime_checkable
@@ -50,7 +51,12 @@ class GeminiChatBackend:
         self._counter = 0
 
     def create_chat(self, *, system_instruction: str, model: str) -> str:
-        config = build_generate_content_config(system_instruction=system_instruction)
+        from ai_company.modules.ai_core import core as ai_core
+
+        config = build_generate_content_config(
+            system_instruction=system_instruction,
+            generation=ai_core.current_generation(),
+        )
         chat = self._client.chats.create(model=model, config=config)
         self._counter += 1
         name = f"gemini-{self._counter}-{id(chat)}"

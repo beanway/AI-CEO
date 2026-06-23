@@ -4,6 +4,7 @@ from ai_company.app_deps import AppDeps
 from ai_company.models.company import SessionRecord, utc_now
 from ai_company.modules.ai_core import core as ai_core
 from ai_company.modules.file_store import core as file_store
+from ai_company.modules.settings import core as app_settings
 from ai_company.schemas.commands import BaseCommand, CeoChatCommand, CommandType
 from ai_company.schemas.results import CeoChatResult
 from ai_company.work_flow.registry import WorkFlowRegistry
@@ -64,7 +65,8 @@ def run(command: BaseCommand, deps: AppDeps) -> CeoChatResult:
         )
     file_store.ensure_company_dirs(deps.workspace_root)
     global_config = file_store.load_global_config(deps.workspace_root)
-    model = ai_core.resolve_model(deps.settings, global_config)
+    ai_core.configure_generation(app_settings.resolve_ai_generation(global_config))
+    model = app_settings.resolve_model(global_config)
     backend = ai_core.get_chat_backend(deps.settings)
     try:
         record = _ensure_ceo_handle(deps, backend, model=model)
