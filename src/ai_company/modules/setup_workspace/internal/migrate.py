@@ -1,10 +1,7 @@
 import shutil
 from pathlib import Path
 
-from ai_company.modules.setup_project_folders.internal.layout import (
-    ensure_project_tree,
-    project_dir,
-)
+from ai_company.modules.setup_project_folders import core as project_folders
 
 LEGACY_DIRS = (
     "shared",
@@ -23,8 +20,8 @@ def migrate_flat_workspace(workspace_root: Path) -> str | None:
     projects_root = workspace_root / "projects"
     if projects_root.exists() and any(projects_root.iterdir()):
         return None
-    dest = project_dir(workspace_root, DEFAULT_ID)
-    ensure_project_tree(dest)
+    dest = project_folders.project_dir(workspace_root, DEFAULT_ID)
+    project_folders.ensure_project_tree(dest)
     for name in LEGACY_DIRS:
         src = workspace_root / name
         if not src.is_dir():
