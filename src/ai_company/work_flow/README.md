@@ -27,6 +27,8 @@
 | `list_projects` | [`list_projects__work_flow`](list_projects__work_flow/README.md) | 列出專案與 active |
 | `switch_project` | [`switch_project__work_flow`](switch_project__work_flow/README.md) | 切換 active 專案 |
 | `create_project` | [`create_project__work_flow`](create_project__work_flow/README.md) | CEO 建專案殼 |
+| `add_skill_to_company` | [`add_skill_to_company__work_flow`](add_skill_to_company__work_flow/README.md) | 啟用 global_skills |
+| `update_global_config` | [`update_global_config__work_flow`](update_global_config__work_flow/README.md) | 更新 global_config |
 | `ceo_chat` | [`ceo_chat__work_flow`](ceo_chat__work_flow/README.md) | CEO 對話（Gemini／Fake） |
 | `show_global_config` | [`show_global_config__work_flow`](show_global_config__work_flow/README.md) | 顯示 global_skills / global_config |
 

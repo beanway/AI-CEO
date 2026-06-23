@@ -6,6 +6,7 @@ from ai_company.adapters.telegram.gate import gate_message
 from ai_company.app_deps import AppDeps
 from ai_company.config import Settings
 from ai_company.schemas.commands import (
+    AddSkillToCompanyCommand,
     Channel,
     CeoChatCommand,
     CreateProjectCommand,
@@ -21,7 +22,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "[管理者 Bot · 帳號 A]\n"
         "AI 虛擬公司已連線。\n"
-        "指令：/projects、/switch <id>、/newproject <名稱>；其餘文字由 CEO（Gemini）回覆。"
+        "指令：/projects、/switch <id>、/newproject <名稱>、/addskill <id>；其餘文字由 CEO（Gemini）回覆。"
     )
 
 
@@ -66,6 +67,22 @@ async def cmd_switch(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     await update.message.reply_text(result.message)
 
 
+async def cmd_addskill(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    if not context.args:
+        await update.message.reply_text("用法：/addskill <registry skill id>")
+        return
+    skill_id = context.args[0].strip()
+    deps = AppDeps(settings=settings)
+    result = dispatch(
+        AddSkillToCompanyCommand(channel=Channel.TELEGRAM, skill_id=skill_id),
+        deps,
+    )
+    await update.message.reply_text(result.message)
+
+
 async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     settings: Settings = context.application.bot_data["settings"]
     if not update.message or not update.message.text:
@@ -88,5 +105,6 @@ def register_manager_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("projects", cmd_projects))
     app.add_handler(CommandHandler("newproject", cmd_newproject))
+    app.add_handler(CommandHandler("addskill", cmd_addskill))
     app.add_handler(CommandHandler("switch", cmd_switch))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_text))

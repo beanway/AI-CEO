@@ -31,3 +31,11 @@ class CeoChatResult(FlowResult):
 
 class ShowGlobalConfigResult(FlowResult):
     pass
+
+
+class AddSkillToCompanyResult(FlowResult):
+    skill_id: str | None = None
+
+
+class UpdateGlobalConfigResult(FlowResult):
+    pass

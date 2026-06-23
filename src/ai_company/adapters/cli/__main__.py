@@ -16,6 +16,24 @@ def main(argv: list[str] | None = None) -> int:
     p_switch = sub.add_parser("switch", help="設定 active 專案（等同 /switch）")
     p_switch.add_argument("project_id", help="專案 id")
     sub.add_parser("global", help="顯示 global_skills / global_config")
+    p_skill = sub.add_parser("add-skill", help="啟用全公司 registry skill")
+    p_skill.add_argument("skill_id", help="skills/registry 下的目錄名")
+    p_cfg = sub.add_parser("update-global", help="更新 global_config.yaml 欄位")
+    p_cfg.add_argument("--model", dest="default_model", help="default_model")
+    p_cfg.add_argument(
+        "--notification-policy",
+        dest="notification_policy",
+        choices=("all", "failures_only", "off"),
+    )
+    p_cfg.add_argument("--max-output-tokens", type=int, dest="max_output_tokens")
+    p_cfg.add_argument("--thinking-budget", type=int, dest="thinking_budget")
+    p_cfg.add_argument(
+        "--include-thoughts",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        dest="include_thoughts",
+    )
+    p_cfg.add_argument("--temperature", type=float, default=None)
     p_chat = sub.add_parser("ceo-chat", help="CEO 對話一則（等同 TG 文字訊息）")
     p_chat.add_argument("text", help="使用者訊息")
 
@@ -31,6 +49,17 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_switch(args.project_id)
     if args.command == "global":
         return cli_inbound.run_global()
+    if args.command == "add-skill":
+        return cli_inbound.run_add_skill(args.skill_id)
+    if args.command == "update-global":
+        return cli_inbound.run_update_global_config(
+            default_model=args.default_model,
+            notification_policy=args.notification_policy,
+            max_output_tokens=args.max_output_tokens,
+            thinking_budget=args.thinking_budget,
+            include_thoughts=args.include_thoughts,
+            temperature=args.temperature,
+        )
     if args.command == "ceo-chat":
         return cli_inbound.run_ceo_chat(args.text)
     return 1

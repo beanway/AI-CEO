@@ -102,8 +102,8 @@
 - [x] 步驟 1（列表／切換／global 展示）
 - [x] 步驟 2（建專案殼）
 - [x] 步驟 3（CEO Session + `ceo_chat__work_flow`）
-- [x] 步驟 5（部分）：`global_config` AI 欄位 + `modules/settings`
-- [ ] 步驟 4–5（global skill flow、global_config 變更 flow）
+- [x] 步驟 4（`add_skill_to_company__work_flow`）
+- [x] 步驟 5（`update_global_config__work_flow` + AI 欄位）
 
 ---
 
