@@ -13,6 +13,7 @@ alwaysApply: false
 - **依賴**：
   - `adapters/*` → `schemas`、`adapters.dispatch`（不直接 import `modules`）
   - `work_flow/**` → `modules/*/core`、`schemas`、`work_flow/_shared`
+  - `modules/*/internal/**` 僅供同模組 `core.py` 使用；守門：`pytest tests/architecture/test_module_encapsulation.py`
   - 新功能 = 新 `*__work_flow/run.py` + `work_flow/_register.py` 登記
 
 ## 過渡期
@@ -20,8 +21,12 @@ alwaysApply: false
 `on_text` 可暫讀 `file_store.get_active_project`；其餘業務須 `dispatch` + `run.py` flow。
 
 ```python
-# ❌ handler 直接改 projects.json
+# ❌ handler 或 flow 穿透 modules/*/internal
 from ai_company.modules.file_store.internal.store import FileStore
+
+# ❌ handler 繞過 dispatch 直接改索引
+from ai_company.modules.file_store import core as file_store
+file_store.save_projects(workspace_root, ...)
 
 # ✅ 通道 → dispatch → 已註冊 flow
 from ai_company.adapters.dispatch import dispatch
@@ -32,6 +37,8 @@ from ai_company.schemas.commands import ListProjectsCommand
 # ❌ 假設全公司單一 shared
 root / "shared" / "requirements.md"
 
-# ✅ 專案沙盒
+# ✅ 專案沙盒（路徑真理來源：schemas/workspace_paths）
+from ai_company.schemas.workspace_paths import project_dir
+
 project_dir(workspace_root, project_id) / "shared" / "requirements.md"
 ```
