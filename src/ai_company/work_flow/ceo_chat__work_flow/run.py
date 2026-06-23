@@ -4,6 +4,7 @@ from ai_company.app_deps import AppDeps
 from ai_company.modules.ai_core import core as ai_core
 from ai_company.modules.file_store import core as file_store
 from ai_company.modules.settings import core as app_settings
+from ai_company.schemas.ai_generation import AiGenerationSettings
 from ai_company.schemas.commands import BaseCommand, CeoChatCommand, CommandType
 from ai_company.schemas.documents import SessionRecord, utc_now
 from ai_company.schemas.results import CeoChatResult
@@ -22,6 +23,7 @@ def _ensure_ceo_handle(
     backend: object,
     *,
     model: str,
+    generation: AiGenerationSettings,
     active_project_id: str | None,
     active_project_name: str | None,
 ) -> SessionRecord:
@@ -40,7 +42,11 @@ def _ensure_ceo_handle(
         or context_changed
         or not backend.has_chat(name)
     ):
-        name = backend.create_chat(system_instruction=instruction, model=model)
+        name = backend.create_chat(
+            system_instruction=instruction,
+            model=model,
+            generation=generation,
+        )
         record = SessionRecord(
             gemini_chat_name=name,
             project_id=active_project_id,
@@ -57,6 +63,7 @@ def _send_with_recovery(
     text: str,
     *,
     model: str,
+    generation: AiGenerationSettings,
     active_project_id: str | None,
     active_project_name: str | None,
 ) -> tuple[str, SessionRecord]:
@@ -67,7 +74,11 @@ def _send_with_recovery(
     try:
         reply = backend.send_message(record.gemini_chat_name, text, model=model)
     except Exception:
-        name = backend.create_chat(system_instruction=instruction, model=model)
+        name = backend.create_chat(
+            system_instruction=instruction,
+            model=model,
+            generation=generation,
+        )
         record = SessionRecord(
             gemini_chat_name=name,
             project_id=active_project_id,
@@ -101,12 +112,14 @@ def run(command: BaseCommand, deps: AppDeps) -> CeoChatResult:
     global_config = file_store.load_global_config(deps.workspace_root)
     ai_core.configure_generation(app_settings.resolve_ai_generation(global_config))
     model = app_settings.resolve_model(global_config)
+    generation = ai_core.current_generation()
     backend = ai_core.get_chat_backend(deps.settings)
     try:
         record = _ensure_ceo_handle(
             deps,
             backend,
             model=model,
+            generation=generation,
             active_project_id=active_id,
             active_project_name=active_name,
         )
@@ -116,6 +129,7 @@ def run(command: BaseCommand, deps: AppDeps) -> CeoChatResult:
             record,
             text,
             model=model,
+            generation=generation,
             active_project_id=active_id,
             active_project_name=active_name,
         )

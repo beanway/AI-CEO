@@ -8,7 +8,13 @@ from ai_company.schemas.ai_generation import AiGenerationSettings
 
 @runtime_checkable
 class ChatBackend(Protocol):
-    def create_chat(self, *, system_instruction: str, model: str) -> str: ...
+    def create_chat(
+        self,
+        *,
+        system_instruction: str,
+        model: str,
+        generation: AiGenerationSettings,
+    ) -> str: ...
 
     def send_message(self, chat_name: str, text: str, *, model: str) -> str: ...
 
@@ -22,8 +28,14 @@ class FakeChatBackend:
         self._chats: dict[str, list[str]] = {}
         self._counter = 0
 
-    def create_chat(self, *, system_instruction: str, model: str) -> str:
-        del model
+    def create_chat(
+        self,
+        *,
+        system_instruction: str,
+        model: str,
+        generation: AiGenerationSettings,
+    ) -> str:
+        del model, generation
         self._counter += 1
         name = f"fake-chat-{self._counter}"
         self._chats[name] = [system_instruction]
@@ -50,12 +62,16 @@ class GeminiChatBackend:
         self._chats: dict[str, object] = {}
         self._counter = 0
 
-    def create_chat(self, *, system_instruction: str, model: str) -> str:
-        from ai_company.modules.ai_core import core as ai_core
-
+    def create_chat(
+        self,
+        *,
+        system_instruction: str,
+        model: str,
+        generation: AiGenerationSettings,
+    ) -> str:
         config = build_generate_content_config(
             system_instruction=system_instruction,
-            generation=ai_core.current_generation(),
+            generation=generation,
         )
         chat = self._client.chats.create(model=model, config=config)
         self._counter += 1

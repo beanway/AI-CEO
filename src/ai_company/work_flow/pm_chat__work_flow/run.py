@@ -5,6 +5,7 @@ from ai_company.schemas.documents import SessionRecord, utc_now
 from ai_company.modules.ai_core import core as ai_core
 from ai_company.modules.file_store import core as file_store
 from ai_company.modules.settings import core as app_settings
+from ai_company.schemas.ai_generation import AiGenerationSettings
 from ai_company.schemas.commands import BaseCommand, CommandType, PmChatCommand
 from ai_company.schemas.results import PmChatResult
 from ai_company.work_flow._shared.pm_project import require_active_project_id
@@ -17,6 +18,7 @@ def _ensure_pm_handle(
     project_id: str,
     *,
     model: str,
+    generation: AiGenerationSettings,
 ) -> SessionRecord:
     record = file_store.load_pm_session(deps.workspace_root, project_id)
     if record is None:
@@ -26,6 +28,7 @@ def _ensure_pm_handle(
         name = backend.create_chat(
             system_instruction=ai_core.PM_SYSTEM_INSTRUCTION,
             model=model,
+            generation=generation,
         )
         record = SessionRecord(gemini_chat_name=name, project_id=project_id, stale=False)
         file_store.save_pm_session(deps.workspace_root, project_id, record)
@@ -40,6 +43,7 @@ def _send_with_recovery(
     text: str,
     *,
     model: str,
+    generation: AiGenerationSettings,
 ) -> tuple[str, SessionRecord]:
     try:
         reply = backend.send_message(record.gemini_chat_name, text, model=model)
@@ -47,6 +51,7 @@ def _send_with_recovery(
         name = backend.create_chat(
             system_instruction=ai_core.PM_SYSTEM_INSTRUCTION,
             model=model,
+            generation=generation,
         )
         record = SessionRecord(gemini_chat_name=name, project_id=project_id, stale=False)
         file_store.save_pm_session(deps.workspace_root, project_id, record)
@@ -70,10 +75,21 @@ def run(command: BaseCommand, deps: AppDeps) -> PmChatResult:
     global_config = file_store.load_global_config(deps.workspace_root)
     ai_core.configure_generation(app_settings.resolve_ai_generation(global_config))
     model = app_settings.resolve_model(global_config)
+    generation = ai_core.current_generation()
     backend = ai_core.get_chat_backend(deps.settings)
     try:
-        record = _ensure_pm_handle(deps, backend, project_id, model=model)
-        reply, _ = _send_with_recovery(deps, backend, project_id, record, text, model=model)
+        record = _ensure_pm_handle(
+            deps, backend, project_id, model=model, generation=generation
+        )
+        reply, _ = _send_with_recovery(
+            deps,
+            backend,
+            project_id,
+            record,
+            text,
+            model=model,
+            generation=generation,
+        )
     except Exception as exc:
         return PmChatResult(
             success=False,
