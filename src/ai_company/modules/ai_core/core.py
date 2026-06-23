@@ -7,6 +7,7 @@ from ai_company.modules.ai_core.internal.backends import (
     FakeChatBackend,
     GeminiChatBackend,
 )
+from ai_company.modules.ai_core.internal.generation_config import build_generate_content_config
 from ai_company.modules.settings.core import AppSettings
 from ai_company.schemas.ai_generation import AiGenerationSettings
 

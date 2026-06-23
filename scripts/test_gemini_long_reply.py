@@ -27,9 +27,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from google import genai  # noqa: E402
 
 from ai_company.modules.ai_core import core as ai_core  # noqa: E402
-from ai_company.modules.ai_core.internal.generation_config import (  # noqa: E402
-    build_generate_content_config,
-)
+from ai_company.modules.ai_core.core import build_generate_content_config  # noqa: E402
 from ai_company.modules.settings.core import (  # noqa: E402
     load_settings,
     resolve_ai_generation,

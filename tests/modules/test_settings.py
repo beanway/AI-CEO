@@ -38,7 +38,7 @@ def test_get_settings_compat_layer():
 
 def test_get_chat_backend_uses_google_api_key_only():
     from ai_company.modules.ai_core import core as ai_core
-    from ai_company.modules.ai_core.internal.backends import FakeChatBackend, GeminiChatBackend
+    from ai_company.modules.ai_core.core import FakeChatBackend, GeminiChatBackend
 
     ai_core.reset_chat_backends_for_tests()
     s = _env_isolated(google_api_key="google-only-key", gemini_api_key="")
@@ -50,7 +50,7 @@ def test_get_chat_backend_uses_google_api_key_only():
 
 def test_get_chat_backend_fake_when_no_keys():
     from ai_company.modules.ai_core import core as ai_core
-    from ai_company.modules.ai_core.internal.backends import FakeChatBackend
+    from ai_company.modules.ai_core.core import FakeChatBackend
 
     ai_core.reset_chat_backends_for_tests()
     s = _env_isolated(google_api_key="", gemini_api_key="")
