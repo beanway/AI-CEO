@@ -22,6 +22,20 @@ CEO_SYSTEM_INSTRUCTION = (
     " /projects、/switch、/newproject 或你引導完成。"
 )
 
+
+def ceo_system_instruction(
+    *,
+    active_project_id: str | None = None,
+    active_project_name: str | None = None,
+) -> str:
+    if active_project_id:
+        label = active_project_name or active_project_id
+        return (
+            f"{CEO_SYSTEM_INSTRUCTION}\n"
+            f"目前 active 專案：{active_project_id}（{label}）。"
+        )
+    return f"{CEO_SYSTEM_INSTRUCTION}\n目前尚無 active 專案。"
+
 _backends: dict[str, ChatBackend] = {}
 _generation: AiGenerationSettings = AiGenerationSettings()
 

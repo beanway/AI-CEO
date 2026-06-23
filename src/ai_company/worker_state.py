@@ -1,4 +1,4 @@
-"""Worker 狀態機骨架（階段三實作）。"""
+"""Worker 狀態機骨架（已廢止；Phase B 改用 modules/execution_store + workers.yaml）。"""
 
 from enum import Enum
 

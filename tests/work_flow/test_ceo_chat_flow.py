@@ -33,6 +33,25 @@ def test_dispatch_ceo_chat_fake(tmp_path):
     assert r2.success
 
 
+def test_ceo_session_tracks_active_project(tmp_path):
+    from ai_company.adapters.dispatch import dispatch
+    from ai_company.app_deps import AppDeps
+    from ai_company.config import Settings
+    from ai_company.modules.file_store import core as file_store
+    from ai_company.schemas.commands import CeoChatCommand, CreateProjectCommand
+
+    settings = Settings(company_workspace_root=tmp_path, gemini_api_key="")
+    deps = AppDeps(settings=settings)
+    file_store.ensure_company_dirs(tmp_path)
+    created = dispatch(CreateProjectCommand(name="Ctx"), deps)
+    assert created.success
+
+    dispatch(CeoChatCommand(text="hi"), deps)
+    record = file_store.load_ceo_session(tmp_path)
+    assert record is not None
+    assert record.project_id == created.project_id
+
+
 def test_resolve_model_prefers_global_config(tmp_path):
     from ai_company.modules.settings import core as app_settings
     from ai_company.schemas.documents import GlobalConfigFile
