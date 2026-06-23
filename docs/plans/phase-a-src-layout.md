@@ -32,7 +32,7 @@
 
 ### A2 — 與 Harness Phase A 產品對齊
 
-- [ ] `create_project__work_flow`（建殼）
+- [x] `create_project__work_flow`（建殼）
 - [ ] `add_skill_to_company__work_flow`（CEO global skill）
 - [ ] CEO Session / Gemini（`ai_core` + 新 flow）
 

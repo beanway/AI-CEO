@@ -8,6 +8,7 @@ from ai_company.config import Settings
 from ai_company.modules.file_store import core as file_store
 from ai_company.schemas.commands import (
     Channel,
+    CreateProjectCommand,
     ListProjectsCommand,
     SwitchProjectCommand,
 )
@@ -20,7 +21,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "[管理者 Bot · 帳號 A]\n"
         "AI 虛擬公司已連線。\n"
-        "指令：/projects 列出專案、/switch <id> 切換 active 專案。"
+        "指令：/projects 列出專案、/switch <id> 切換 active 專案、/newproject <名稱> 建專案殼。"
     )
 
 
@@ -30,6 +31,22 @@ async def cmd_projects(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         return
     deps = AppDeps(settings=settings)
     result = dispatch(ListProjectsCommand(channel=Channel.TELEGRAM), deps)
+    await update.message.reply_text(result.message)
+
+
+async def cmd_newproject(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    if not context.args:
+        await update.message.reply_text("用法：/newproject <專案名稱>")
+        return
+    name = " ".join(context.args).strip()
+    deps = AppDeps(settings=settings)
+    result = dispatch(
+        CreateProjectCommand(channel=Channel.TELEGRAM, name=name),
+        deps,
+    )
     await update.message.reply_text(result.message)
 
 
@@ -69,5 +86,6 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 def register_manager_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("projects", cmd_projects))
+    app.add_handler(CommandHandler("newproject", cmd_newproject))
     app.add_handler(CommandHandler("switch", cmd_switch))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_text))

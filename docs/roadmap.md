@@ -54,12 +54,12 @@
 
 | 項目 | 狀態 |
 |------|------|
-| `work_flow` + 四條 `run.py` flow | 完成 |
+| `work_flow` + 五條 `run.py` flow | 完成 |
 | `modules/file_store`、`setup_workspace`、`setup_project_folders`、`format_messages` | 完成 |
 | `adapters/telegram`、`adapters/cli` | 完成 |
 | 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
-| TG `/projects`、`/switch`；CLI；`on_text` 讀 active | 經 dispatch / `file_store` |
-| CEO Gemini、建專案 flow、PM、執行層 | 未做 |
+| TG `/projects`、`/switch`、`/newproject`；CLI；`on_text` 讀 active | 經 dispatch / `file_store` |
+| CEO Gemini、PM、執行層 | 未做 |
 
 ---
 
@@ -100,7 +100,8 @@
 | 5 | **global_config** 變更（模型、通知政策） | 對應 Command + flow | 與 `ai_core.resolve_model` 銜接 |
 
 - [x] 步驟 1（列表／切換／global 展示）
-- [ ] 步驟 2–5
+- [x] 步驟 2（建專案殼）
+- [ ] 步驟 3–5
 
 ---
 

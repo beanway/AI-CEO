@@ -12,6 +12,7 @@ class CommandType(str, Enum):
     INIT_WORKSPACE = "init_workspace"
     LIST_PROJECTS = "list_projects"
     SWITCH_PROJECT = "switch_project"
+    CREATE_PROJECT = "create_project"
     SHOW_GLOBAL_CONFIG = "show_global_config"
 
 
@@ -39,6 +40,12 @@ class SwitchProjectCommand(BaseCommand):
     project_id: str = Field(min_length=1)
 
 
+class CreateProjectCommand(BaseCommand):
+    command_type: Literal[CommandType.CREATE_PROJECT] = CommandType.CREATE_PROJECT
+    name: str = Field(min_length=1)
+    initial_requirements: str | None = None
+
+
 class ShowGlobalConfigCommand(BaseCommand):
     command_type: Literal[CommandType.SHOW_GLOBAL_CONFIG] = CommandType.SHOW_GLOBAL_CONFIG
 
@@ -47,5 +54,6 @@ Command = (
     InitWorkspaceCommand
     | ListProjectsCommand
     | SwitchProjectCommand
+    | CreateProjectCommand
     | ShowGlobalConfigCommand
 )

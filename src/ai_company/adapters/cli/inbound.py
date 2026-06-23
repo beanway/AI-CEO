@@ -9,6 +9,7 @@ from ai_company.adapters.dispatch import dispatch
 from ai_company.config import get_settings
 from ai_company.schemas.commands import (
     Channel,
+    CreateProjectCommand,
     InitWorkspaceCommand,
     ListProjectsCommand,
     ShowGlobalConfigCommand,
@@ -28,6 +29,23 @@ def run_projects() -> int:
     result = dispatch(ListProjectsCommand(channel=Channel.CLI), deps)
     print(result.message)
     return 0 if result.success else 1
+
+
+def run_create_project(name: str, *, initial_requirements: str | None = None) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        CreateProjectCommand(
+            channel=Channel.CLI,
+            name=name,
+            initial_requirements=initial_requirements,
+        ),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
 
 
 def run_switch(project_id: str) -> int:

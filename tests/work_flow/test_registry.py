@@ -6,7 +6,8 @@ def test_registry_lists_phase_a_flows():
     ids = {f.flow_id for f in flows}
     assert "list_projects__work_flow" in ids
     assert "switch_project__work_flow" in ids
-    assert len(flows) >= 4
+    assert "create_project__work_flow" in ids
+    assert len(flows) >= 5
 
 
 def test_dispatch_list_projects(tmp_path):

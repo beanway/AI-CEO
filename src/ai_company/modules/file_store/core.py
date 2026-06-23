@@ -13,6 +13,7 @@ from ai_company.schemas.documents import (
     GlobalSkillsFile,
     ProjectRecord,
     ProjectsFile,
+    SessionRecord,
     UserMode,
     UserPref,
     UserPrefsFile,
@@ -98,6 +99,9 @@ def create_project(
     project_id = secrets.token_hex(4)
     root = project_dir(workspace_root, project_id)
     store = _store(workspace_root)
+    session_path: Path | None = None
+    prev_active: str | None = None
+    projects_saved = False
     try:
         ensure_project_tree(root)
         if initial_requirements is not None:
@@ -105,14 +109,34 @@ def create_project(
                 initial_requirements, encoding="utf-8"
             )
         pf = store.load_projects()
+        prev_active = pf.active_project_id
         rec = ProjectRecord(id=project_id, name=name)
         pf.projects.append(rec)
         if pf.active_project_id is None:
             pf.active_project_id = project_id
         store.save_projects(pf)
+        projects_saved = True
+        session_path = store.session_path(project_id)
+        store.save_session(
+            session_path,
+            SessionRecord(gemini_chat_name="", project_id=project_id),
+        )
         return rec
     except Exception:
         shutil.rmtree(root, ignore_errors=True)
+        if session_path is not None and session_path.exists():
+            session_path.unlink(missing_ok=True)
+        if projects_saved:
+            pf = store.load_projects()
+            pf.projects = [p for p in pf.projects if p.id != project_id]
+            if pf.active_project_id == project_id:
+                remaining = pf.projects
+                pf.active_project_id = (
+                    prev_active
+                    if prev_active and any(p.id == prev_active for p in remaining)
+                    else (remaining[0].id if remaining else None)
+                )
+            store.save_projects(pf)
         raise
 
 

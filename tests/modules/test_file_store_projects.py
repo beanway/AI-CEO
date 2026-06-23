@@ -11,6 +11,9 @@ def test_create_and_switch_project(tmp_workspace):
     active = file_store.get_active_project(tmp_workspace)
     assert active is not None
     assert active.name == "Alpha"
+    session = tmp_workspace / "_company" / "sessions" / f"pm_{p.id}.json"
+    assert session.is_file()
+    assert not (tmp_workspace / "projects" / p.id / "workers.yaml").exists()
 
 
 def test_switch_unknown_raises(tmp_workspace):

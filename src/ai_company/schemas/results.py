@@ -21,5 +21,9 @@ class SwitchProjectResult(FlowResult):
     project_id: str | None = None
 
 
+class CreateProjectResult(FlowResult):
+    project_id: str | None = None
+
+
 class ShowGlobalConfigResult(FlowResult):
     pass
