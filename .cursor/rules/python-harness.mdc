@@ -1,15 +1,32 @@
 ---
-description: Python Router、服務層與沙盒路徑慣例
+description: Python Router、work_flow、modules 與沙盒路徑慣例
 globs: src/**/*.py
 alwaysApply: false
 ---
 
 # Python 實作慣例
 
+- 規格：`docs/design/src-layout.md`；編輯框架時可套用 skill `.cursor/skills/ai-ceo-framework/SKILL.md`。
 - 路徑解析以 `company_workspace/projects/<project_id>/` 為準；`_company/` 存索引與 Session。
-- 檔案 I/O 與 `subprocess` 經 **SandboxRunner / ToolPolicy**（設計中或實作中），禁止硬編碼 repo 根下扁平 `company_workspace/shared`。
-- 雙 Telegram Bot 分流：管理者 = CEO/PM；執行者 = 通知（排程在專案 `task_scheduler` Worker）。
-- 新增模組時保持邊界：`store/`、`services/`、`telegram/` 分層（見歸檔計畫與將來的 Harness Phase A 計畫）。
+- 檔案 I/O 與 `subprocess` 經 **`modules/file_store`**、**`modules/sandbox_runner`**（遷移中可暫用 `store/`）；禁止硬編碼 repo 根下扁平 `company_workspace/shared`。
+- 雙 Telegram Bot：管理者 = CEO/PM；執行者 = 通知（排程在專案 `task_scheduler` Worker）。
+- **依賴**：
+  - `adapters/*` → `schemas`、`adapters.dispatch`（不直接 import `modules`）
+  - `work_flow/**` → `modules/*/core`、`schemas`、`work_flow/_shared`
+  - 新功能 = 新 `*__work_flow/run.py` + `work_flow/_register.py` 登記
+
+## 過渡期（A1 完成前）
+
+見 `docs/plans/phase-a-src-layout.md`：`legacy_services`、`main`/`router` 注入、`telegram/` 仍在套件根目錄。新指令仍須 `dispatch` + `run.py` flow。
+
+```python
+# ❌ handler 直接改 projects.json
+from ai_company.store.company_store import CompanyStore
+
+# ✅ 通道 → dispatch → 已註冊 flow
+from ai_company.adapters.dispatch import dispatch
+from ai_company.schemas.commands import ListProjectsCommand
+```
 
 ```python
 # ❌ 假設全公司單一 shared

@@ -91,4 +91,4 @@
 | **防改錯檔靠什麼** | 沙盒 **cwd**、**ToolPolicy**（依 Worker `kind`）、CEO/PM 權限分層；不是只靠文件提 Cursor。 |
 | **Skill 不要混用** | Cursor / `find-skills` 用於**開發框架**；Worker 用 `skills/registry/` + 專案／角色 YAML。 |
 
-**本 repo 的 Cursor 規則**：見 [`.cursor/rules/`](../.cursor/rules/)（`.mdc`）；舊版根目錄 `.cursorrules` 僅指向該目錄。用法摘要見 [`docs/README.md`](README.md#cursor-專案規則)。
+**本 repo 的 Cursor 規則**：見 [`.cursor/rules/`](../.cursor/rules/)（`.mdc`）；框架開發 skill： [`.cursor/skills/ai-ceo-framework/`](../.cursor/skills/ai-ceo-framework/SKILL.md)。用法摘要見 [`docs/README.md`](README.md#cursor-規則與-skill)。

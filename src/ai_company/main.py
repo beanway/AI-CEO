@@ -2,8 +2,11 @@ import argparse
 import logging
 import sys
 
+from ai_company.app_deps import AppDeps
+from ai_company.adapters.dispatch import dispatch
 from ai_company.config import get_settings
 from ai_company.router import run_dual_bots
+from ai_company.schemas.commands import Channel, InitWorkspaceCommand
 from ai_company.services.company_service import CompanyService
 from ai_company.store.company_store import CompanyStore
 from ai_company.workspace import ensure_workspace
@@ -34,10 +37,12 @@ def main() -> None:
     settings = get_settings()
 
     if args.command == "init-workspace":
-        ensure_workspace(settings.workspace_root)
-        company = _company_service(settings)
-        company.bootstrap_default_project_if_needed()
-        print(f"已建立沙盒：{settings.workspace_root}")
+        deps = AppDeps(settings=settings)
+        result = dispatch(InitWorkspaceCommand(channel=Channel.CLI), deps)
+        if not result.success:
+            print(result.message, file=sys.stderr)
+            sys.exit(1)
+        print(result.message)
         return
 
     try:

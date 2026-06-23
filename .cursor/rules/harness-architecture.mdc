@@ -5,16 +5,19 @@ alwaysApply: true
 
 # Harness 架構（本 repo）
 
-- **Canonical**：`docs/design/harness-design.md`；摘要 `docs/discussion-outcomes.md`。
-- **CEO**（全公司）：切換專案、`global_skills` / `global_config`；建專案「殼」。
+- **Canonical 產品**：`docs/design/harness-design.md`；摘要 `docs/discussion-outcomes.md`。
+- **Canonical 程式分層**：`docs/design/src-layout.md`；實作計畫 `docs/plans/phase-a-src-layout.md`。
+- **CEO**（全公司）：切換專案、`global_skills` / `global_config`；建專案「殼」→ 對應 `work_flow/*__work_flow`。
 - **PM**（單專案）：`workers.yaml`、動態 `workers/<id>/`、專案 skill、狀態、維修、Git；建專案「局」。
 - **沙盒**：僅 `company_workspace/projects/<project_id>/`；勿恢復扁平五目錄模型。
 - **執行層**：狀態機一次一 Worker；Worker **不遙控 Cursor IDE**，不修改 `src/` 當作沙盒產物。
-- **Router**：Telegram ↔ Gemini ↔ 工具；PM 高風險 Git / skill 安裝需 TG 核准設計。
+- **Router**：Telegram ↔ Gemini ↔ 工具；業務經 **`adapters.dispatch` → `work_flow.registry`**。
 
 ## Cursor 在本專案的角色
 
-- **Cursor Agent**：協助編輯 **本框架**（`src/`、`docs/`、設定檔）。
+- **Cursor Agent**：協助編輯 **本框架**（`src/`、`docs/`、設定檔）。專案 skill：`.cursor/skills/ai-ceo-framework/SKILL.md`。
 - **虛擬公司 Worker**：僅在沙盒內由 Router 驅動；與 Cursor skill 目錄分離（執行用 `skills/registry/` + 專案 YAML）。
 
 改架構前先對照 `docs/document-audit.md`，避免與 Harness 設計衝突。
+
+**程式過渡期**（`services/`/`store/`、`telegram/` 路徑）：見 `docs/plans/phase-a-src-layout.md` A1；新 flow 一律 `*__work_flow/run.py` + `_register.py`。

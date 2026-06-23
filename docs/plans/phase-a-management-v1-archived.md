@@ -1,6 +1,13 @@
 # Phase A — 管理層與多專案 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **已廢止 — 勿作架構或實作依據**  
+> 現行產品設計：[`design/harness-design.md`](../design/harness-design.md)  
+> 現行程式分層：[`design/src-layout.md`](../design/src-layout.md)  
+> 現行實作計畫：[`phase-a-src-layout.md`](phase-a-src-layout.md)
+
+---
+
+> **For agentic workers:** 以下內容僅供歷史對照；請勿依本檔的 `CompanyService` / `store` 分層實作新程式。
 
 **Goal:** 在管理者 Telegram Bot 上完成 CEO/PM Gemini 對話、多專案建立／列出／切換，並持久化 Session 與 `company_workspace/_company/` 索引。
 

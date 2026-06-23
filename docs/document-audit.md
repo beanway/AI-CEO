@@ -14,6 +14,7 @@
 | `harness-design.md` | `reference/original-spec.txt` | 歷史原文 | **部分** — 見 §2 |
 | `harness-design.md` | `discussion-outcomes.md` | 摘要一致 | 否 |
 | `harness-design.md` | `roadmap.md` | 路線對齊 Harness | 否 |
+| `src-layout.md` | `harness-design.md` | 程式分層實作產品設計 | 否 |
 | `harness-design.md` | 根目錄 `README.md` | 應指向 `docs/` | **已修正**（見下方程式碼表） |
 
 ---
@@ -40,9 +41,10 @@
 | `company_workspace/shared/` 等扁平目錄 | 存在 | 應在 `projects/<id>/` 下 | **是** |
 | `src/ai_company/workspace.py` | `ensure_workspace` 建扁平五目錄 | 建 `_company/` + 專案子樹 | **是** |
 | `src/ai_company/worker_state.py` | 固定 `WorkerState` 五角色 | 應讀 `workers.yaml` | **是**（Phase B 前可暫留） |
-| `src/ai_company/router.py` | echo，無 CEO/PM | 管理者指令 + Session | **是**（未實作） |
-| `.cursorrules` | 初版五原則 | 需反映 CEO/PM 範圍、動態 Worker | **部分** — 已建議更新 |
-| 根 `README.md` | 指向舊 `SPEC.txt`、扁平沙盒 | 指向 `docs/README.md` | **已修正** |
+| `src/ai_company/router.py` | 管理者指令經 dispatch | Session、完整 CEO/PM | **部分**（Phase A1） |
+| `src/ai_company/work_flow/` | `run.py` + `_register.py` | 全產品 flow | **進行中** |
+| `services/`、`store/` | 過渡期仍使用 | 應遷至 `modules/` | **是（預期）** — 見 `phase-a-src-layout.md` |
+| `.cursor/rules`、`ai-ceo-framework` skill | 已對齊 src-layout | — | **已更新** |
 
 ---
 
@@ -56,14 +58,14 @@
 
 ## 5. 建議下一步（非文件）
 
-1. 依 Harness 重寫 `docs/plans/` 下 Phase A 實作計畫（舊檔僅作參考）。  
-2. 實作 `migrate_flat_workspace` → `projects/default/`。  
-3. 更新 `workspace.py` 與 Router，消除 §3 程式衝突。
+1. 執行 [`plans/phase-a-src-layout.md`](plans/phase-a-src-layout.md) A1 模組遷移。  
+2. 新增 flow 時只改 `work_flow/_register.py` 與 adapters 路由表。  
+3. Phase B 接上 `modules/ai_core`、`execution_store`。
 
 ---
 
 ## 6. 審查結論
 
 - **文件集中於 `docs/` 後**：單一真相來源為 **`design/harness-design.md`**；無互斥的「現行」規格並存。  
-- **殘留衝突**：主要在 **程式碼與 `company_workspace` 實體目錄** 仍為初版模型；**歸檔計畫** 與現設計 intentionally 不一致。  
+- **殘留衝突**：主要在 **舊 `services/`/`store/` 與目標 `modules/`** 並存；`company_workspace` 扁平目錄遷移仍可能未完成。  
 - **歷史原文** `original-spec.txt` 僅作對照，不與 Harness 等同。

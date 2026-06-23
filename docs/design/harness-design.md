@@ -154,6 +154,8 @@ workers:
 - **Session 持久化**：`_company/sessions/`（與初版 spec 相同原則）。  
 - **建專案失敗回滾**；Gemini 失敗不改 `projects.json`。
 
+**框架程式（`src/ai_company`）**：通道 → `work_flow` 統一註冊 → 工具模組，見 [`src-layout.md`](src-layout.md)。
+
 ---
 
 ## 7. 任務分配、狀態機與反饋（Harness 反饋層）

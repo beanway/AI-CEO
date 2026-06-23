@@ -5,21 +5,13 @@ import shutil
 from pathlib import Path
 
 from ai_company.models.company import ProjectRecord, ProjectsFile, UserMode, UserPref
+from ai_company.modules.format_messages.core import format_projects_message
 from ai_company.services.project_paths import ensure_project_tree, project_dir
 from ai_company.store.company_store import CompanyStore
 
 DEFAULT_PROJECT_ID = "default"
 
-
-def format_projects_message(pf: ProjectsFile) -> str:
-    lines = [f"Active: {pf.active_project_id or '（無）'}"]
-    if not pf.projects:
-        lines.append("（尚無專案）")
-    else:
-        for p in pf.projects:
-            mark = " *" if p.id == pf.active_project_id else ""
-            lines.append(f"- {p.id}{mark}: {p.name}")
-    return "\n".join(lines)
+__all__ = ["CompanyService", "format_projects_message", "DEFAULT_PROJECT_ID"]
 
 
 class CompanyService:
