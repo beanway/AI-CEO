@@ -10,11 +10,14 @@ from ai_company.models.company import (
     GlobalSkillsFile,
     NotificationPolicy,
     ProjectRecord,
+    ProjectSkillsFile,
     ProjectsFile,
     SessionRecord,
     UserMode,
     UserPref,
     UserPrefsFile,
+    WorkerEntry,
+    WorkersFile,
 )
 
 __all__ = [
@@ -22,9 +25,12 @@ __all__ = [
     "GlobalSkillsFile",
     "NotificationPolicy",
     "ProjectRecord",
+    "ProjectSkillsFile",
     "ProjectsFile",
     "SessionRecord",
     "UserMode",
     "UserPref",
     "UserPrefsFile",
+    "WorkerEntry",
+    "WorkersFile",
 ]

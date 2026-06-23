@@ -10,7 +10,10 @@ def test_registry_lists_phase_a_flows():
     assert "ceo_chat__work_flow" in ids
     assert "add_skill_to_company__work_flow" in ids
     assert "update_global_config__work_flow" in ids
-    assert len(flows) >= 8
+    assert "set_user_mode__work_flow" in ids
+    assert "pm_chat__work_flow" in ids
+    assert "setup_workers__work_flow" in ids
+    assert len(flows) >= 13
 
 
 def test_dispatch_list_projects(tmp_path):

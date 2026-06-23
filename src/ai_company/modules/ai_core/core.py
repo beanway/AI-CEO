@@ -10,6 +10,12 @@ from ai_company.modules.ai_core.internal.backends import (
 from ai_company.modules.settings.core import AppSettings
 from ai_company.schemas.ai_generation import AiGenerationSettings
 
+PM_SYSTEM_INSTRUCTION = (
+    "你是 AI 公司的專案經理（PM），只負責目前 active 專案。"
+    "協助使用者建立 Worker 編制（workers.yaml）、啟用專案 skill、"
+    "並摘要專案狀態。全公司設定由 CEO 處理；切換專案用 /switch。"
+)
+
 CEO_SYSTEM_INSTRUCTION = (
     "你是 AI 公司的執行長（CEO）。協助使用者確認商業模式與需求，可建議建立專案。"
     "全公司設定在 global_config / global_skills；專案列表與切換由使用者透過"

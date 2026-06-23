@@ -56,13 +56,13 @@
 |------|------|
 | 架構 **A0**、**A1** | 完成 |
 | **P-A1** CEO 全公司（§六 步驟 1–5） | 完成 |
-| `work_flow` 已註冊 **8** 條 `run.py` flow | 完成 |
+| `work_flow` 已註冊 **13** 條 `run.py` flow | 完成 |
 | `modules`：`file_store`、`setup_workspace`、`setup_project_folders`、`format_messages`、`ai_core`、`settings`、`skill_registry` | 完成（CEO／全公司路徑） |
 | `adapters/telegram`、`adapters/cli` → `dispatch` | 完成 |
 | 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
 | TG：`/projects`、`/switch`、`/newproject`、`/addskill`；`on_text` → **`ceo_chat` only** | 完成 |
 | CLI：對等子命令 + `ceo-chat`、`update-global`、`global`、`add-skill` | 完成 |
-| **P-A2** PM 建局（mode 路由、`pm_chat`、`workers.yaml`、`project_skills`、狀態 flow） | **未做**（建殼僅預留 `sessions/pm_<id>.json`；`UserMode` 在 `file_store`，TG 未掛載） |
+| **P-A2** PM 建局（mode 路由、`pm_chat`、`workers.yaml`、`project_skills`、狀態 flow） | **完成** |
 | **P-A3** Git／維修／TG 核准；**B** 執行層 | 未做 |
 
 ---
@@ -121,7 +121,7 @@
 | 4 | **`project_skills.yaml`** | flow + `file_store` | 與 registry 對齊 |
 | 5 | 專案狀態摘要（`pm/`、`shared/`） | `show_project_status__work_flow` | 純讀為主 |
 
-- [ ] 步驟 1–5
+- [x] 步驟 1–5
 
 ---
 

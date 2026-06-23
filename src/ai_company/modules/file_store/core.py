@@ -6,17 +6,21 @@ import secrets
 import shutil
 from pathlib import Path
 
+import yaml
+
 from ai_company.modules.file_store.internal.store import FileStore
 from ai_company.modules.setup_project_folders.core import ensure_project_tree, project_dir
 from ai_company.schemas.documents import (
     GlobalConfigFile,
     GlobalSkillsFile,
     ProjectRecord,
+    ProjectSkillsFile,
     ProjectsFile,
     SessionRecord,
     UserMode,
     UserPref,
     UserPrefsFile,
+    WorkersFile,
 )
 
 DEFAULT_PROJECT_ID = "default"
@@ -162,3 +166,76 @@ def load_ceo_session(workspace_root: Path) -> SessionRecord | None:
 def save_ceo_session(workspace_root: Path, record: SessionRecord) -> None:
     store = _store(workspace_root)
     store.save_session(store.session_path("ceo"), record)
+
+
+def load_pm_session(workspace_root: Path, project_id: str) -> SessionRecord | None:
+    store = _store(workspace_root)
+    return store.load_session(store.session_path(project_id))
+
+
+def save_pm_session(workspace_root: Path, project_id: str, record: SessionRecord) -> None:
+    store = _store(workspace_root)
+    store.save_session(store.session_path(project_id), record)
+
+
+def _project_root(workspace_root: Path, project_id: str) -> Path:
+    return project_dir(workspace_root, project_id)
+
+
+def load_workers(workspace_root: Path, project_id: str) -> WorkersFile:
+    path = _project_root(workspace_root, project_id) / "workers.yaml"
+    if not path.is_file():
+        return WorkersFile()
+    raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if raw is None:
+        return WorkersFile()
+    return WorkersFile.model_validate(raw)
+
+
+def save_workers(workspace_root: Path, project_id: str, data: WorkersFile) -> None:
+    root = _project_root(workspace_root, project_id)
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / "workers.yaml"
+    body = yaml.safe_dump(
+        data.model_dump(mode="json"),
+        allow_unicode=True,
+        default_flow_style=False,
+        sort_keys=False,
+    )
+    store = _store(workspace_root)
+    store.write_text_file(path, body)
+
+
+def load_project_skills(workspace_root: Path, project_id: str) -> ProjectSkillsFile:
+    path = _project_root(workspace_root, project_id) / "project_skills.yaml"
+    if not path.is_file():
+        return ProjectSkillsFile()
+    raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if raw is None:
+        return ProjectSkillsFile()
+    return ProjectSkillsFile.model_validate(raw)
+
+
+def save_project_skills(
+    workspace_root: Path, project_id: str, data: ProjectSkillsFile
+) -> None:
+    root = _project_root(workspace_root, project_id)
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / "project_skills.yaml"
+    body = yaml.safe_dump(
+        data.model_dump(mode="json"),
+        allow_unicode=True,
+        default_flow_style=False,
+        sort_keys=False,
+    )
+    store = _store(workspace_root)
+    store.write_text_file(path, body)
+
+
+def resolve_project_id(workspace_root: Path, project_id: str | None) -> str:
+    if project_id is not None and project_id.strip():
+        return project_id.strip()
+    active = get_active_project(workspace_root)
+    if active is None:
+        raise ValueError("尚無 active 專案，請先 /switch 或 /newproject。")
+    return active.id

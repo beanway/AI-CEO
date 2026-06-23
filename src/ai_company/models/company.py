@@ -62,3 +62,18 @@ class GlobalConfigFile(BaseModel):
     thinking_budget: int = 0
     include_thoughts: bool = False
     temperature: float | None = None
+
+
+class WorkerEntry(BaseModel):
+    id: str = Field(min_length=1)
+    kind: str = Field(min_length=1)
+
+
+class WorkersFile(BaseModel):
+    workers: list[WorkerEntry] = Field(default_factory=list)
+
+
+class ProjectSkillsFile(BaseModel):
+    """PM：本專案全角色共用的 registry skill id。"""
+
+    enabled_skill_ids: list[str] = Field(default_factory=list)

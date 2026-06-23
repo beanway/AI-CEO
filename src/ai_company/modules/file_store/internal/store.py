@@ -140,3 +140,6 @@ class FileStore:
 
     def save_session(self, path: Path, record: SessionRecord) -> None:
         self._atomic_write(path, record.model_dump_json(indent=2))
+
+    def write_text_file(self, path: Path, text: str) -> None:
+        self._atomic_write(path, text)

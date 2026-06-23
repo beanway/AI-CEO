@@ -7,7 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from ai_company.schemas.documents import NotificationPolicy
+from ai_company.schemas.documents import NotificationPolicy, UserMode, WorkerEntry
 
 
 class CommandType(str, Enum):
@@ -19,6 +19,11 @@ class CommandType(str, Enum):
     SHOW_GLOBAL_CONFIG = "show_global_config"
     ADD_SKILL_TO_COMPANY = "add_skill_to_company"
     UPDATE_GLOBAL_CONFIG = "update_global_config"
+    SET_USER_MODE = "set_user_mode"
+    PM_CHAT = "pm_chat"
+    SETUP_WORKERS = "setup_workers"
+    ADD_SKILL_TO_PROJECT = "add_skill_to_project"
+    SHOW_PROJECT_STATUS = "show_project_status"
 
 
 class Channel(str, Enum):
@@ -83,6 +88,43 @@ class UpdateGlobalConfigCommand(BaseCommand):
         return self
 
 
+class SetUserModeCommand(BaseCommand):
+    command_type: Literal[CommandType.SET_USER_MODE] = CommandType.SET_USER_MODE
+    telegram_user_id: int
+    mode: UserMode
+
+
+class PmChatCommand(BaseCommand):
+    command_type: Literal[CommandType.PM_CHAT] = CommandType.PM_CHAT
+    text: str = Field(min_length=1)
+
+
+class SetupWorkersCommand(BaseCommand):
+    command_type: Literal[CommandType.SETUP_WORKERS] = CommandType.SETUP_WORKERS
+    project_id: str | None = None
+    template: Literal["five", "three"] | None = None
+    workers: list[WorkerEntry] | None = None
+
+    @model_validator(mode="after")
+    def template_xor_workers(self) -> SetupWorkersCommand:
+        has_template = self.template is not None
+        has_workers = self.workers is not None and len(self.workers) > 0
+        if has_template == has_workers:
+            raise ValueError("請指定 template（five|three）或 workers 列表，擇一")
+        return self
+
+
+class AddSkillToProjectCommand(BaseCommand):
+    command_type: Literal[CommandType.ADD_SKILL_TO_PROJECT] = CommandType.ADD_SKILL_TO_PROJECT
+    skill_id: str = Field(min_length=1)
+    project_id: str | None = None
+
+
+class ShowProjectStatusCommand(BaseCommand):
+    command_type: Literal[CommandType.SHOW_PROJECT_STATUS] = CommandType.SHOW_PROJECT_STATUS
+    project_id: str | None = None
+
+
 Command = (
     InitWorkspaceCommand
     | ListProjectsCommand
@@ -92,4 +134,9 @@ Command = (
     | ShowGlobalConfigCommand
     | AddSkillToCompanyCommand
     | UpdateGlobalConfigCommand
+    | SetUserModeCommand
+    | PmChatCommand
+    | SetupWorkersCommand
+    | AddSkillToProjectCommand
+    | ShowProjectStatusCommand
 )

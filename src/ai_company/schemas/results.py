@@ -39,3 +39,25 @@ class AddSkillToCompanyResult(FlowResult):
 
 class UpdateGlobalConfigResult(FlowResult):
     pass
+
+
+class SetUserModeResult(FlowResult):
+    mode: str | None = None
+
+
+class PmChatResult(FlowResult):
+    reply: str | None = None
+
+
+class SetupWorkersResult(FlowResult):
+    project_id: str | None = None
+    worker_count: int | None = None
+
+
+class AddSkillToProjectResult(FlowResult):
+    project_id: str | None = None
+    skill_id: str | None = None
+
+
+class ShowProjectStatusResult(FlowResult):
+    project_id: str | None = None

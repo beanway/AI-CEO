@@ -10,14 +10,20 @@ from ai_company.config import get_settings
 from ai_company.schemas.commands import (
     UpdateGlobalConfigCommand,
     AddSkillToCompanyCommand,
+    AddSkillToProjectCommand,
     Channel,
     CeoChatCommand,
     CreateProjectCommand,
     InitWorkspaceCommand,
     ListProjectsCommand,
+    PmChatCommand,
+    SetUserModeCommand,
+    SetupWorkersCommand,
     ShowGlobalConfigCommand,
+    ShowProjectStatusCommand,
     SwitchProjectCommand,
 )
+from ai_company.schemas.documents import UserMode
 
 
 def run_init_workspace() -> int:
@@ -132,4 +138,77 @@ def run_ceo_chat(text: str) -> int:
         return 1
     reply = getattr(result, "reply", None) or result.message
     print(reply)
+    return 0
+
+
+CLI_TELEGRAM_USER_ID = 0
+
+
+def run_mode(mode: str) -> int:
+    if mode not in ("ceo", "pm"):
+        print("用法：mode ceo|pm", file=sys.stderr)
+        return 1
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        SetUserModeCommand(
+            channel=Channel.CLI,
+            telegram_user_id=CLI_TELEGRAM_USER_ID,
+            mode=UserMode.PM if mode == "pm" else UserMode.CEO,
+        ),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_pm_chat(text: str) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(PmChatCommand(channel=Channel.CLI, text=text), deps)
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    reply = getattr(result, "reply", None) or result.message
+    print(reply)
+    return 0
+
+
+def run_setup_workers(template: str) -> int:
+    if template not in ("five", "three"):
+        print("template 須為 five 或 three", file=sys.stderr)
+        return 1
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        SetupWorkersCommand(channel=Channel.CLI, template=template),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_project_status() -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(ShowProjectStatusCommand(channel=Channel.CLI), deps)
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_add_project_skill(skill_id: str) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        AddSkillToProjectCommand(channel=Channel.CLI, skill_id=skill_id),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
     return 0
