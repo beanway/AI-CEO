@@ -24,6 +24,8 @@ def test_dispatch_create_project(tmp_path):
     assert any(p.id == result.project_id and p.name == "Beta" for p in pf.projects)
     session = tmp_path / "_company" / "sessions" / f"pm_{result.project_id}.json"
     assert session.is_file()
+    project_root = tmp_path / "projects" / result.project_id
+    assert (project_root / ".git").is_dir()
 
 
 def test_create_project_shell_rolls_back_on_session_failure(tmp_path, monkeypatch):

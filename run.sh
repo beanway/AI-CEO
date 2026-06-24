@@ -82,6 +82,17 @@ run_simulate_all() {
   "$PYTHON" "$ROOT/scripts/simulate_all_acceptance.py"
 }
 
+run_test_github_account() {
+  echo ""
+  echo "▶ Git／GitHub 帳號與整合（scripts/test_github_project_repo.py）…"
+  read -r -p "是否在 GitHub 建立並刪除測試倉？需 GITHUB_AUTO_CREATE_REPO=true (y/N): " gh_remote
+  if [[ "$gh_remote" == [yY] ]]; then
+    "$PYTHON" "$ROOT/scripts/test_github_project_repo.py" --remote --delete-repo
+  else
+    "$PYTHON" "$ROOT/scripts/test_github_project_repo.py"
+  fi
+}
+
 run_all_simulations() {
   local ec=0
   echo ""
@@ -138,6 +149,7 @@ test_menu() {
     echo "  4  Phase B/C 模擬驗收"
     echo "  6  第二期模擬驗收"
     echo "  5  已註冊 work_flow 列表"
+    echo "  g  Git／GitHub 帳號檢查（gh 登入、.env、專案 git init）"
     echo "  b  返回主選單"
     echo ""
     read -r -p "請選擇: " test_choice
@@ -168,6 +180,9 @@ test_menu() {
         ;;
       6)
         run_simulate_phase2 || true
+        ;;
+      g | G)
+        run_test_github_account || true
         ;;
       b | B)
         return 0

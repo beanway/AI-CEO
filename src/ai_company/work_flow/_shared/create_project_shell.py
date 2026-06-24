@@ -7,6 +7,7 @@ import shutil
 
 from ai_company.app_deps import AppDeps
 from ai_company.modules.file_store import core as file_store
+from ai_company.modules.project_git_bootstrap import core as project_git_bootstrap
 from ai_company.modules.setup_project_folders import core as project_folders
 from ai_company.schemas.documents import ProjectRecord
 
@@ -16,7 +17,7 @@ def create_project_shell(
     name: str,
     *,
     initial_requirements: str | None = None,
-) -> ProjectRecord:
+) -> tuple[ProjectRecord, str]:
     workspace_root = deps.workspace_root
     project_id = secrets.token_hex(4)
     root = project_folders.project_dir(workspace_root, project_id)
@@ -34,7 +35,13 @@ def create_project_shell(
         projects_saved = True
         file_store.init_pm_session(workspace_root, project_id)
         session_written = True
-        return rec
+        git_note = project_git_bootstrap.bootstrap_project_git(
+            root,
+            project_id=project_id,
+            project_name=name,
+            settings=deps.settings,
+        )
+        return rec, git_note
     except Exception:
         shutil.rmtree(root, ignore_errors=True)
         if session_written:

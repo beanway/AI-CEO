@@ -13,7 +13,7 @@ def _deps(tmp_workspace):
 
 def test_create_and_switch_project(tmp_workspace):
     file_store.ensure_company_dirs(tmp_workspace)
-    p = create_project_shell(_deps(tmp_workspace), "Alpha")
+    p, _git = create_project_shell(_deps(tmp_workspace), "Alpha")
     file_store.set_active_project(tmp_workspace, p.id)
     active = file_store.get_active_project(tmp_workspace)
     assert active is not None
@@ -41,7 +41,7 @@ def test_bootstrap_default_from_migrated_tree(tmp_workspace):
 def test_format_projects_message_marks_active(tmp_workspace):
     file_store.ensure_company_dirs(tmp_workspace)
     deps = _deps(tmp_workspace)
-    a = create_project_shell(deps, "A")
+    a, _ = create_project_shell(deps, "A")
     create_project_shell(deps, "B")
     file_store.set_active_project(tmp_workspace, a.id)
     text = format_projects_message(file_store.load_projects(tmp_workspace))

@@ -18,7 +18,7 @@ def run(command: BaseCommand, deps: AppDeps) -> CreateProjectResult:
             error_code="invalid_name",
         )
     try:
-        rec = create_project_shell(
+        rec, git_note = create_project_shell(
             deps,
             name,
             initial_requirements=command.initial_requirements,
@@ -29,9 +29,15 @@ def run(command: BaseCommand, deps: AppDeps) -> CreateProjectResult:
             message=f"建專案失敗：{exc}",
             error_code="create_failed",
         )
+    message = (
+        f"已建立專案殼 → id={rec.id}（{rec.name}）\n"
+        f"PM Session 索引：sessions/pm_{rec.id}.json"
+    )
+    if git_note.strip():
+        message = f"{message}\n{git_note}"
     return CreateProjectResult(
         success=True,
-        message=f"已建立專案殼 → id={rec.id}（{rec.name}）\nPM Session 索引：sessions/pm_{rec.id}.json",
+        message=message,
         project_id=rec.id,
     )
 

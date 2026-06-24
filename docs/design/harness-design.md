@@ -187,7 +187,7 @@ workers:
 ### 8.1 本機 Git（版本回滾）
 
 - **工作區根**：`COMPANY_WORKSPACE_ROOT`（預設 `company_workspace/`），與框架 repo（`src/`）分離；勿在 repo 根另建 `_company/`。
-- **專案**：每個 `projects/<id>/` 一個 Git 倉（PM `project_git`；cwd 為專案根）。
+- **專案**：每個 `projects/<id>/` 一個 Git 倉（建殼時 **git init**；可選 `GITHUB_AUTO_CREATE_REPO` + `gh repo create`）；PM `project_git` 的 cwd 為專案根。
 - **全公司設定**：`company_workspace/_company/` 可為獨立 Git 倉；**版本化** `projects.json`、`global_config.yaml`、`global_skills.yaml`、`user_prefs.json`；**不版本化** `sessions/`、`execution/`、`metrics/`（由 `init-workspace` 寫入 `.gitignore`）。
 
 ---

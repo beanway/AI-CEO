@@ -54,6 +54,19 @@ class AppSettings(BaseSettings):
     )
     web_api_key: str = Field(default="", validation_alias=AliasChoices("WEB_API_KEY", "web_api_key"))
 
+    github_auto_create_repo: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("GITHUB_AUTO_CREATE_REPO", "github_auto_create_repo"),
+    )
+    github_owner: str = Field(
+        default="",
+        validation_alias=AliasChoices("GITHUB_OWNER", "github_owner"),
+    )
+    github_repo_visibility: str = Field(
+        default="private",
+        validation_alias=AliasChoices("GITHUB_REPO_VISIBILITY", "github_repo_visibility"),
+    )
+
     @property
     def workspace_root(self) -> Path:
         if self.company_workspace_root:
