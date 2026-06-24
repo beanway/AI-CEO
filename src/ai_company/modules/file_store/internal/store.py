@@ -23,6 +23,17 @@ COMPANY_DIR = "_company"
 SESSIONS_DIR = "sessions"
 PROJECTS_DIR = "projects"
 
+# _company 獨立 Git 倉：僅版本化廣域設定；runtime 目錄排除
+_COMPANY_GITIGNORE = """\
+# Harness runtime（不納入可回滾設定）
+sessions/
+execution/
+metrics/
+
+# 暫存
+*.tmp
+"""
+
 
 class FileStore:
     def __init__(self, workspace_root: Path) -> None:
@@ -35,6 +46,9 @@ class FileStore:
         (self.company_dir / SESSIONS_DIR).mkdir(parents=True, exist_ok=True)
         (self.company_dir / "execution").mkdir(exist_ok=True)
         (self.company_dir / "metrics").mkdir(exist_ok=True)
+        gitignore = self.company_dir / ".gitignore"
+        if not gitignore.exists():
+            gitignore.write_text(_COMPANY_GITIGNORE, encoding="utf-8")
 
     def ensure_company_index_files(self, *, initial_global_config: GlobalConfigFile) -> None:
         projects_path = self.company_dir / "projects.json"

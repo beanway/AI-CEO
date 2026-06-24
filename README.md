@@ -33,4 +33,4 @@ python -m ai_company.main run
 | `docs/` | 產品／設計／路線圖／src-layout |
 | `src/ai_company/` | adapters、work_flow、modules、schemas |
 | `.cursor/skills/ai-ceo-framework/` | Cursor 開發本框架的 skill |
-| `company_workspace/` | 本機沙盒（`projects/<id>/`） |
+| `company_workspace/` | 本機沙盒（`COMPANY_WORKSPACE_ROOT`；含 `_company/`、`projects/<id>/`） |

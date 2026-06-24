@@ -48,7 +48,10 @@ class AppSettings(BaseSettings):
         validation_alias=AliasChoices("GOOGLE_API_KEY", "google_api_key"),
     )
 
-    company_workspace_root: Path | None = None
+    company_workspace_root: Path | None = Field(
+        default=None,
+        validation_alias=AliasChoices("COMPANY_WORKSPACE_ROOT", "company_workspace_root"),
+    )
     web_api_key: str = Field(default="", validation_alias=AliasChoices("WEB_API_KEY", "web_api_key"))
 
     @property

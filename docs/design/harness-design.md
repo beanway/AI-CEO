@@ -179,10 +179,16 @@ workers:
 
 ## 8. 安全與 ToolPolicy
 
-- **SandboxRunner**：`cwd` 限 `workers/<id>/` 與該 kind 允許的 `shared/` 等。  
+- **SandboxRunner**：Worker subprocess 的 `cwd` 為 `projects/<id>/` 根（須存在 `workers/<id>/`）；Git 亦在專案根。路徑政策仍限專案沙盒內。  
 - **Git**：預設僅 `task_scheduler`（及 PM 高風險操作經 TG 核准）。  
 - **自動安裝工具/skill**：CEO 裝 registry；PM 啟用；高風險安裝 TG 核准（可分期：先手動 YAML）。  
 - **Secrets**：僅環境變數，不寫入 `company_workspace`。
+
+### 8.1 本機 Git（版本回滾）
+
+- **工作區根**：`COMPANY_WORKSPACE_ROOT`（預設 `company_workspace/`），與框架 repo（`src/`）分離；勿在 repo 根另建 `_company/`。
+- **專案**：每個 `projects/<id>/` 一個 Git 倉（PM `project_git`；cwd 為專案根）。
+- **全公司設定**：`company_workspace/_company/` 可為獨立 Git 倉；**版本化** `projects.json`、`global_config.yaml`、`global_skills.yaml`、`user_prefs.json`；**不版本化** `sessions/`、`execution/`、`metrics/`（由 `init-workspace` 寫入 `.gitignore`）。
 
 ---
 

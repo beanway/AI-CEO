@@ -87,3 +87,13 @@ def test_ensure_company_index_files_creates_defaults(tmp_workspace):
     assert file_store.load_projects(tmp_workspace).projects == []
     assert file_store.load_global_skills(tmp_workspace).enabled_skill_ids == []
     assert file_store.load_global_config(tmp_workspace).default_model == "gemini-2.5-flash"
+
+
+def test_ensure_company_dirs_writes_gitignore(tmp_workspace):
+    file_store.ensure_company_dirs(tmp_workspace)
+    path = tmp_workspace / "_company" / ".gitignore"
+    assert path.is_file()
+    text = path.read_text(encoding="utf-8")
+    assert "sessions/" in text
+    assert "execution/" in text
+    assert "metrics/" in text

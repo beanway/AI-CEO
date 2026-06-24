@@ -85,11 +85,15 @@ def complete_worker_harness_step(
     project_id: str,
     worker_id: str,
 ) -> WorkerStepResult:
-    """在 Worker cwd 寫入步驟完成標記（Phase B 沙盒執行最小產物）。"""
-    cwd = worker_sandbox_cwd(workspace_root, project_id, worker_id)
-    marker = cwd / ".harness_step_done"
+    """在 workers/<id>/ 寫入步驟完成標記；subprocess cwd 為專案根。"""
+    project_root = worker_sandbox_cwd(workspace_root, project_id, worker_id)
+    marker = project_root / "workers" / worker_id / ".harness_step_done"
+    marker.parent.mkdir(parents=True, exist_ok=True)
     marker.write_text(datetime.now(timezone.utc).isoformat(), encoding="utf-8")
-    return WorkerStepResult(worker_id=worker_id, marker_path=str(marker.relative_to(cwd)))
+    return WorkerStepResult(
+        worker_id=worker_id,
+        marker_path=str(marker.relative_to(project_root)),
+    )
 
 
 __all__ = [
