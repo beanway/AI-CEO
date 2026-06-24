@@ -53,6 +53,20 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="手動中斷進行中的 execution 狀態",
     )
+    p_step = sub.add_parser("run-step", help="執行層：派工並跑一步 Worker")
+    p_step.add_argument(
+        "--simulate-failure",
+        action="store_true",
+        help="測試用：模擬 Worker 失敗",
+    )
+    p_fail = sub.add_parser("resolve-failure", help="處理 execution 失敗決策")
+    p_fail.add_argument("failure_id")
+    p_fail.add_argument("decision", choices=("retry", "code_review"))
+    p_skills = sub.add_parser("find-skills", help="列出 skills/registry")
+    p_skills.add_argument("--query", default=None)
+    p_create = sub.add_parser("create-skill", help="建立 registry skill stub")
+    p_create.add_argument("skill_id")
+    p_create.add_argument("--description", default="")
 
     args = parser.parse_args(argv)
 
@@ -99,6 +113,16 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_project_git(argv)
     if args.command == "pm-repair":
         return cli_inbound.run_pm_repair(interrupt=args.interrupt)
+    if args.command == "run-step":
+        return cli_inbound.run_execution_step(simulate_failure=args.simulate_failure)
+    if args.command == "resolve-failure":
+        return cli_inbound.run_resolve_execution_failure(args.failure_id, args.decision)
+    if args.command == "find-skills":
+        return cli_inbound.run_list_registry_skills(query=args.query)
+    if args.command == "create-skill":
+        return cli_inbound.run_create_registry_skill(
+            args.skill_id, description=args.description
+        )
     return 1
 
 

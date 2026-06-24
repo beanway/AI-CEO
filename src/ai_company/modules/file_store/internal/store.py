@@ -8,6 +8,7 @@ from ai_company.schemas.documents import (
     GlobalSkillsFile,
     PendingApprovalRecord,
     PendingApprovalsFile,
+    PendingExecutionFailuresFile,
     ProjectsFile,
     SessionRecord,
     UserPrefsFile,
@@ -153,5 +154,19 @@ class FileStore:
     def save_pending_approvals(self, data: PendingApprovalsFile) -> None:
         self._atomic_write(
             self.company_dir / "pending_approvals.json",
+            data.model_dump_json(indent=2),
+        )
+
+    def load_pending_execution_failures(self) -> PendingExecutionFailuresFile:
+        path = self.company_dir / "pending_execution_failures.json"
+        if not path.exists():
+            return PendingExecutionFailuresFile()
+        return PendingExecutionFailuresFile.model_validate_json(
+            path.read_text(encoding="utf-8")
+        )
+
+    def save_pending_execution_failures(self, data: PendingExecutionFailuresFile) -> None:
+        self._atomic_write(
+            self.company_dir / "pending_execution_failures.json",
             data.model_dump_json(indent=2),
         )

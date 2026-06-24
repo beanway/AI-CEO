@@ -27,6 +27,10 @@ class CommandType(str, Enum):
     PROJECT_GIT = "project_git"
     RESOLVE_APPROVAL = "resolve_approval"
     PM_REPAIR = "pm_repair"
+    RUN_EXECUTION_STEP = "run_execution_step"
+    RESOLVE_EXECUTION_FAILURE = "resolve_execution_failure"
+    LIST_REGISTRY_SKILLS = "list_registry_skills"
+    CREATE_REGISTRY_SKILL = "create_registry_skill"
 
 
 class Channel(str, Enum):
@@ -149,6 +153,31 @@ class PmRepairCommand(BaseCommand):
     interrupt: bool = False
 
 
+class RunExecutionStepCommand(BaseCommand):
+    command_type: Literal[CommandType.RUN_EXECUTION_STEP] = CommandType.RUN_EXECUTION_STEP
+    project_id: str | None = None
+    simulate_failure: bool = False
+
+
+class ResolveExecutionFailureCommand(BaseCommand):
+    command_type: Literal[CommandType.RESOLVE_EXECUTION_FAILURE] = (
+        CommandType.RESOLVE_EXECUTION_FAILURE
+    )
+    failure_id: str = Field(min_length=1)
+    decision: Literal["retry", "code_review"]
+
+
+class ListRegistrySkillsCommand(BaseCommand):
+    command_type: Literal[CommandType.LIST_REGISTRY_SKILLS] = CommandType.LIST_REGISTRY_SKILLS
+    query: str | None = None
+
+
+class CreateRegistrySkillCommand(BaseCommand):
+    command_type: Literal[CommandType.CREATE_REGISTRY_SKILL] = CommandType.CREATE_REGISTRY_SKILL
+    skill_id: str = Field(min_length=1)
+    description: str = ""
+
+
 Command = (
     InitWorkspaceCommand
     | ListProjectsCommand
@@ -166,4 +195,8 @@ Command = (
     | ProjectGitCommand
     | ResolveApprovalCommand
     | PmRepairCommand
+    | RunExecutionStepCommand
+    | ResolveExecutionFailureCommand
+    | ListRegistrySkillsCommand
+    | CreateRegistrySkillCommand
 )

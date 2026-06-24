@@ -79,14 +79,14 @@
 | **P-A1** CEO 全公司（§六） | 完成 |
 | **P-A2** PM 編制／skill／對話／狀態（§七） | 完成 |
 | **P-A3** Git／維修／TG 核准（§八） | 完成 |
-| `work_flow` 已註冊 **16** 條 `run.py` flow | 完成 |
+| `work_flow` 已註冊 **20** 條 `run.py` flow | 完成 |
 | `modules`：`file_store`、`setup_workspace`、`setup_project_folders`、`format_messages`、`ai_core`、`settings`、`skill_registry` | 完成（CEO／全公司與 PM 路徑） |
 | `adapters/telegram`、`adapters/cli` → `dispatch` | 完成 |
 | 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
 | TG：`/projects`、`/switch`、`/newproject`、`/addskill`、`/mode`、`/setupworkers`…；`on_text` 依 mode → **`ceo_chat` / `pm_chat`** | 完成 |
 | CLI：對等子命令（`mode`、`pm-chat`、`setup-workers`、`project-status` 等） | 完成 |
 | **架構收斂**（§十五 #1–2） | **待做** |
-| **B** 執行層（§九：`execution_store` 佇列、`task_scheduler`） | **未做** |
+| **B** 執行層（§九：`execution_store` 佇列、`task_scheduler`） | **完成** |
 
 **§三 未完成項（為何／何時）**
 
@@ -204,7 +204,7 @@ CEO 動作影響 **所有專案**（或建立新專案 **殼**）。PM 專案內
 | 5 | **人機關卡**：失敗時 TG 選重試或 code review | human-in-the-loop flow | harness §7 |
 | 6 | **追加（唯寫 log）** 派工與失敗記錄 | `pm/scheduler_decisions.jsonl` | 不做結構化評分門檻 |
 
-- [ ] 步驟 1–6
+- [x] 步驟 1–6
 
 ---
 
@@ -212,8 +212,8 @@ CEO 動作影響 **所有專案**（或建立新專案 **殼**）。PM 專案內
 
 **代號**：B+ · **規格錨點**：harness §2.2 第 4 項、§5.4 疊加順序。
 
-- [ ] **對齊** `skills/registry/` 與 CEO／PM **啟用** flow 的疊加順序（global → project → role）
-- [ ] **adapter**：find-skills / create-skill（給 **開發本框架** 用；≠ 沙盒內 Worker skill 目錄）
+- [x] **對齊** `skills/registry/` 與 CEO／PM **啟用** flow 的疊加順序（global → project → role）
+- [x] **adapter**：find-skills / create-skill（給 **開發本框架** 用；≠ 沙盒內 Worker skill 目錄）
 
 ---
 
@@ -221,7 +221,7 @@ CEO 動作影響 **所有專案**（或建立新專案 **殼**）。PM 專案內
 
 **代號**：C · **規格錨點**：harness §2.2 第 5 項。
 
-- [ ] QA Worker 產出回流，專案狀態可至 `PROJECT_DONE`（見 harness 測試 Phase B/C）
+- [x] QA Worker 產出回流，專案狀態可至 `PROJECT_DONE`（見 harness 測試 Phase B/C）
 
 ---
 

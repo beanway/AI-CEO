@@ -16,6 +16,18 @@ from ai_company.work_flow.project_git__work_flow.run import register as register
 from ai_company.work_flow.resolve_approval__work_flow.run import (
     register as register_resolve_approval,
 )
+from ai_company.work_flow.run_execution_step__work_flow.run import (
+    register as register_run_execution_step,
+)
+from ai_company.work_flow.resolve_execution_failure__work_flow.run import (
+    register as register_resolve_execution_failure,
+)
+from ai_company.work_flow.list_registry_skills__work_flow.run import (
+    register as register_list_registry_skills,
+)
+from ai_company.work_flow.create_registry_skill__work_flow.run import (
+    register as register_create_registry_skill,
+)
 from ai_company.work_flow.set_user_mode__work_flow.run import register as register_set_user_mode
 from ai_company.work_flow.setup_workers__work_flow.run import register as register_setup_workers
 from ai_company.work_flow.show_global_config__work_flow.run import (
@@ -43,6 +55,10 @@ register_pm_chat(registry)
 register_pm_repair(registry)
 register_project_git(registry)
 register_resolve_approval(registry)
+register_run_execution_step(registry)
+register_resolve_execution_failure(registry)
+register_list_registry_skills(registry)
+register_create_registry_skill(registry)
 register_setup_workers(registry)
 register_add_skill_to_project(registry)
 register_show_project_status(registry)

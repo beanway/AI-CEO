@@ -38,8 +38,11 @@ def run(command: BaseCommand, deps: AppDeps) -> ShowProjectStatusResult:
     )
     pm_dir = root / "pm"
     pm_files = len(list(pm_dir.iterdir())) if pm_dir.is_dir() else 0
+    harness = file_store.load_project_harness_state(deps.workspace_root, project_id)
+    lifecycle = harness.lifecycle.value
     message = (
         f"專案 {project_id} · {name}\n"
+        f"harness：{lifecycle}\n"
         f"requirements.md：{req_hint}\n"
         f"pm/ 檔案數：{pm_files}\n"
         f"Workers（workers.yaml）：\n{worker_lines}\n"

@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import yaml
-
+import json
 import secrets
+
+import yaml
 
 from ai_company.schemas.workspace_paths import project_dir
 from ai_company.modules.file_store.internal.store import FileStore
@@ -15,6 +16,10 @@ from ai_company.schemas.documents import (
     GlobalSkillsFile,
     PendingApprovalRecord,
     PendingApprovalsFile,
+    PendingExecutionFailureRecord,
+    PendingExecutionFailuresFile,
+    ProjectHarnessStateFile,
+    ProjectLifecycle,
     ProjectRecord,
     ProjectSkillsFile,
     ProjectsFile,
@@ -23,6 +28,7 @@ from ai_company.schemas.documents import (
     UserPref,
     UserPrefsFile,
     WorkersFile,
+    ApprovalStatus,
 )
 
 DEFAULT_PROJECT_ID = "default"
@@ -274,3 +280,105 @@ def update_pending_approval(
     data = load_pending_approvals(workspace_root)
     data.items[record.id] = record
     save_pending_approvals(workspace_root, data)
+
+
+def _harness_state_path(workspace_root: Path, project_id: str) -> Path:
+    return project_dir(workspace_root, project_id) / "pm" / "harness_state.json"
+
+
+def load_project_harness_state(
+    workspace_root: Path, project_id: str
+) -> ProjectHarnessStateFile:
+    path = _harness_state_path(workspace_root, project_id)
+    if not path.is_file():
+        return ProjectHarnessStateFile()
+    return ProjectHarnessStateFile.model_validate_json(path.read_text(encoding="utf-8"))
+
+
+def save_project_harness_state(
+    workspace_root: Path, project_id: str, state: ProjectHarnessStateFile
+) -> None:
+    path = _harness_state_path(workspace_root, project_id)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(state.model_dump_json(indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
+def append_scheduler_decision(
+    workspace_root: Path,
+    project_id: str,
+    *,
+    event: str,
+    worker_id: str | None = None,
+    detail: str = "",
+) -> None:
+    log_path = project_dir(workspace_root, project_id) / "pm" / "scheduler_decisions.jsonl"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    line = {
+        "event": event,
+        "worker_id": worker_id,
+        "detail": detail,
+    }
+    with log_path.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(line, ensure_ascii=False) + "\n")
+
+
+def set_project_lifecycle_done(workspace_root: Path, project_id: str) -> None:
+    pf = load_projects(workspace_root)
+    updated: list[ProjectRecord] = []
+    for rec in pf.projects:
+        if rec.id == project_id:
+            updated.append(rec.model_copy(update={"status": ProjectLifecycle.PROJECT_DONE.value}))
+        else:
+            updated.append(rec)
+    save_projects(workspace_root, pf.model_copy(update={"projects": updated}))
+
+
+def load_pending_execution_failures(workspace_root: Path) -> PendingExecutionFailuresFile:
+    return _store(workspace_root).load_pending_execution_failures()
+
+
+def save_pending_execution_failures(
+    workspace_root: Path, data: PendingExecutionFailuresFile
+) -> None:
+    _store(workspace_root).save_pending_execution_failures(data)
+
+
+def create_pending_execution_failure(
+    workspace_root: Path,
+    *,
+    record: PendingExecutionFailureRecord,
+) -> PendingExecutionFailureRecord:
+    store = _store(workspace_root)
+    data = store.load_pending_execution_failures()
+    failure_id = secrets.token_hex(4)
+    while failure_id in data.items:
+        failure_id = secrets.token_hex(4)
+    stored = record.model_copy(update={"id": failure_id})
+    data.items[failure_id] = stored
+    store.save_pending_execution_failures(data)
+    return stored
+
+
+def get_pending_execution_failure(
+    workspace_root: Path, failure_id: str
+) -> PendingExecutionFailureRecord | None:
+    return load_pending_execution_failures(workspace_root).items.get(failure_id)
+
+
+def update_pending_execution_failure(
+    workspace_root: Path, record: PendingExecutionFailureRecord
+) -> None:
+    data = load_pending_execution_failures(workspace_root)
+    data.items[record.id] = record
+    save_pending_execution_failures(workspace_root, data)
+
+
+def pending_execution_failure_for_project(
+    workspace_root: Path, project_id: str
+) -> PendingExecutionFailureRecord | None:
+    for item in load_pending_execution_failures(workspace_root).items.values():
+        if item.project_id == project_id and item.status == ApprovalStatus.PENDING:
+            return item
+    return None

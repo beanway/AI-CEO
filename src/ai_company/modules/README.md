@@ -14,6 +14,7 @@
 | `ai_core` | AI 供應商與對話 | Phase A（CEO chat） |
 | `execution_store` | 執行狀態持久化 | Phase B |
 | `sandbox_runner` | 沙盒指令執行 | Phase B |
+| [`task_scheduler`](task_scheduler/README.md) | Worker 排程 | Phase B |
 | `notify` | 出站通知 | Phase B |
 
 規格：[`docs/design/src-layout.md`](../../../docs/design/src-layout.md)

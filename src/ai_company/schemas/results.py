@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, Field
+from pydantic import BaseModel, Field
 
 
 class FlowResult(BaseModel):
@@ -82,3 +82,25 @@ class PmRepairResult(FlowResult):
     project_id: str | None = None
     running_execution_count: int | None = None
     interrupted_execution_ids: list[str] = Field(default_factory=list)
+
+
+class RunExecutionStepResult(FlowResult):
+    project_id: str | None = None
+    execution_id: str | None = None
+    worker_id: str | None = None
+    project_done: bool = False
+    failure_id: str | None = None
+
+
+class ResolveExecutionFailureResult(FlowResult):
+    failure_id: str | None = None
+    decision: str | None = None
+
+
+class ListRegistrySkillsResult(FlowResult):
+    skill_ids: list[str] = Field(default_factory=list)
+
+
+class CreateRegistrySkillResult(FlowResult):
+    skill_id: str | None = None
+    path: str | None = None

@@ -24,6 +24,10 @@ from ai_company.schemas.commands import (
     SwitchProjectCommand,
     PmRepairCommand,
     ProjectGitCommand,
+    RunExecutionStepCommand,
+    ResolveExecutionFailureCommand,
+    ListRegistrySkillsCommand,
+    CreateRegistrySkillCommand,
 )
 from ai_company.schemas.documents import UserMode
 
@@ -233,6 +237,66 @@ def run_pm_repair(*, interrupt: bool) -> int:
     deps = AppDeps(settings=get_settings())
     result = dispatch(
         PmRepairCommand(channel=Channel.CLI, interrupt=interrupt),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_execution_step(*, simulate_failure: bool = False) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        RunExecutionStepCommand(
+            channel=Channel.CLI,
+            simulate_failure=simulate_failure,
+        ),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_resolve_execution_failure(failure_id: str, decision: str) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        ResolveExecutionFailureCommand(
+            channel=Channel.CLI,
+            failure_id=failure_id,
+            decision=decision,  # type: ignore[arg-type]
+        ),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_list_registry_skills(query: str | None = None) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        ListRegistrySkillsCommand(channel=Channel.CLI, query=query),
+        deps,
+    )
+    print(result.message)
+    return 0 if result.success else 1
+
+
+def run_create_registry_skill(skill_id: str, description: str = "") -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        CreateRegistrySkillCommand(
+            channel=Channel.CLI,
+            skill_id=skill_id,
+            description=description,
+        ),
         deps,
     )
     if not result.success:

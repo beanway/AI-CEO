@@ -27,6 +27,17 @@ def project_sandbox_root(workspace_root: Path, project_id: str) -> Path:
     return root.resolve()
 
 
+def worker_sandbox_cwd(workspace_root: Path, project_id: str, worker_id: str) -> Path:
+    """Worker 工作目錄，限於 projects/<id>/workers/<worker_id>/。"""
+    root = project_sandbox_root(workspace_root, project_id)
+    cwd = (root / "workers" / worker_id).resolve()
+    if not cwd.is_dir():
+        raise ToolPolicyError(f"Worker 目錄不存在：workers/{worker_id}/")
+    if not _path_within_root(cwd, root):
+        raise ToolPolicyError(f"Worker cwd 超出沙盒：{worker_id!r}")
+    return cwd
+
+
 def _path_within_root(candidate: Path, root: Path) -> bool:
     try:
         candidate.resolve().relative_to(root.resolve())
