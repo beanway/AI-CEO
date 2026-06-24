@@ -217,18 +217,18 @@ flowchart TB
 
 ## 10. 測試與完成判定（修訂 Phase A/B）
 
-**Phase A（CEO + PM 殼局）**
+**Phase A（CEO + PM 殼局）** — 簽收見 `docs/ROADMAP.md` §十三 模擬腳本
 
-- [ ] CEO `/switch` 於 a/b 間切換，PM Session 隔離  
-- [ ] CEO 寫入 `global_skills.yaml` / `global_config.yaml`  
-- [ ] PM 為專案 b 建立 3 Worker、專案 a 建立 5 Worker（`workers.yaml` + 目錄）  
-- [ ] 自訂 kind 需 `SKILL.md` 校驗失敗可拒絕  
+- [x] CEO `/switch` 於 a/b 間切換，PM Session 隔離  
+- [x] CEO 寫入 `global_skills.yaml` / `global_config.yaml`  
+- [x] PM 為專案 b 建立 3 Worker、專案 a 建立 5 Worker（`workers.yaml` + 目錄）  
+- [x] 自訂 kind 需 `SKILL.md` 校驗失敗可拒絕  
 
 **Phase B（Harness 執行）**
 
-- [ ] 任務分配者排程 + 執行者 Bot 通知  
-- [ ] 失敗 TG：重試 / code review 路徑  
-- [ ] `scheduler_decisions.jsonl` 有記錄（無結構化評分）  
+- [x] 任務分配者排程 + 執行者 Bot 通知  
+- [x] 失敗 TG：重試 / code review 路徑  
+- [x] `scheduler_decisions.jsonl` 有記錄（無結構化評分）  
 
 ---
 

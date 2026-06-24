@@ -46,6 +46,14 @@ run_unit_tests() {
   "$pytest_bin" -q
 }
 
+run_simulate_p_a1() {
+  "$PYTHON" "$ROOT/scripts/simulate_p_a1_acceptance.py"
+}
+
+run_simulate_p_a2() {
+  "$PYTHON" "$ROOT/scripts/simulate_p_a2_acceptance.py"
+}
+
 run_simulate_p_a3() {
   "$PYTHON" "$ROOT/scripts/simulate_p_a3_acceptance.py"
 }
@@ -70,6 +78,31 @@ for f in registry.list_flows():
     print(f.flow_id)"
 }
 
+run_simulate_all() {
+  "$PYTHON" "$ROOT/scripts/simulate_all_acceptance.py"
+}
+
+run_all_simulations() {
+  local ec=0
+  echo ""
+  echo "▶ P-A1 模擬驗收…"
+  if run_simulate_p_a1; then echo "  P-A1：PASS"; else echo "  P-A1：FAIL" >&2; ec=1; fi
+  echo ""
+  echo "▶ P-A2 模擬驗收…"
+  if run_simulate_p_a2; then echo "  P-A2：PASS"; else echo "  P-A2：FAIL" >&2; ec=1; fi
+  echo ""
+  echo "▶ P-A3 模擬驗收…"
+  if run_simulate_p_a3; then echo "  P-A3：PASS"; else echo "  P-A3：FAIL" >&2; ec=1; fi
+  echo ""
+  echo "▶ Phase B/C 模擬驗收…"
+  if run_simulate_p_b_c; then echo "  B/C：PASS"; else echo "  B/C：FAIL" >&2; ec=1; fi
+  echo ""
+  echo "▶ 第二期模擬驗收…"
+  if run_simulate_phase2; then echo "  第二期：PASS"; else echo "  第二期：FAIL" >&2; ec=1; fi
+  echo ""
+  return "$ec"
+}
+
 run_all_tests() {
   local ec=0
   echo ""
@@ -80,31 +113,9 @@ run_all_tests() {
     echo "  單元測試：FAIL" >&2
     ec=1
   fi
-  echo ""
-  echo "▶ P-A3 模擬驗收…"
-  if run_simulate_p_a3; then
-    echo "  P-A3 模擬驗收：PASS"
-  else
-    echo "  P-A3 模擬驗收：FAIL" >&2
+  if ! run_all_simulations; then
     ec=1
   fi
-  echo ""
-  echo "▶ Phase B/C 模擬驗收…"
-  if run_simulate_p_b_c; then
-    echo "  Phase B/C 模擬驗收：PASS"
-  else
-    echo "  Phase B/C 模擬驗收：FAIL" >&2
-    ec=1
-  fi
-  echo ""
-  echo "▶ 第二期模擬驗收…"
-  if run_simulate_phase2; then
-    echo "  第二期模擬驗收：PASS"
-  else
-    echo "  第二期模擬驗收：FAIL" >&2
-    ec=1
-  fi
-  echo ""
   if [[ "$ec" -eq 0 ]]; then
     echo "全部測試通過。"
   else
@@ -117,12 +128,16 @@ test_menu() {
   while true; do
     echo ""
     echo "── 測試（驗收，見 docs/ROADMAP.md §十三）──"
-    echo "  1  全部（pytest + P-A3 + B/C + 第二期模擬）"
+    echo "  1  全部（pytest + 所有模擬驗收）"
     echo "  2  單元測試 (pytest -q)"
-    echo "  3  P-A3 模擬驗收 (scripts/simulate_p_a3_acceptance.py)"
-    echo "  4  Phase B/C 模擬驗收 (scripts/simulate_p_b_c_acceptance.py)"
+    echo "  7  一鍵全部模擬（scripts/simulate_all_acceptance.py）"
+    echo "  ── 單項模擬 ──"
+    echo "  a1 P-A1 模擬 (simulate_p_a1_acceptance.py)"
+    echo "  a2 P-A2 模擬 (simulate_p_a2_acceptance.py)"
+    echo "  3  P-A3 模擬驗收"
+    echo "  4  Phase B/C 模擬驗收"
+    echo "  6  第二期模擬驗收"
     echo "  5  已註冊 work_flow 列表"
-    echo "  6  第二期模擬驗收 (scripts/simulate_phase2_acceptance.py)"
     echo "  b  返回主選單"
     echo ""
     read -r -p "請選擇: " test_choice
@@ -132,6 +147,15 @@ test_menu() {
         ;;
       2)
         run_unit_tests || true
+        ;;
+      7)
+        run_simulate_all || true
+        ;;
+      a1 | A1)
+        run_simulate_p_a1 || true
+        ;;
+      a2 | A2)
+        run_simulate_p_a2 || true
         ;;
       3)
         run_simulate_p_a3 || true

@@ -46,8 +46,8 @@
 
 | 缺口 | 為何未做 | 何時可做 |
 |------|----------|----------|
-| 步驟 5：`adapters/README.md` 路由表未列齊 TG／CLI | 產品迭代快於文件；不擋 dispatch | 下一個改 adapter 或補 TG 指令的 PR 順手更新 |
-| 步驟 8：`harness-design` §10 核取未回寫 | §十四 約定 **以本檔為執行勾選** | 需要對外簽收 Phase A 時回寫，或維持單一真相在本檔 |
+| 步驟 5：`adapters/README.md` 路由表 | 已擴充 CLI／Web；TG 細項見 §六 表 | — |
+| 步驟 8：`harness-design` §10 核取未回寫 | §十四 約定 **以本檔為執行勾選** | 需要對外簽收時回寫，或維持單一真相在本檔 |
 
 ---
 
@@ -67,7 +67,7 @@
 | 7 | 網頁 adapter | **C** 端到端 QA 閉環 | §十一 |
 | 8 | — | **二期** COO 報表、Web 產品化、評分 | §十二 |
 
-**§二 尚未進行的列（順序 5–8）**：需 §七 建局與（部分）執行層就緒；**刻意排在 P-A1–P-A3 之後**，避免無沙盒／無 ToolPolicy 時先做排程。對照 §九–§十二 勾選項。
+**§二 尚未進行的列（順序 5–8）**：§五–§十二 產品與架構主線已交付；剩餘為 §十五 可選收斂與 TG 次要指令（§六 表）。
 
 ---
 
@@ -79,21 +79,20 @@
 | **P-A1** CEO 全公司（§六） | 完成 |
 | **P-A2** PM 編制／skill／對話／狀態（§七） | 完成 |
 | **P-A3** Git／維修／TG 核准（§八） | 完成 |
-| `work_flow` 已註冊 **20** 條 `run.py` flow | 完成 |
-| `modules`：`file_store`、`setup_workspace`、`setup_project_folders`、`format_messages`、`ai_core`、`settings`、`skill_registry` | 完成（CEO／全公司與 PM 路徑） |
-| `adapters/telegram`、`adapters/cli` → `dispatch` | 完成 |
-| 已刪 `services/`、`store/`、`workspace.py`、`legacy_services` | 完成 |
-| TG：`/projects`、`/switch`、`/newproject`、`/addskill`、`/mode`、`/setupworkers`…；`on_text` 依 mode → **`ceo_chat` / `pm_chat`** | 完成 |
-| CLI：對等子命令（`mode`、`pm-chat`、`setup-workers`、`project-status` 等） | 完成 |
-| **架構收斂**（§十五 #1–2） | **待做** |
-| **B** 執行層（§九：`execution_store` 佇列、`task_scheduler`） | **完成** |
+| **B**／**B+**／**C**（§九–§十一） | 完成 |
+| **第二期** COO／Web／評分（§十二） | 完成 |
+| `work_flow` 已註冊 **22** 條 `run.py` flow | 完成 |
+| `adapters/telegram`、`adapters/cli`、`adapters/web` → `dispatch` | 完成 |
+| **模擬驗收**（§十三 表） | 完成 |
+| **架構收斂**（§十五 #1–2） | **完成**（`company_workspace` 編排、`route_manager_chat`） |
+| TG：`/global`、`update-global` 等次要路由 | 待補（§六 表，不擋簽收） |
 
 **§三 未完成項（為何／何時）**
 
 | 項目 | 為何未做 | 何時可做 |
 |------|----------|----------|
-| **架構收斂**（§十五 #1–2） | Phase A 先交付產品；`on_text` 直讀 mode、`setup_workspace`↔`file_store` 為過渡取捨 | **Phase B 前**小步 PR（§十五 表） |
-| **B 執行層** | 佇列與排程屬 §九；Git／核准已於 P-A3 交付 | **§九** |
+| TG `/global` 等 | MVP 以 CLI／Web 補齊 | 小 PR |
+| **移除 global skill** flow | 手改 YAML 可替代 | 營運需要時 |
 
 ---
 
@@ -108,7 +107,7 @@
 
 **驗收**：`.venv/bin/pytest` 全綠；`./run.sh` / `main init-workspace` 與 list/switch/global 行為正常。
 
-**§四 備註**：「Phase A 四 flow」為 A0 當時表述；現以 §三 flow 總數（16）為準。
+**§四 備註**：「Phase A 四 flow」為 A0 當時表述；現以 §三 flow 總數（22）為準。
 
 ---
 
@@ -235,12 +234,23 @@ CEO 動作影響 **所有專案**（或建立新專案 **殼**）。PM 專案內
 
 ## 十三、驗收指令速查
 
+**互動**：`./run.sh` → **3 測試** → **1**（pytest + 下表全部模擬）或 **7**（僅模擬）。
+
+| 路線圖 | 模擬腳本 |
+|--------|----------|
+| §六 P-A1 | `scripts/simulate_p_a1_acceptance.py` |
+| §七 P-A2 | `scripts/simulate_p_a2_acceptance.py` |
+| §八 P-A3 | `scripts/simulate_p_a3_acceptance.py` |
+| §九–§十一 B／B+／C | `scripts/simulate_p_b_c_acceptance.py` |
+| §十二 第二期 | `scripts/simulate_phase2_acceptance.py` |
+| **一鍵全部模擬** | `scripts/simulate_all_acceptance.py` |
+
 ```bash
-# 測試（互動選單：./run.sh → 3 測試）
+# 單元測試
 .venv/bin/pytest -q
-.venv/bin/python scripts/simulate_p_a3_acceptance.py
-.venv/bin/python scripts/simulate_p_b_c_acceptance.py
-.venv/bin/python scripts/simulate_phase2_acceptance.py
+
+# 全部模擬（與 run.sh 測試選單 7 相同）
+.venv/bin/python scripts/simulate_all_acceptance.py
 
 # Web（或 ./run.sh → 4）
 python -m ai_company.adapters.web --port 8765
@@ -248,9 +258,11 @@ python -m ai_company.adapters.web --port 8765
 # 已註冊 flow
 .venv/bin/python -c "from ai_company.work_flow import _register; from ai_company.work_flow.registry import registry; print([f.flow_id for f in registry.list_flows()])"
 
-# 本機 CEO CLI
+# 本機選單
 ./run.sh
 ```
+
+模擬腳本使用 **Fake chat**（不讀 `.env` API key），可離線簽收。
 
 ---
 
@@ -269,20 +281,13 @@ python -m ai_company.adapters.web --port 8765
 
 P-A1–P-A3 與一輪產品交付已完成；下列為 **刻意保留的過渡實作**，開 Phase B 前請對照 [`src-layout.md`](design/src-layout.md) 依賴規則。
 
-| # | 項目 | 現狀 | 建議修改方向 | 建議時機 |
-|---|------|------|--------------|----------|
-| 1 | **`setup_workspace` ↔ `file_store`** | `ensure_workspace` 內直接呼叫 `file_store.ensure_company_*` | 由 **`init_workspace__work_flow`**／啟動路徑編排；避免模組互引 `core` | Phase B 前小步 PR |
-| 2 | **TG `on_text` 直讀 `get_user_mode`** | `manager_handlers` 未經 `dispatch` 分支 CEO／PM chat | **`route_manager_chat__work_flow`**（或等價單一 Command）；更新 framework skill 過渡說明 | Phase B 前（§三 待做） |
-| 3 | **`worker_state.py`** | 固定五角色佔位；已標廢止 | 遷移至 **`execution_store`**（§九 步驟 1） | §九 步驟 1 |
-| 4 | **Phase B 模組空殼** | `execution_store`、`sandbox_runner`、`notify` 僅骨架 | 依 §九 實作 | P-A3 之後；Git 深化可與 `sandbox_runner` 並行 |
+| # | 項目 | 現狀 | 建議修改方向 | 狀態 |
+|---|------|------|--------------|------|
+| 1 | **`setup_workspace` ↔ `file_store`** | `ensure_workspace` 僅遷移；索引由 `work_flow/_shared/company_workspace` 編排 | `init_workspace`／CEO flow 呼叫 `ensure_company_workspace` | **完成** |
+| 2 | **TG `on_text` 直讀 `get_user_mode`** | 改為 `RouteManagerChatCommand` → `route_manager_chat__work_flow` | 單一 dispatch 路由 chat | **完成** |
+| 3 | **`worker_state.py`** | 已廢止 | 使用 `execution_store` | **完成** |
+| 4 | **Phase B 模組** | 已實作 | §九 | **完成** |
 
-**下一步產品優先序**
+**後續產品（非阻擋簽收）**
 
-- **Phase B**（§九）：佇列、`task_scheduler`、執行者通知；銜接 harness §7 失敗決策。
-- 架構收斂（上表 #1–2）可與 §九 第一個 flow **同輪小 PR**，不擋排程主線。
-
-**驗收（收斂項）**
-
-- `rg 'from ai_company.modules.file_store' src/ai_company/modules/setup_workspace` 無 `core` 互依，或已文件化例外並有 flow 編排。
-- `manager_handlers.on_text` 僅 `dispatch` 一條 chat 路由 Command。
-- `.venv/bin/pytest -q` 全綠。
+- TG 補 `/global`、CEO 移除 global skill 等（§六 表）。
