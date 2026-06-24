@@ -5,59 +5,52 @@ from __future__ import annotations
 
 import json
 import sys
-import tempfile
 import urllib.request
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 
-import ai_company.work_flow._register  # noqa: F401
+import simulate_common as sim  # noqa: E402
 
-from ai_company.adapters.deps import AppDeps
-from ai_company.adapters.dispatch import dispatch
-from ai_company.adapters.web.inbound import dispatch_json
-from ai_company.adapters.web.server import make_handler
-from ai_company.config import Settings
-from ai_company.modules.file_store import core as file_store
-from ai_company.schemas.commands import CeoChatCommand, ShowCooReportCommand
+sim.bootstrap_imports()
+sim.register_flows()
 
-
-def _ok(label: str) -> None:
-    print(f"  ✓ {label}")
-
-
-def _fail(label: str, detail: str) -> None:
-    print(f"  ✗ {label}: {detail}", file=sys.stderr)
+from ai_company.adapters.dispatch import dispatch  # noqa: E402
+from ai_company.adapters.web.inbound import dispatch_json  # noqa: E402
+from ai_company.adapters.web.server import make_handler  # noqa: E402
+from ai_company.modules.file_store import core as file_store  # noqa: E402
+from ai_company.schemas.commands import CeoChatCommand, ShowCooReportCommand  # noqa: E402
 
 
 def main() -> int:
     print("第二期（§十二）驗收模擬")
-    workspace = Path(tempfile.mkdtemp(prefix="ai-ceo-p2-"))
-    settings = Settings(company_workspace_root=workspace)
-    deps = AppDeps(settings=settings)
+    workspace = sim.temp_workspace("ai-ceo-p2-")
+    deps = sim.make_deps(workspace)
     file_store.ensure_company_dirs(workspace)
 
     chat = dispatch(CeoChatCommand(text="ping"), deps)
     if not chat.success:
-        _fail("ceo_chat + metrics", chat.message)
+        sim.fail("ceo_chat + metrics", chat.message)
         return 1
-    _ok("ceo_chat 寫入 usage.jsonl")
+    sim.ok("ceo_chat 寫入 usage.jsonl")
 
     report = dispatch(ShowCooReportCommand(), deps)
     if not report.success or not report.total_events:
-        _fail("COO 報表", report.message)
+        sim.fail("COO 報表", report.message)
         return 1
-    _ok("show_coo_report 報表")
+    sim.ok("show_coo_report 報表")
 
     out = dispatch_json({"command_type": "list_projects"}, deps)
     if not out.get("success"):
-        _fail("web inbound", str(out))
+        sim.fail("web inbound", str(out))
         return 1
-    _ok("Web inbound dispatch_json")
+    sim.ok("Web inbound dispatch_json")
 
+    settings = deps.settings
     handler = make_handler(settings, deps)
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     port = server.server_address[1]
@@ -73,9 +66,9 @@ def main() -> int:
         with urllib.request.urlopen(req, timeout=5) as resp:
             body = json.loads(resp.read().decode("utf-8"))
         if not body.get("success"):
-            _fail("HTTP dispatch", str(body))
+            sim.fail("HTTP dispatch", str(body))
             return 1
-        _ok("HTTP POST /api/v1/dispatch")
+        sim.ok("HTTP POST /api/v1/dispatch")
     finally:
         server.shutdown()
 
