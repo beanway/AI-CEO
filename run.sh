@@ -50,6 +50,17 @@ run_simulate_p_a3() {
   "$PYTHON" "$ROOT/scripts/simulate_p_a3_acceptance.py"
 }
 
+run_simulate_p_b_c() {
+  "$PYTHON" "$ROOT/scripts/simulate_p_b_c_acceptance.py"
+}
+
+run_list_flows() {
+  "$PYTHON" -c "from ai_company.work_flow import _register  # noqa: F401
+from ai_company.work_flow.registry import registry
+for f in registry.list_flows():
+    print(f.flow_id)"
+}
+
 run_all_tests() {
   local ec=0
   echo ""
@@ -63,9 +74,17 @@ run_all_tests() {
   echo ""
   echo "▶ P-A3 模擬驗收…"
   if run_simulate_p_a3; then
-    echo "  模擬驗收：PASS"
+    echo "  P-A3 模擬驗收：PASS"
   else
-    echo "  模擬驗收：FAIL" >&2
+    echo "  P-A3 模擬驗收：FAIL" >&2
+    ec=1
+  fi
+  echo ""
+  echo "▶ Phase B/C 模擬驗收…"
+  if run_simulate_p_b_c; then
+    echo "  Phase B/C 模擬驗收：PASS"
+  else
+    echo "  Phase B/C 模擬驗收：FAIL" >&2
     ec=1
   fi
   echo ""
@@ -80,10 +99,12 @@ run_all_tests() {
 test_menu() {
   while true; do
     echo ""
-    echo "── 測試 ──"
-    echo "  1  全部（單元測試 + P-A3 模擬驗收）"
+    echo "── 測試（驗收，見 docs/ROADMAP.md §十三）──"
+    echo "  1  全部（pytest + P-A3 + Phase B/C 模擬）"
     echo "  2  單元測試 (pytest -q)"
     echo "  3  P-A3 模擬驗收 (scripts/simulate_p_a3_acceptance.py)"
+    echo "  4  Phase B/C 模擬驗收 (scripts/simulate_p_b_c_acceptance.py)"
+    echo "  5  已註冊 work_flow 列表"
     echo "  b  返回主選單"
     echo ""
     read -r -p "請選擇: " test_choice
@@ -96,6 +117,12 @@ test_menu() {
         ;;
       3)
         run_simulate_p_a3 || true
+        ;;
+      4)
+        run_simulate_p_b_c || true
+        ;;
+      5)
+        run_list_flows || true
         ;;
       b | B)
         return 0
