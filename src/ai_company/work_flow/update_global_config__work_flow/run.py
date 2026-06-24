@@ -33,6 +33,10 @@ def _merge_config(
         updates["include_thoughts"] = command.include_thoughts
     if command.temperature is not None:
         updates["temperature"] = command.temperature
+    if command.executor_notify_chat_id is not None:
+        updates["executor_notify_chat_id"] = command.executor_notify_chat_id
+    if command.dispatch_min_score is not None:
+        updates["dispatch_min_score"] = command.dispatch_min_score
     return current.model_copy(update=updates)
 
 
@@ -62,6 +66,10 @@ def run(command: BaseCommand, deps: AppDeps) -> UpdateGlobalConfigResult:
     ]
     if merged.temperature is not None:
         lines.append(f"  temperature: {merged.temperature}")
+    if merged.executor_notify_chat_id is not None:
+        lines.append(f"  executor_notify_chat_id: {merged.executor_notify_chat_id}")
+    if merged.dispatch_min_score is not None:
+        lines.append(f"  dispatch_min_score: {merged.dispatch_min_score}")
     return UpdateGlobalConfigResult(success=True, message="\n".join(lines))
 
 

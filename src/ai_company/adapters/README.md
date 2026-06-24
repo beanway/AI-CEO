@@ -10,6 +10,7 @@
 | `dispatch.py` | 統一入口 → `work_flow.dispatch` |
 | `cli/` | `python -m ai_company.adapters.cli`（`ceo_cli` 轉發） |
 | `telegram/` | 管理者／執行者 Bot handler |
+| [`web/`](web/README.md) | HTTP `POST /api/v1/dispatch`（第二期） |
 
 ## 路由表（Phase A）
 

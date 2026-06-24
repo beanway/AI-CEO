@@ -8,6 +8,7 @@ from ai_company.schemas.ai_generation import AiGenerationSettings
 from ai_company.schemas.commands import BaseCommand, CeoChatCommand, CommandType
 from ai_company.schemas.documents import SessionRecord, utc_now
 from ai_company.schemas.results import CeoChatResult
+from ai_company.work_flow._shared.record_chat_usage import record_chat_usage
 from ai_company.work_flow.registry import WorkFlowRegistry
 
 
@@ -139,6 +140,14 @@ def run(command: BaseCommand, deps: AppDeps) -> CeoChatResult:
             message=f"CEO 對話失敗：{exc}",
             error_code="ceo_chat_failed",
         )
+    record_chat_usage(
+        deps.workspace_root,
+        event="ceo_chat",
+        project_id=active_id,
+        role="ceo",
+        user_text=text,
+        reply_text=reply,
+    )
     return CeoChatResult(success=True, message=reply, reply=reply)
 
 

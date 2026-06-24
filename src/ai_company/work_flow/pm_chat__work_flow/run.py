@@ -9,6 +9,7 @@ from ai_company.schemas.ai_generation import AiGenerationSettings
 from ai_company.schemas.commands import BaseCommand, CommandType, PmChatCommand
 from ai_company.schemas.results import PmChatResult
 from ai_company.work_flow._shared.pm_project import require_active_project_id
+from ai_company.work_flow._shared.record_chat_usage import record_chat_usage
 from ai_company.work_flow.registry import WorkFlowRegistry
 
 
@@ -96,6 +97,14 @@ def run(command: BaseCommand, deps: AppDeps) -> PmChatResult:
             message=f"PM 對話失敗：{exc}",
             error_code="pm_chat_failed",
         )
+    record_chat_usage(
+        deps.workspace_root,
+        event="pm_chat",
+        project_id=project_id,
+        role="pm",
+        user_text=text,
+        reply_text=reply,
+    )
     return PmChatResult(success=True, message=reply, reply=reply)
 
 

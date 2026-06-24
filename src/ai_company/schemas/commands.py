@@ -31,6 +31,7 @@ class CommandType(str, Enum):
     RESOLVE_EXECUTION_FAILURE = "resolve_execution_failure"
     LIST_REGISTRY_SKILLS = "list_registry_skills"
     CREATE_REGISTRY_SKILL = "create_registry_skill"
+    SHOW_COO_REPORT = "show_coo_report"
 
 
 class Channel(str, Enum):
@@ -85,13 +86,16 @@ class UpdateGlobalConfigCommand(BaseCommand):
     thinking_budget: int | None = None
     include_thoughts: bool | None = None
     temperature: float | None = None
+    executor_notify_chat_id: int | None = None
+    dispatch_min_score: int | None = Field(default=None, ge=0, le=100)
 
     @model_validator(mode="after")
     def at_least_one_field(self) -> UpdateGlobalConfigCommand:
         if self.default_model is None and self.notification_policy is None:
             if self.max_output_tokens is None and self.thinking_budget is None:
                 if self.include_thoughts is None and self.temperature is None:
-                    raise ValueError("至少需提供一項 global_config 欄位")
+                    if self.executor_notify_chat_id is None and self.dispatch_min_score is None:
+                        raise ValueError("至少需提供一項 global_config 欄位")
         return self
 
 
@@ -178,6 +182,10 @@ class CreateRegistrySkillCommand(BaseCommand):
     description: str = ""
 
 
+class ShowCooReportCommand(BaseCommand):
+    command_type: Literal[CommandType.SHOW_COO_REPORT] = CommandType.SHOW_COO_REPORT
+
+
 Command = (
     InitWorkspaceCommand
     | ListProjectsCommand
@@ -199,4 +207,5 @@ Command = (
     | ResolveExecutionFailureCommand
     | ListRegistrySkillsCommand
     | CreateRegistrySkillCommand
+    | ShowCooReportCommand
 )

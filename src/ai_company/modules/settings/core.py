@@ -49,6 +49,7 @@ class AppSettings(BaseSettings):
     )
 
     company_workspace_root: Path | None = None
+    web_api_key: str = Field(default="", validation_alias=AliasChoices("WEB_API_KEY", "web_api_key"))
 
     @property
     def workspace_root(self) -> Path:

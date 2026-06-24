@@ -33,6 +33,7 @@ from ai_company.work_flow.setup_workers__work_flow.run import register as regist
 from ai_company.work_flow.show_global_config__work_flow.run import (
     register as register_show_global_config,
 )
+from ai_company.work_flow.show_coo_report__work_flow.run import register as register_show_coo_report
 from ai_company.work_flow.show_project_status__work_flow.run import (
     register as register_show_project_status,
 )
@@ -62,5 +63,6 @@ register_create_registry_skill(registry)
 register_setup_workers(registry)
 register_add_skill_to_project(registry)
 register_show_project_status(registry)
+register_show_coo_report(registry)
 
 _REGISTERED = frozenset(registry.list_flows())

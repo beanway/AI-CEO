@@ -104,3 +104,8 @@ class ListRegistrySkillsResult(FlowResult):
 class CreateRegistrySkillResult(FlowResult):
     skill_id: str | None = None
     path: str | None = None
+
+
+class ShowCooReportResult(FlowResult):
+    total_events: int | None = None
+    total_tokens_estimated: int | None = None

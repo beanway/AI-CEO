@@ -67,6 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     p_create = sub.add_parser("create-skill", help="建立 registry skill stub")
     p_create.add_argument("skill_id")
     p_create.add_argument("--description", default="")
+    sub.add_parser("coo-report", help="COO 用量報表（usage.jsonl）")
 
     args = parser.parse_args(argv)
 
@@ -123,6 +124,8 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_create_registry_skill(
             args.skill_id, description=args.description
         )
+    if args.command == "coo-report":
+        return cli_inbound.run_coo_report()
     return 1
 
 

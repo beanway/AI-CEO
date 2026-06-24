@@ -68,6 +68,7 @@ class GlobalConfigFile(BaseModel):
     default_model: str = "gemini-2.5-flash"
     notification_policy: NotificationPolicy = NotificationPolicy.ALL
     executor_notify_chat_id: int | None = None
+    dispatch_min_score: int | None = Field(default=None, ge=0, le=100)
     max_output_tokens: int = Field(default=8192, ge=1)
     thinking_budget: int = 0
     include_thoughts: bool = False
@@ -180,6 +181,17 @@ class PendingExecutionFailuresFile(BaseModel):
     items: dict[str, PendingExecutionFailureRecord] = Field(default_factory=dict)
 
 
+class UsageMetricRecord(BaseModel):
+    """COO：`metrics/usage.jsonl` 單行。"""
+
+    ts: datetime = Field(default_factory=utc_now)
+    event: str = Field(min_length=1)
+    project_id: str | None = None
+    role: str | None = None
+    tokens_estimated: int = Field(default=0, ge=0)
+    detail: str = ""
+
+
 __all__ = [
     "ApprovalKind",
     "ApprovalStatus",
@@ -206,6 +218,7 @@ __all__ = [
     "UserMode",
     "UserPref",
     "UserPrefsFile",
+    "UsageMetricRecord",
     "WorkerEntry",
     "WorkersFile",
     "utc_now",

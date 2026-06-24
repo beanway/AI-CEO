@@ -8,8 +8,10 @@ from ai_company.modules.sandbox_runner.core import (
     ToolPolicyError,
     complete_worker_harness_step,
 )
+from ai_company.modules.metrics import core as metrics
 from ai_company.modules.skill_registry import core as skill_registry
 from ai_company.modules.task_scheduler import core as task_scheduler
+from ai_company.modules.task_scoring import core as task_scoring
 from ai_company.schemas.commands import BaseCommand, CommandType, RunExecutionStepCommand
 from ai_company.schemas.documents import (
     ApprovalStatus,
@@ -125,6 +127,44 @@ def run(command: BaseCommand, deps: AppDeps) -> RunExecutionStepResult:
             error_code="invalid_worker",
             project_id=project_id,
         )
+
+    global_config = file_store.load_global_config(deps.workspace_root)
+    if (
+        global_config.dispatch_min_score is not None
+        and harness.last_completed_worker_id is not None
+    ):
+        ok_score, scored = task_scoring.passes_dispatch_gate(
+            deps.workspace_root,
+            project_id,
+            previous_worker_id=harness.last_completed_worker_id,
+            min_score=global_config.dispatch_min_score,
+        )
+        metrics.append_usage_event(
+            deps.workspace_root,
+            event="task_score",
+            project_id=project_id,
+            role=harness.last_completed_worker_id,
+            tokens_estimated=0,
+            detail=f"score={scored.value} reasons={','.join(scored.reasons)}",
+        )
+        file_store.append_scheduler_decision(
+            deps.workspace_root,
+            project_id,
+            event="task_score",
+            worker_id=harness.last_completed_worker_id,
+            detail=f"score={scored.value} min={global_config.dispatch_min_score}",
+        )
+        if not ok_score:
+            return RunExecutionStepResult(
+                success=False,
+                message=(
+                    f"上一 Worker {harness.last_completed_worker_id} 評分 {scored.value} "
+                    f"低於門檻 {global_config.dispatch_min_score}，拒絕派工"
+                ),
+                error_code="score_below_threshold",
+                project_id=project_id,
+                worker_id=worker_id,
+            )
 
     if from_queue:
         dequeued = execution_store.dequeue_next_pending(deps.workspace_root)

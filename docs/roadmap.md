@@ -227,9 +227,9 @@ CEO 動作影響 **所有專案**（或建立新專案 **殼**）。PM 專案內
 
 ## 十二、第二期
 
-- [ ] **COO**：`metrics/usage.jsonl`、報表
-- [ ] **Web 通道**：`adapters/web` + 同一 `dispatch`
-- [ ] **評分**：結構化 AI 任務評分接入排程閘道（harness §7.2）
+- [x] **COO**：`metrics/usage.jsonl`、報表
+- [x] **Web 通道**：`adapters/web` + 同一 `dispatch`
+- [x] **評分**：結構化 AI 任務評分接入排程閘道（harness §7.2）
 
 ---
 
@@ -240,6 +240,10 @@ CEO 動作影響 **所有專案**（或建立新專案 **殼**）。PM 專案內
 .venv/bin/pytest -q
 .venv/bin/python scripts/simulate_p_a3_acceptance.py
 .venv/bin/python scripts/simulate_p_b_c_acceptance.py
+.venv/bin/python scripts/simulate_phase2_acceptance.py
+
+# Web（或 ./run.sh → 4）
+python -m ai_company.adapters.web --port 8765
 
 # 已註冊 flow
 .venv/bin/python -c "from ai_company.work_flow import _register; from ai_company.work_flow.registry import registry; print([f.flow_id for f in registry.list_flows()])"

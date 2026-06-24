@@ -28,6 +28,7 @@ from ai_company.schemas.commands import (
     ResolveExecutionFailureCommand,
     ListRegistrySkillsCommand,
     CreateRegistrySkillCommand,
+    ShowCooReportCommand,
 )
 from ai_company.schemas.documents import UserMode
 
@@ -304,3 +305,10 @@ def run_create_registry_skill(skill_id: str, description: str = "") -> int:
         return 1
     print(result.message)
     return 0
+
+
+def run_coo_report() -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(ShowCooReportCommand(channel=Channel.CLI), deps)
+    print(result.message)
+    return 0 if result.success else 1

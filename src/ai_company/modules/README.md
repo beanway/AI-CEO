@@ -16,5 +16,7 @@
 | `sandbox_runner` | 沙盒指令執行 | Phase B |
 | [`task_scheduler`](task_scheduler/README.md) | Worker 排程 | Phase B |
 | `notify` | 出站通知 | Phase B |
+| [`metrics`](metrics/README.md) | COO usage.jsonl | 第二期 |
+| [`task_scoring`](task_scoring/README.md) | 排程評分閘道 | 第二期 |
 
 規格：[`docs/design/src-layout.md`](../../../docs/design/src-layout.md)
