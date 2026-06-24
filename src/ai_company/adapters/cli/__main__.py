@@ -18,6 +18,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("global", help="顯示 global_skills / global_config")
     p_skill = sub.add_parser("add-skill", help="啟用全公司 registry skill")
     p_skill.add_argument("skill_id", help="skills/registry 下的目錄名")
+    p_rm = sub.add_parser("remove-skill", help="停用全公司 registry skill")
+    p_rm.add_argument("skill_id", help="skills/registry 下的目錄名")
     p_cfg = sub.add_parser("update-global", help="更新 global_config.yaml 欄位")
     p_cfg.add_argument("--model", dest="default_model", help="default_model")
     p_cfg.add_argument(
@@ -83,6 +85,8 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_global()
     if args.command == "add-skill":
         return cli_inbound.run_add_skill(args.skill_id)
+    if args.command == "remove-skill":
+        return cli_inbound.run_remove_skill(args.skill_id)
     if args.command == "update-global":
         return cli_inbound.run_update_global_config(
             default_model=args.default_model,

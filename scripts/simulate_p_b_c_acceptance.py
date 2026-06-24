@@ -13,13 +13,15 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 
-import ai_company.work_flow._register  # noqa: F401
+from simulate_common import bootstrap_imports, fail as _fail, make_deps, ok as _ok, register_flows
+
+bootstrap_imports()
+register_flows()
 
 from ai_company.adapters.dispatch import dispatch
-from ai_company.app_deps import AppDeps
-from ai_company.config import Settings
 from ai_company.modules.file_store import core as file_store
 from ai_company.modules.notify import core as notify
 from ai_company.schemas.commands import (
@@ -42,8 +44,7 @@ def _fail(label: str, detail: str) -> None:
 def main() -> int:
     print("Phase B/C 驗收模擬")
     workspace = Path(tempfile.mkdtemp(prefix="ai-ceo-b-"))
-    settings = Settings(company_workspace_root=workspace)
-    deps = AppDeps(settings=settings)
+    deps = make_deps(workspace)
     sent: list[str] = []
     notify.set_notify_sink(lambda _cid, text: sent.append(text))
 

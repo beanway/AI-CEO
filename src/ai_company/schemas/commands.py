@@ -18,6 +18,7 @@ class CommandType(str, Enum):
     CEO_CHAT = "ceo_chat"
     SHOW_GLOBAL_CONFIG = "show_global_config"
     ADD_SKILL_TO_COMPANY = "add_skill_to_company"
+    REMOVE_SKILL_FROM_COMPANY = "remove_skill_from_company"
     UPDATE_GLOBAL_CONFIG = "update_global_config"
     SET_USER_MODE = "set_user_mode"
     PM_CHAT = "pm_chat"
@@ -76,6 +77,13 @@ class ShowGlobalConfigCommand(BaseCommand):
 
 class AddSkillToCompanyCommand(BaseCommand):
     command_type: Literal[CommandType.ADD_SKILL_TO_COMPANY] = CommandType.ADD_SKILL_TO_COMPANY
+    skill_id: str = Field(min_length=1)
+
+
+class RemoveSkillFromCompanyCommand(BaseCommand):
+    command_type: Literal[CommandType.REMOVE_SKILL_FROM_COMPANY] = (
+        CommandType.REMOVE_SKILL_FROM_COMPANY
+    )
     skill_id: str = Field(min_length=1)
 
 
@@ -201,6 +209,7 @@ Command = (
     | CeoChatCommand
     | ShowGlobalConfigCommand
     | AddSkillToCompanyCommand
+    | RemoveSkillFromCompanyCommand
     | UpdateGlobalConfigCommand
     | SetUserModeCommand
     | PmChatCommand

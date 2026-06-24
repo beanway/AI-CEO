@@ -37,6 +37,10 @@ class AddSkillToCompanyResult(FlowResult):
     skill_id: str | None = None
 
 
+class RemoveSkillFromCompanyResult(FlowResult):
+    skill_id: str | None = None
+
+
 class UpdateGlobalConfigResult(FlowResult):
     pass
 

@@ -3,6 +3,9 @@
 from ai_company.work_flow.add_skill_to_company__work_flow.run import (
     register as register_add_skill_to_company,
 )
+from ai_company.work_flow.remove_skill_from_company__work_flow.run import (
+    register as register_remove_skill_from_company,
+)
 from ai_company.work_flow.add_skill_to_project__work_flow.run import (
     register as register_add_skill_to_project,
 )
@@ -53,6 +56,7 @@ register_ceo_chat(registry)
 register_switch_project(registry)
 register_show_global_config(registry)
 register_add_skill_to_company(registry)
+register_remove_skill_from_company(registry)
 register_update_global_config(registry)
 register_set_user_mode(registry)
 register_pm_chat(registry)

@@ -21,11 +21,15 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 
+from simulate_common import bootstrap_imports, fail as _fail, make_deps, ok as _ok, register_flows
+
+bootstrap_imports()
+register_flows()
+
 from ai_company.adapters.dispatch import dispatch  # noqa: E402
-from ai_company.app_deps import AppDeps  # noqa: E402
-from ai_company.config import Settings  # noqa: E402
 from ai_company.modules.execution_store import core as execution_store  # noqa: E402
 from ai_company.modules.file_store import core as file_store  # noqa: E402
 from ai_company.schemas.commands import (  # noqa: E402
@@ -42,14 +46,6 @@ from ai_company.schemas.documents import (  # noqa: E402
     ExecutionStatus,
 )
 from ai_company.schemas.workspace_paths import project_dir  # noqa: E402
-
-
-def _ok(label: str) -> None:
-    print(f"  ✓ {label}")
-
-
-def _fail(label: str, detail: str) -> None:
-    print(f"  ✗ {label}: {detail}", file=sys.stderr)
 
 
 def _require_git() -> bool:
@@ -224,8 +220,7 @@ def main() -> int:
     failed = 0
     with tempfile.TemporaryDirectory(prefix="p-a3-sim-") as tmp:
         workspace = Path(tmp)
-        settings = Settings(company_workspace_root=workspace)
-        deps = AppDeps(settings=settings)
+        deps = make_deps(workspace)
         scenarios = (
             scenario_tool_policy_outside_sandbox,
             scenario_approval_gate,

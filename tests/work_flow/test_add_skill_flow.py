@@ -37,3 +37,24 @@ def test_dispatch_add_skill_unknown(tmp_path):
     result = dispatch(AddSkillToCompanyCommand(skill_id="no-such-skill"), deps)
     assert not result.success
     assert result.error_code == "skill_not_found"
+
+
+def test_dispatch_remove_skill_from_company(tmp_path):
+    from ai_company.adapters.dispatch import dispatch
+    from ai_company.app_deps import AppDeps
+    from ai_company.config import Settings
+    from ai_company.modules.file_store import core as file_store
+    from ai_company.schemas.commands import (
+        AddSkillToCompanyCommand,
+        RemoveSkillFromCompanyCommand,
+    )
+
+    settings = Settings(company_workspace_root=tmp_path)
+    deps = AppDeps(settings=settings)
+    file_store.ensure_company_dirs(tmp_path)
+
+    dispatch(AddSkillToCompanyCommand(skill_id="example-ceo"), deps)
+    result = dispatch(RemoveSkillFromCompanyCommand(skill_id="example-ceo"), deps)
+    assert result.success
+    skills = file_store.load_global_skills(tmp_path)
+    assert skills.enabled_skill_ids == []

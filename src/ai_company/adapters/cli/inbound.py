@@ -10,6 +10,7 @@ from ai_company.config import get_settings
 from ai_company.schemas.commands import (
     UpdateGlobalConfigCommand,
     AddSkillToCompanyCommand,
+    RemoveSkillFromCompanyCommand,
     AddSkillToProjectCommand,
     Channel,
     CeoChatCommand,
@@ -88,6 +89,19 @@ def run_add_skill(skill_id: str) -> int:
     deps = AppDeps(settings=get_settings())
     result = dispatch(
         AddSkillToCompanyCommand(channel=Channel.CLI, skill_id=skill_id),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_remove_skill(skill_id: str) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        RemoveSkillFromCompanyCommand(channel=Channel.CLI, skill_id=skill_id),
         deps,
     )
     if not result.success:

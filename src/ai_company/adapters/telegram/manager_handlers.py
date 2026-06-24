@@ -15,14 +15,17 @@ from ai_company.schemas.commands import (
     ListProjectsCommand,
     PmRepairCommand,
     ProjectGitCommand,
+    RemoveSkillFromCompanyCommand,
     ResolveApprovalCommand,
     RouteManagerChatCommand,
     SetUserModeCommand,
     SetupWorkersCommand,
+    ShowGlobalConfigCommand,
     ShowProjectStatusCommand,
     SwitchProjectCommand,
+    UpdateGlobalConfigCommand,
 )
-from ai_company.schemas.documents import UserMode
+from ai_company.schemas.documents import NotificationPolicy, UserMode
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -32,7 +35,8 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "[管理者 Bot · 帳號 A]\n"
         "AI 虛擬公司已連線。\n"
-        "指令：/projects、/switch <id>、/newproject <名稱>、/addskill <id>；"
+        "指令：/projects、/switch <id>、/newproject <名稱>、/global、/addskill <id>、/removeskill <id>；"
+        "/updateglobal model|notification|dispatch_min_score|temperature …；"
         "/mode ceo|pm、/status、/repair [interrupt]、/setupworkers five|three、/addprojectskill <id>、/git <子命令…>；"
         "其餘文字依模式由 CEO 或 PM（Gemini）回覆。"
     )
@@ -92,6 +96,66 @@ async def cmd_addskill(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         AddSkillToCompanyCommand(channel=Channel.TELEGRAM, skill_id=skill_id),
         deps,
     )
+    await update.message.reply_text(result.message)
+
+
+async def cmd_global(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    deps = AppDeps(settings=settings)
+    result = dispatch(ShowGlobalConfigCommand(channel=Channel.TELEGRAM), deps)
+    await update.message.reply_text(result.message)
+
+
+async def cmd_removeskill(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    if not context.args:
+        await update.message.reply_text("用法：/removeskill <registry skill id>")
+        return
+    skill_id = context.args[0].strip()
+    deps = AppDeps(settings=settings)
+    result = dispatch(
+        RemoveSkillFromCompanyCommand(channel=Channel.TELEGRAM, skill_id=skill_id),
+        deps,
+    )
+    await update.message.reply_text(result.message)
+
+
+async def cmd_updateglobal(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    if len(context.args) < 2:
+        await update.message.reply_text(
+            "用法：/updateglobal <欄位> <值>\n"
+            "欄位：model、notification（all|failures_only|off）、"
+            "dispatch_min_score（0–100）、temperature（浮點數）"
+        )
+        return
+    field = context.args[0].strip().lower()
+    value = " ".join(context.args[1:]).strip()
+    kwargs: dict = {"channel": Channel.TELEGRAM}
+    try:
+        if field in ("model", "default_model"):
+            kwargs["default_model"] = value
+        elif field in ("notification", "notification_policy"):
+            kwargs["notification_policy"] = NotificationPolicy(value.lower())
+        elif field in ("dispatch_min_score", "dispatch-min-score", "min_score"):
+            kwargs["dispatch_min_score"] = int(value)
+        elif field == "temperature":
+            kwargs["temperature"] = float(value)
+        else:
+            await update.message.reply_text(f"不支援的欄位：{field}")
+            return
+        command = UpdateGlobalConfigCommand(**kwargs)
+    except (ValueError, TypeError) as exc:
+        await update.message.reply_text(f"參數錯誤：{exc}")
+        return
+    deps = AppDeps(settings=settings)
+    result = dispatch(command, deps)
     await update.message.reply_text(result.message)
 
 
@@ -248,6 +312,9 @@ def register_manager_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("projects", cmd_projects))
     app.add_handler(CommandHandler("newproject", cmd_newproject))
     app.add_handler(CommandHandler("addskill", cmd_addskill))
+    app.add_handler(CommandHandler("removeskill", cmd_removeskill))
+    app.add_handler(CommandHandler("global", cmd_global))
+    app.add_handler(CommandHandler("updateglobal", cmd_updateglobal))
     app.add_handler(CommandHandler("switch", cmd_switch))
     app.add_handler(CommandHandler("mode", cmd_mode))
     app.add_handler(CommandHandler("status", cmd_status))

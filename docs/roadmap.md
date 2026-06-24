@@ -40,14 +40,14 @@
 | 7 | **測試**：flow 整合 + 模組單元 | `pytest` |
 | 8 | **文件**：本檔勾選、`document-audit` 若改契約則更新 | PR 自檢 |
 
-過渡期：`manager_handlers.on_text` 可暫用 **`file_store.get_user_mode`** 決定 CEO／PM chat（見 §十五）；**新指令**仍須 `dispatch` + flow。
+過渡期：`on_text` 經 **`RouteManagerChatCommand`** → `route_manager_chat__work_flow`（見 §十五 #2）；**新指令**仍須 `dispatch` + flow。
 
-**§一 與現況（未當成 Phase 勾選，但常漏）**
+**§一 與現況**
 
-| 缺口 | 為何未做 | 何時可做 |
-|------|----------|----------|
-| 步驟 5：`adapters/README.md` 路由表 | 已擴充 CLI／Web；TG 細項見 §六 表 | — |
-| 步驟 8：`harness-design` §10 核取未回寫 | §十四 約定 **以本檔為執行勾選** | 需要對外簽收時回寫，或維持單一真相在本檔 |
+| 步驟 | 狀態 |
+|------|------|
+| 5 `adapters/README.md` 路由表 | 完成（TG／CLI／Web 對照 `Command`） |
+| 8 `harness-design` §10 核取 | 已回寫；**執行勾選以本檔為準**（§十四） |
 
 ---
 
@@ -67,7 +67,7 @@
 | 7 | 網頁 adapter | **C** 端到端 QA 閉環 | §十一 |
 | 8 | — | **二期** COO 報表、Web 產品化、評分 | §十二 |
 
-**§二 尚未進行的列（順序 5–8）**：§五–§十二 產品與架構主線已交付；剩餘為 §十五 可選收斂與 TG 次要指令（§六 表）。
+**§二 產品與架構主線（順序 0–8）均已交付**；後續為能力擴充（真實 Worker、Web 安全硬化等），見優化 backlog 或新 Phase 章節。
 
 ---
 
@@ -81,18 +81,11 @@
 | **P-A3** Git／維修／TG 核准（§八） | 完成 |
 | **B**／**B+**／**C**（§九–§十一） | 完成 |
 | **第二期** COO／Web／評分（§十二） | 完成 |
-| `work_flow` 已註冊 **22** 條 `run.py` flow | 完成 |
+| `work_flow` 已註冊 **23** 條 `run.py` flow | 完成 |
 | `adapters/telegram`、`adapters/cli`、`adapters/web` → `dispatch` | 完成 |
-| **模擬驗收**（§十三 表） | 完成 |
-| **架構收斂**（§十五 #1–2） | **完成**（`company_workspace` 編排、`route_manager_chat`） |
-| TG：`/global`、`update-global` 等次要路由 | 待補（§六 表，不擋簽收） |
-
-**§三 未完成項（為何／何時）**
-
-| 項目 | 為何未做 | 何時可做 |
-|------|----------|----------|
-| TG `/global` 等 | MVP 以 CLI／Web 補齊 | 小 PR |
-| **移除 global skill** flow | 手改 YAML 可替代 | 營運需要時 |
+| **模擬驗收**（§十三 表） | 完成（含 `simulate_common` 離線 deps） |
+| **架構收斂**（§十五 #1–3） | **完成** |
+| TG：`/global`、`/updateglobal`、`/removeskill` | 完成 |
 
 ---
 
@@ -107,7 +100,7 @@
 
 **驗收**：`.venv/bin/pytest` 全綠；`./run.sh` / `main init-workspace` 與 list/switch/global 行為正常。
 
-**§四 備註**：「Phase A 四 flow」為 A0 當時表述；現以 §三 flow 總數（22）為準。
+**§四 備註**：「Phase A 四 flow」為 A0 當時表述；現以 §三 flow 總數（23）為準。
 
 ---
 
@@ -140,19 +133,12 @@ CEO 動作影響 **所有專案**（或建立新專案 **殼**）。PM 專案內
 | 2 | **建立** 新專案殼（id、目錄、索引、PM session 索引） | `create_project__work_flow` | 失敗回滾；**不**寫 `workers.yaml` |
 | 3 | **對話**：CEO Session + 全公司脈絡 chat | `ceo_chat__work_flow`、`ai_core`、`file_store` sessions | Fake 或 Gemini 可對話 |
 | 4 | **寫入** 全專案啟用的 registry skill（`global_skills`） | `add_skill_to_company__work_flow` | 僅 CEO flow |
+| 4b | **移除** 全公司已啟用 skill | `remove_skill_from_company__work_flow` | TG／CLI |
 | 5 | **寫入** 全公司預設（模型、通知、AI 參數） | `update_global_config__work_flow` | 與 `ai_core.resolve_model` 銜接 |
 
-- [x] 步驟 1–5
+- [x] 步驟 1–5、4b
 
-**§六 主幹已完成；介面／次要路徑未齊（不推翻上列勾選）**
-
-| 缺口 | 為何未做 | 何時可做 |
-|------|----------|----------|
-| 步驟 1：TG 無 `/global` | MVP 先 CLI `global`；列表／切換已在 TG | 補 TG 路由的小 PR |
-| 步驟 2：建殼 **回滾** 無專門 pytest | 成功路徑已驗 | 隨時補測試 |
-| 步驟 4：無 **移除** global skill 的 flow | 可手改 YAML；新增已覆蓋主路徑 | 營運需要或併入 **B+** |
-| 步驟 5：TG 無 `update-global` | 變更頻率低；CLI + flow 已有 | 與 `/global` 同一輪或維持 YAML |
-| §一 步驟 5：`adapters/README` 未列全 CEO 指令 | 見 §一 表 | 與 TG 補指令同 PR |
+**驗收**：`scripts/simulate_p_a1_acceptance.py`；建殼失敗回滾見 `tests/work_flow/test_create_project_flow.py`。
 
 ---
 
@@ -262,7 +248,7 @@ python -m ai_company.adapters.web --port 8765
 ./run.sh
 ```
 
-模擬腳本使用 **Fake chat**（不讀 `.env` API key），可離線簽收。
+模擬腳本一律經 **`scripts/simulate_common.make_deps`**（Fake chat、不讀 `.env` API key），可離線簽收。
 
 ---
 
@@ -288,6 +274,6 @@ P-A1–P-A3 與一輪產品交付已完成；下列為 **刻意保留的過渡�
 | 3 | **`worker_state.py`** | 已廢止 | 使用 `execution_store` | **完成** |
 | 4 | **Phase B 模組** | 已實作 | §九 | **完成** |
 
-**後續產品（非阻擋簽收）**
+**後續產品（新 Phase，非本檔未完成項）**
 
-- TG 補 `/global`、CEO 移除 global skill 等（§六 表）。
+- 真實 Gemini Worker 執行（取代 harness 標記步驟）、Web 認證白名單、執行佇列檔案鎖等——見 code review／優化 backlog。

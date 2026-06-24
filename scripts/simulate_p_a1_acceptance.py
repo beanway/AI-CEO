@@ -70,6 +70,14 @@ def main() -> int:
         return 1
     sim.ok("add_skill_to_company")
 
+    from ai_company.schemas.commands import RemoveSkillFromCompanyCommand
+
+    removed = dispatch(RemoveSkillFromCompanyCommand(skill_id="example-ceo"), deps)
+    if not removed.success:
+        sim.fail("remove_skill_from_company", removed.message)
+        return 1
+    sim.ok("remove_skill_from_company")
+
     updated = dispatch(UpdateGlobalConfigCommand(dispatch_min_score=0), deps)
     if not updated.success:
         sim.fail("update_global_config", updated.message)
