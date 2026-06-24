@@ -93,6 +93,12 @@ run_test_github_account() {
   fi
 }
 
+run_bootstrap_company_github() {
+  echo ""
+  echo "▶ 建立 company_workspace/_company 的 GitHub 遠端倉…"
+  "$PYTHON" "$ROOT/scripts/bootstrap_company_github_repo.py"
+}
+
 run_all_simulations() {
   local ec=0
   echo ""
@@ -150,6 +156,7 @@ test_menu() {
     echo "  6  第二期模擬驗收"
     echo "  5  已註冊 work_flow 列表"
     echo "  g  Git／GitHub 帳號檢查（gh 登入、.env、專案 git init）"
+    echo "  c  建立 _company 的 GitHub 遠端倉（廣域設定）"
     echo "  b  返回主選單"
     echo ""
     read -r -p "請選擇: " test_choice
@@ -183,6 +190,9 @@ test_menu() {
         ;;
       g | G)
         run_test_github_account || true
+        ;;
+      c | C)
+        run_bootstrap_company_github || true
         ;;
       b | B)
         return 0

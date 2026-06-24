@@ -66,6 +66,10 @@ class AppSettings(BaseSettings):
         default="private",
         validation_alias=AliasChoices("GITHUB_REPO_VISIBILITY", "github_repo_visibility"),
     )
+    github_company_repo_name: str = Field(
+        default="ai-ceo-company",
+        validation_alias=AliasChoices("GITHUB_COMPANY_REPO_NAME", "github_company_repo_name"),
+    )
 
     @property
     def workspace_root(self) -> Path:

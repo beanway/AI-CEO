@@ -97,3 +97,4 @@ def test_ensure_company_dirs_writes_gitignore(tmp_workspace):
     assert "sessions/" in text
     assert "execution/" in text
     assert "metrics/" in text
+    assert "pending_approvals.json" in text
