@@ -49,6 +49,7 @@ def test_pm_chat_and_status(tmp_path):
     from ai_company.adapters.dispatch import dispatch
     from ai_company.app_deps import AppDeps
     from ai_company.config import Settings
+    from ai_company.modules.ai_core import core as ai_core
     from ai_company.modules.file_store import core as file_store
     from ai_company.schemas.commands import (
         CreateProjectCommand,
@@ -57,7 +58,8 @@ def test_pm_chat_and_status(tmp_path):
         ShowProjectStatusCommand,
     )
 
-    settings = Settings(company_workspace_root=tmp_path)
+    ai_core.reset_chat_backends_for_tests()
+    settings = Settings(company_workspace_root=tmp_path, gemini_api_key="", google_api_key="")
     deps = AppDeps(settings=settings)
     file_store.ensure_company_dirs(tmp_path)
     created = dispatch(CreateProjectCommand(name="Delta"), deps)
@@ -70,6 +72,7 @@ def test_pm_chat_and_status(tmp_path):
     status = dispatch(ShowProjectStatusCommand(project_id=created.project_id), deps)
     assert status.success
     assert "backend" in status.message
+    ai_core.reset_chat_backends_for_tests()
 
 
 def test_add_skill_to_project(tmp_path):

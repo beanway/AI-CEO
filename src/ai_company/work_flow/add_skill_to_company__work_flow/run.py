@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from ai_company.app_deps import AppDeps
 from ai_company.modules.file_store import core as file_store
-from ai_company.modules.setup_workspace import core as setup_workspace
+from ai_company.work_flow._shared.company_workspace import ensure_company_workspace
 from ai_company.modules.skill_registry import core as skill_registry
 from ai_company.schemas.commands import (
     AddSkillToCompanyCommand,
@@ -33,7 +33,7 @@ def run(command: BaseCommand, deps: AppDeps) -> AddSkillToCompanyResult:
             message=f"registry 找不到 skill {skill_id!r}。可用：{known}",
             error_code="skill_not_found",
         )
-    setup_workspace.ensure_workspace(deps.workspace_root)
+    ensure_company_workspace(deps.workspace_root)
     skills = file_store.load_global_skills(deps.workspace_root)
     if skill_id in skills.enabled_skill_ids:
         return AddSkillToCompanyResult(

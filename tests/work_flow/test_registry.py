@@ -15,7 +15,7 @@ def test_registry_lists_phase_a_flows():
     assert "setup_workers__work_flow" in ids
     assert "project_git__work_flow" in ids
     assert "pm_repair__work_flow" in ids
-    assert len(flows) >= 21
+    assert len(flows) >= 22
 
 
 def test_dispatch_list_projects(tmp_path):

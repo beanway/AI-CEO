@@ -11,7 +11,7 @@ from ai_company.adapters.telegram.executor_handlers import (
 from ai_company.adapters.telegram.manager_handlers import register_manager_handlers
 from ai_company.config import Settings
 from ai_company.modules.file_store import core as file_store
-from ai_company.modules.setup_workspace import core as setup_workspace
+from ai_company.work_flow._shared.company_workspace import ensure_company_workspace
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ async def run_dual_bots(settings: Settings) -> None:
             "可複製 .env.example 後填入 @BotFather 申請的兩組 Token。"
         )
 
-    setup_workspace.ensure_workspace(settings.workspace_root)
+    ensure_company_workspace(settings.workspace_root)
     file_store.bootstrap_default_project_if_needed(settings.workspace_root)
 
     manager_app = build_manager_application(settings.telegram_manager_bot_token, settings)

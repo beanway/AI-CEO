@@ -7,18 +7,16 @@ from ai_company.adapters.telegram.approval_ui import parse_approval_callback
 from ai_company.adapters.telegram.gate import gate_message
 from ai_company.app_deps import AppDeps
 from ai_company.config import Settings
-from ai_company.modules.file_store import core as file_store
 from ai_company.schemas.commands import (
     AddSkillToCompanyCommand,
     AddSkillToProjectCommand,
     Channel,
-    CeoChatCommand,
     CreateProjectCommand,
     ListProjectsCommand,
-    PmChatCommand,
     PmRepairCommand,
     ProjectGitCommand,
     ResolveApprovalCommand,
+    RouteManagerChatCommand,
     SetUserModeCommand,
     SetupWorkersCommand,
     ShowProjectStatusCommand,
@@ -230,17 +228,14 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     deps = AppDeps(settings=settings)
     user = update.effective_user
     user_id = user.id if user else 0
-    mode = file_store.get_user_mode(deps.workspace_root, user_id)
-    if mode == UserMode.PM:
-        result = dispatch(
-            PmChatCommand(channel=Channel.TELEGRAM, text=update.message.text),
-            deps,
-        )
-    else:
-        result = dispatch(
-            CeoChatCommand(channel=Channel.TELEGRAM, text=update.message.text),
-            deps,
-        )
+    result = dispatch(
+        RouteManagerChatCommand(
+            channel=Channel.TELEGRAM,
+            text=update.message.text,
+            telegram_user_id=user_id,
+        ),
+        deps,
+    )
     if not result.success:
         await update.message.reply_text(result.message)
         return

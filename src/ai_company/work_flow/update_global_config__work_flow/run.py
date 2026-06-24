@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from ai_company.app_deps import AppDeps
 from ai_company.modules.file_store import core as file_store
-from ai_company.modules.setup_workspace import core as setup_workspace
+from ai_company.work_flow._shared.company_workspace import ensure_company_workspace
 from ai_company.schemas.commands import (
     BaseCommand,
     CommandType,
@@ -45,7 +45,7 @@ def run(command: BaseCommand, deps: AppDeps) -> UpdateGlobalConfigResult:
         return UpdateGlobalConfigResult(
             success=False, message="指令類型錯誤", error_code="bad_command"
         )
-    setup_workspace.ensure_workspace(deps.workspace_root)
+    ensure_company_workspace(deps.workspace_root)
     current = file_store.load_global_config(deps.workspace_root)
     try:
         merged = _merge_config(current, command)

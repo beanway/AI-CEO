@@ -32,6 +32,7 @@ class CommandType(str, Enum):
     LIST_REGISTRY_SKILLS = "list_registry_skills"
     CREATE_REGISTRY_SKILL = "create_registry_skill"
     SHOW_COO_REPORT = "show_coo_report"
+    ROUTE_MANAGER_CHAT = "route_manager_chat"
 
 
 class Channel(str, Enum):
@@ -186,6 +187,12 @@ class ShowCooReportCommand(BaseCommand):
     command_type: Literal[CommandType.SHOW_COO_REPORT] = CommandType.SHOW_COO_REPORT
 
 
+class RouteManagerChatCommand(BaseCommand):
+    command_type: Literal[CommandType.ROUTE_MANAGER_CHAT] = CommandType.ROUTE_MANAGER_CHAT
+    text: str = Field(min_length=1)
+    telegram_user_id: int
+
+
 Command = (
     InitWorkspaceCommand
     | ListProjectsCommand
@@ -208,4 +215,5 @@ Command = (
     | ListRegistrySkillsCommand
     | CreateRegistrySkillCommand
     | ShowCooReportCommand
+    | RouteManagerChatCommand
 )

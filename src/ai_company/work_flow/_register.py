@@ -16,6 +16,9 @@ from ai_company.work_flow.project_git__work_flow.run import register as register
 from ai_company.work_flow.resolve_approval__work_flow.run import (
     register as register_resolve_approval,
 )
+from ai_company.work_flow.route_manager_chat__work_flow.run import (
+    register as register_route_manager_chat,
+)
 from ai_company.work_flow.run_execution_step__work_flow.run import (
     register as register_run_execution_step,
 )
@@ -57,6 +60,7 @@ register_pm_repair(registry)
 register_project_git(registry)
 register_resolve_approval(registry)
 register_run_execution_step(registry)
+register_route_manager_chat(registry)
 register_resolve_execution_failure(registry)
 register_list_registry_skills(registry)
 register_create_registry_skill(registry)
