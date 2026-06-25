@@ -14,6 +14,8 @@
 | `harness-design.md` | `reference/original-spec.txt` | 歷史原文 | **部分** — 見 §2 |
 | `harness-design.md` | `discussion-outcomes.md` | 摘要一致 | 否 |
 | `harness-design.md` | `roadmap.md` | 路線對齊 Harness | 否 |
+| `harness-design.md` | `execution-layer-v2.md` | §7.4 指向 v2 細節 | 否 |
+| `execution-layer-v2.md` | `run_execution_step` 等程式 | E1 尚未實作 | **預期落差**（文件領先） |
 | `src-layout.md` | `harness-design.md` | 程式分層實作產品設計 | 否 |
 | `harness-design.md` | 根目錄 `README.md` | 應指向 `docs/` | **已修正**（見下方程式碼表） |
 

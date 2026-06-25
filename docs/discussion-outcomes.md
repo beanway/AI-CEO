@@ -40,6 +40,7 @@
 - **Skill 來源**：Git、`find-skills`（`npx skills`）、`/create-skill`；CEO 裝 **registry 全公司級**，PM **啟用專案／角色級**（見設計規格 §5.4 疊加順序）。
 - **任務分配者**（`task_scheduler`）：專案內 Worker；具 Git、排程、裝工具/skill；失敗時 **TG 詢問** 使用者：**重試** 或 **code review 找問題**。
 - **執行者 Bot（帳號 B）**：通知通道；排程邏輯在專案 scheduler Worker，不與管理者 Bot 混用。
+- 執行層 v2（2026-06-25）：終態為 AI 產出任務順序；現程式為固定 pipeline + 標記步驟。E1 先維護 repo 內 [`workerDefault/`](../../workerDefault/README.md) 預設 backend，fixture 測試通過後再接 `run-step`；見 [`design/execution-layer-v2.md`](design/execution-layer-v2.md)。
 
 ---
 

@@ -1,0 +1,9 @@
+# 複製到專案 workers/backend/ 後，由 resolve_skill_stack 第三層載入。
+# registry skill 建立後取消註解並對齊 id。
+enabled_skill_ids: []
+# enabled_skill_ids:
+#   - backend-sandbox-layout
+#   - backend-task-contract
+#   - backend-python-service
+#   - backend-api-design
+#   - backend-verify-local

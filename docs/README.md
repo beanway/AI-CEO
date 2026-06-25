@@ -12,7 +12,8 @@
 3. [`design/src-layout.md`](design/src-layout.md) — `src/ai_company` 分層、work_flow 註冊、modules 命名
 4. [`plans/phase-a-src-layout.md`](plans/phase-a-src-layout.md) — Phase A 程式重構計畫
 5. [`roadmap.md`](roadmap.md) — 實作階段與檢查清單
-6. [`document-audit.md`](document-audit.md) — 文件與程式碼一致性審查
+6. [`design/execution-layer-v2.md`](design/execution-layer-v2.md) — **執行層 v2**（真實 Worker、先 backend）
+7. [`document-audit.md`](document-audit.md) — 文件與程式碼一致性審查
 
 ## 目錄結構
 
@@ -20,12 +21,14 @@
 |------|------|
 | [`discussion-outcomes.md`](discussion-outcomes.md) | 產品決策與 Harness 對照摘要 |
 | [`design/harness-design.md`](design/harness-design.md) | 產品設計規格 |
+| [`design/execution-layer-v2.md`](design/execution-layer-v2.md) | 執行層 v2：AI 排程願景、E1 backend |
 | [`design/src-layout.md`](design/src-layout.md) | **框架程式目錄與依賴規則** |
 | [`plans/phase-a-src-layout.md`](plans/phase-a-src-layout.md) | Phase A 分層重構（現行計畫） |
 | [`design/framework-design-v1-archived.md`](design/framework-design-v1-archived.md) | 初版設計（已廢止） |
 | [`plans/phase-a-management-v1-archived.md`](plans/phase-a-management-v1-archived.md) | 舊 Phase A（已廢止） |
 | [`reference/original-spec.txt`](reference/original-spec.txt) | 歷史原文 |
 | [`roadmap.md`](roadmap.md) | 路線圖 |
+| [`../workerDefault/README.md`](../workerDefault/README.md) | E1 預設 Worker 模板目錄 |
 | [`document-audit.md`](document-audit.md) | 衝突與待辦 |
 
 ## Cursor 規則與 Skill

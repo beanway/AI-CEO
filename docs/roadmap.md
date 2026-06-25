@@ -283,4 +283,28 @@ P-A1–P-A3 與一輪產品交付已完成；下列為 **刻意保留的過渡�
 
 **後續產品（新 Phase，非本檔未完成項）**
 
-- 真實 Gemini Worker 執行（取代 harness 標記步驟）、Web 認證白名單、執行佇列檔案鎖等——見 code review／優化 backlog。
+- **執行層 v2**：見 [`design/execution-layer-v2.md`](design/execution-layer-v2.md)（先 **E1 backend Worker**，再 scheduler v2／PM 進階）。
+- 其他：Web 認證白名單、執行佇列檔案鎖等——見 code review／優化 backlog。
+
+---
+
+## 十六、執行層 v2（E1 — backend Worker）
+
+**規格**：[`design/execution-layer-v2.md`](design/execution-layer-v2.md)  
+**預設模板**：[`workerDefault/`](../workerDefault/README.md)
+
+| # | 步驟 | 驗收 |
+|---|------|------|
+| 1 | 任務契約（輸入 YAML／輸出 `last_run.json`）定稿並寫入文件 | 與 E3 scheduler 接口一致 |
+| 2 | 建立 **`workerDefault/backend/`**（`SKILL.md`、`role_skills.yaml`） | 與 §4.0、§4.6 一致 |
+| 3 | `skills/registry/` 新增 E1 backend 共用 skill（§4.4）並寫入 `role_skills.yaml` | id 對齊、可 resolve |
+| 4 | **`tests/`**：fixture 專案從 workerDefault 種子複製 → 跑 backend runner | 不依賴 Training／TG |
+| 5 | ToolPolicy：`backend` 測試／lint argv 白名單 | 越界拒絕 |
+| 6 | `run-step` 對 `kind=backend` 接 Gemini + 工具（非僅標記） | 測試通過才 DONE |
+| 7 | 可選：Training（`d668c955`）小 API 手動端到端 | 碼 + 測試 + `shared/api_docs/` |
+
+- [x] 步驟 1（見 execution-layer-v2 §4.2）
+- [x] 步驟 2（目錄與預設 backend 正文；見 `workerDefault/`）
+- [ ] 步驟 3–7
+
+**刻意延後（E3／E4）**：AI 決定 pipeline、`/addworker`、執行期自動 find/install skill、scheduler 主導 code review。
