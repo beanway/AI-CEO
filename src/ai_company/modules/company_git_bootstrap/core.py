@@ -5,7 +5,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-from ai_company.modules.file_store.internal.store import COMPANY_GITIGNORE_TEXT
+from ai_company.modules.file_store import core as file_store
 from ai_company.modules.project_git_bootstrap import github_common as gh
 from ai_company.modules.settings.core import AppSettings
 
@@ -34,7 +34,7 @@ def bootstrap_company_github(
         return "Git：未安裝 git。"
 
     try:
-        gh.git_init_with_gitignore(root, COMPANY_GITIGNORE_TEXT)
+        gh.git_init_with_gitignore(root, file_store.COMPANY_GITIGNORE_TEXT)
         lines.append("Git：已更新 .gitignore 並確保本機倉庫。")
     except Exception as exc:
         return f"Git：init 失敗（{exc}）。"

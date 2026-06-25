@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ai_company.modules.setup_workspace.internal import migrate_repo_root
+from ai_company.modules.setup_workspace import core as setup_workspace
 from ai_company.schemas.documents import ProjectsFile
 from ai_company.schemas.workspace_paths import resolve_company_workspace_root
 
@@ -49,7 +49,7 @@ def test_migrate_repo_root_projects_and_company(tmp_path):
     (legacy_company / "sessions").mkdir()
     (legacy_company / "sessions" / "pm_abc12345.json").write_text("{}", encoding="utf-8")
 
-    moved = migrate_repo_root.migrate_repo_root_company_layout(repo, workspace)
+    moved = setup_workspace.migrate_repo_root_company_layout(repo, workspace)
     assert any("abc12345" in m for m in moved)
     assert (workspace / "projects" / "abc12345" / "shared").is_dir()
     merged = ProjectsFile.model_validate_json(
