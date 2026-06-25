@@ -9,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from ai_company.schemas.ai_generation import AiGenerationSettings
 from ai_company.schemas.documents import GlobalConfigFile
+from ai_company.schemas.workspace_paths import resolve_company_workspace_root
 
 DEFAULT_MODEL = "gemini-2.5-flash"
 DEFAULT_MAX_OUTPUT_TOKENS = 8192
@@ -73,9 +74,7 @@ class AppSettings(BaseSettings):
 
     @property
     def workspace_root(self) -> Path:
-        if self.company_workspace_root:
-            return self.company_workspace_root.expanduser().resolve()
-        return (Path(__file__).resolve().parents[4] / "company_workspace").resolve()
+        return resolve_company_workspace_root(self.company_workspace_root)
 
     def resolved_gemini_api_key(self) -> str:
         """官網：GOOGLE_API_KEY 與 GEMINI_API_KEY 皆可；兩者皆有時 GOOGLE 優先。"""

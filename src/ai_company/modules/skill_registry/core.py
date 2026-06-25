@@ -13,7 +13,9 @@ REGISTRY_DIRNAME = ("skills", "registry")
 
 
 def repo_root() -> Path:
-    return Path(__file__).resolve().parents[4]
+    from ai_company.schemas.workspace_paths import framework_repo_root
+
+    return framework_repo_root()
 
 
 def registry_dir() -> Path:

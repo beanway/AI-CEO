@@ -1,6 +1,0 @@
-default_model: gemini-2.5-flash
-notification_policy: all
-max_output_tokens: 8192
-thinking_budget: 0
-include_thoughts: false
-temperature: null

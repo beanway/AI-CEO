@@ -79,3 +79,4 @@ node_modules/
 # --- Harness 本機沙盒（執行層產物，非框架原始碼；內可含獨立 git 倉）---
 company_workspace/
 /_company/
+/projects/

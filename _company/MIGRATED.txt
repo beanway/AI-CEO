@@ -1,6 +1,0 @@
-此目錄已廢棄。全公司索引與設定請使用：
-
-  company_workspace/_company/
-
-並在 .env 設定 COMPANY_WORKSPACE_ROOT=company_workspace（或絕對路徑）。
-可安全刪除本目錄（_company/）。

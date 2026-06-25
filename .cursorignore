@@ -21,7 +21,7 @@ build/
 htmlcov/
 
 # 本機沙盒（執行層產物，非框架原始碼）
-company_workspace/
+# company_workspace/
 
 # Git 物件庫（通常不需納入 Agent 上下文）
 .git/

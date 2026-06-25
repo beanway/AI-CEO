@@ -2,6 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from ai_company.adapters.telegram.gate import gate_message
+from ai_company.adapters.telegram.help_text import EXECUTOR_HELP_TEXT
 from ai_company.config import Settings
 
 
@@ -20,8 +21,15 @@ async def cmd_start_executor(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await update.message.reply_text(
         f"{prefix}\n"
         "AI 虛擬公司已連線。\n"
-        "執行者 Bot 用於任務進度通知（Phase B 接上排程後啟用）。"
+        "輸入 /help 查看說明；本 Bot 用於任務進度通知。"
     )
+
+
+async def cmd_help_executor(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    await update.message.reply_text(EXECUTOR_HELP_TEXT)
 
 
 async def on_text_executor(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

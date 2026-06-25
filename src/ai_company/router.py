@@ -5,6 +5,7 @@ from enum import Enum
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 from ai_company.adapters.telegram.executor_handlers import (
+    cmd_help_executor,
     cmd_start_executor,
     on_text_executor,
 )
@@ -34,6 +35,7 @@ def build_executor_application(token: str, settings: Settings) -> Application:
     app.bot_data["settings"] = settings
     app.bot_data["lane"] = BotLane.EXECUTOR
     app.add_handler(CommandHandler("start", cmd_start_executor))
+    app.add_handler(CommandHandler("help", cmd_help_executor))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_text_executor))
     return app
 
