@@ -14,7 +14,7 @@
 | run-step 輪到 scheduler，但像「空跑一步」 | 專案**沒有** `pm/scheduler_intake.yaml` 時仍只寫 **harness 標記**（`.harness_step_done`），不跑完整 package 規劃 | 政策二選一：禁止派 scheduler／或建局時建立 intake |
 | run-step 輪到 backend，有時只打勾 | 專案**沒有** `pm/backend_current_task.yaml` 時同樣只寫 harness 標記 | 派 backend 前須有任務契約，或 PM 從 intake 鏈寫入 |
 | 改沙盒 `workers/backend/package/` **改不到**「真 AI 寫碼」 | **Gemini backend** 仍走 `worker_runner._run_backend_worker_gemini_impl`（框架內 agent 迴圈） | Gemini 迴圈遷入沙盒 package 或 package 可插拔 driver |
-| `/resync`、`/loadfixture` 在 TG 可能沒有 | `PmResyncWorkerCommand`、`LoadFixtureScenarioCommand` 已註冊 **dispatch**，**未**接 Telegram／CLI 子命令 | adapters 與 help 文案 |
+| `/resync`、`/loadfixture` 在 TG 可能沒有 | 已接 **`/resyncworker`**、**`/loadfixture`** 與 CLI `resync-worker`、`load-fixture-scenario` | — |
 
 **Intake 語意**（產品）：交給任務分配者的開工輸入 = `pm/scheduler_intake.yaml`（`user_goal`、`context_refs`）。PM 口頭分析 ≠ intake，除非寫成該檔或等同 flow。
 
@@ -47,8 +47,8 @@
 | 已有 | 未有 |
 |------|------|
 | `/repair` 摘要、中斷 execution、**Worker 健檢清單**（manifest／package import） | 健檢後 **一鍵修復**（除 resync 種子外） |
-| `pm_resync_worker__work_flow`（dispatch／測試） | TG：`/resyncworker backend` 等 |
-| `load_fixture_scenario__work_flow` | TG／CLI：`load-fixture-scenario` |
+| `pm_resync_worker__work_flow`（dispatch／測試／TG／CLI） | — |
+| `load_fixture_scenario__work_flow`（dispatch／測試／TG／CLI） | — |
 | resync **force_package** | resync 細粒度（只 skills、保留 package 自訂）文件化與 UX |
 
 ---

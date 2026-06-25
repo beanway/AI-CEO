@@ -326,8 +326,10 @@ P-A1–P-A3 與一輪產品交付已完成；下列為 **刻意保留的過渡�
 | E-P4 | fixtures package 載入場景 | `test_fixtures_package` |
 | E-P5 | PM resync + repair 健檢 | `test_pm_resync_worker_flow`、`test_pm_repair_flow` |
 | E-P6 | `run-step` → worker_host | `test_run_execution_step_flow`、全量 `pytest` |
+| E-P+ | TG／CLI resync、load-fixture；整合／E2E | `test_ep_*`、`simulate_ep_acceptance.py` |
 
 - [x] E-P0（文件）
-- [x] E-P1–E-P6（見 commit；`pytest` 109 passed）
+- [x] E-P1–E-P6（見 commit；`pytest` 全綠）
+- [x] E-P 通道與驗收：`/resyncworker`、`/loadfixture`、CLI、`tests/integration/`、`scripts/simulate_ep_acceptance.py`
 
 **未完成與過渡**：[`plans/phase-e-worker-backlog.md`](plans/phase-e-worker-backlog.md)

@@ -15,6 +15,7 @@ SCRIPTS = (
     "simulate_p_a3_acceptance.py",
     "simulate_p_b_c_acceptance.py",
     "simulate_phase2_acceptance.py",
+    "simulate_ep_acceptance.py",
 )
 
 
