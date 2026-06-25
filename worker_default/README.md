@@ -1,4 +1,4 @@
-# workerDefault — 預設 Worker 模板（框架 repo）
+# worker_default — 預設 Worker 模板（框架 repo）
 
 **規格**：[`docs/design/execution-layer-v2.md`](../docs/design/execution-layer-v2.md) §4.0、§4.6  
 **路線圖**：[`docs/ROADMAP.md`](../docs/ROADMAP.md) §十六  
@@ -12,7 +12,7 @@
 ## 目錄
 
 ```text
-workerDefault/
+worker_default/
 ├── README.md           # 本檔
 └── backend/            # kind: backend 的預設實例（id 建議同目錄名 backend）
     ├── SKILL.md        # 自訂 kind 能力／流程／工具邊界（skill 格式）
@@ -21,8 +21,8 @@ workerDefault/
 
 ## 與專案沙盒的對應
 
-| workerDefault | 複製到專案後 |
-|---------------|--------------|
+| worker_default | 複製到專案後 |
+|----------------|--------------|
 | `backend/SKILL.md` | `projects/<id>/workers/backend/SKILL.md` |
 | `backend/role_skills.yaml` | `projects/<id>/workers/backend/role_skills.yaml` |
 
@@ -31,7 +31,7 @@ workerDefault/
 ## 測試策略（E1）
 
 - **不**在 TG／Training 專案上手動試跑為第一關。
-- **先**跑 `tests/` 內 E1 用例：從 `workerDefault/backend/` 種子到 `tempfile` 專案目錄 → 呼叫 backend runner（待實作）→ 斷言測試與 `last_run.json`。
+- **先**跑 `tests/` 內 E1 用例：從 `worker_default/backend/` 種子到 `tempfile` 專案目錄 → 呼叫 backend runner（待實作）→ 斷言測試與 `last_run.json`。
 - Training（`d668c955`）可作 **第二關** 手動驗收。
 
 ## 修訂
@@ -39,3 +39,4 @@ workerDefault/
 | 日期 | 說明 |
 |------|------|
 | 2026-06-25 | 初版目錄與 E1 測試順序 |
+| 2026-06-25 | 目錄更名 `workerDefault` → `worker_default`（與 `company_workspace` 一致） |

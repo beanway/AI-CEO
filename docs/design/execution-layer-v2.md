@@ -51,34 +51,34 @@
 | **E3 — scheduler v2** | 提問 → 分析 → 任務列表 → 派工 | — |
 | **E4 — PM 進階** | `/addworker`、role skill 指令、與核准整合 | — |
 
-**目前焦點：E1。** 實作順序：**先 `workerDefault/` 定稿預設 backend → fixture 測試 → 再接 `run-step`**（見 §4.0）。
+**目前焦點：E1。** 實作順序：**先 `worker_default/` 定稿預設 backend → fixture 測試 → 再接 `run-step`**（見 §4.0）。
 
 ---
 
 ## 4. E1：backend Worker
 
-### 4.0 `workerDefault/`（E1 起點）
+### 4.0 `worker_default/`（E1 起點）
 
-在框架 repo 根目錄新增 **`workerDefault/`**（非沙盒），作為 **預設 Worker 種子**，與 `skills/registry/`（共用 skill 套件）分開：
+在框架 repo 根目錄新增 **`worker_default/`**（非沙盒），作為 **預設 Worker 種子**，與 `skills/registry/`（共用 skill 套件）分開：
 
 | 路徑 | 說明 |
 |------|------|
-| [`workerDefault/README.md`](../../workerDefault/README.md) | 用途、複製規則、測試順序 |
-| `workerDefault/backend/SKILL.md` | 預設後端 Worker 能力／路徑／流程（**skill 格式**） |
-| `workerDefault/backend/role_skills.yaml` | 預設要啟用的 registry skill id |
+| [`worker_default/README.md`](../../worker_default/README.md) | 用途、複製規則、測試順序 |
+| `worker_default/backend/SKILL.md` | 預設後端 Worker 能力／路徑／流程（**skill 格式**） |
+| `worker_default/backend/role_skills.yaml` | 預設要啟用的 registry skill id |
 
 **為何先放這裡**
 
 - 不必等 Training 專案或 TG 建局即可迭代模板與 **pytest fixture**。
-- 專案內真實路徑仍是 `projects/<id>/workers/backend/`；測試時 **複製** `workerDefault/backend/*` 進 fixture 專案。
-- `run-step` 整合排在 workerDefault + 單元／整合測試綠燈之後。
+- 專案內真實路徑仍是 `projects/<id>/workers/backend/`；測試時 **複製** `worker_default/backend/*` 進 fixture 專案。
+- `run-step` 整合排在 worker_default + 單元／整合測試綠燈之後。
 
 **E1 實作順序（修訂）**
 
 1. ~~任務契約文件化~~（§4.2）  
-2. 維護 `workerDefault/backend/`（SKILL + role_skills；必要時補 `fixtures/` 任務樣本）  
+2. 維護 `worker_default/backend/`（SKILL + role_skills；必要時補 `fixtures/` 任務樣本）  
 3. `skills/registry/` 建立 §4.4 所列 id，並寫入 `role_skills.yaml`  
-4. **測試**：`tests/` 從 workerDefault 種子到臨時沙盒，跑 backend runner（尚未接 TG）  
+4. **測試**：`tests/` 從 worker_default 種子到臨時沙盒，跑 backend runner（尚未接 TG）  
 5. ToolPolicy：`backend` argv 白名單  
 6. `run_execution_step` 對 `kind=backend` 接 runner  
 7. 可選：Training `d668c955` 手動端到端  
@@ -134,7 +134,7 @@ notes_for_reviewer: string   # 供 E3 scheduler 使用
 
 ### 4.4 建議 registry skill（`skills/registry/<id>/SKILL.md`）
 
-掛載：CEO global（可選）→ `project_skills.yaml` → 專案內 `workers/backend/role_skills.yaml`（**可由 `workerDefault/backend/role_skills.yaml` 複製**）。
+掛載：CEO global（可選）→ `project_skills.yaml` → 專案內 `workers/backend/role_skills.yaml`（**可由 `worker_default/backend/role_skills.yaml` 複製**）。
 
 | skill id（建議） | 用途 |
 |------------------|------|
@@ -148,18 +148,18 @@ notes_for_reviewer: string   # 供 E3 scheduler 使用
 
 ### 4.5 程式落點（實作時）
 
-- 種子：`workerDefault/backend/`；複製邏輯可放在 `work_flow/_shared/` 或測試 helper（E1 先供 pytest 使用）。
+- 種子：`worker_default/backend/`；複製邏輯可放在 `work_flow/_shared/` 或測試 helper（E1 先供 pytest 使用）。
 - 新增或擴充 `work_flow/*__work_flow`：`run_execution_step` 在 `kind == backend` 時呼叫專用 runner（非僅 `complete_worker_harness_step`）。
 - 工具：`modules/sandbox_runner` + `modules/ai_core`；skill 正文經 `skill_registry.resolve_skill_stack` 注入 prompt。
-- 測試：**優先** workerDefault 種子 + fixture 專案；其次 Training 小 API 需求。
+- 測試：**優先** worker_default 種子 + fixture 專案；其次 Training 小 API 需求。
 
-### 4.6 `workerDefault` 與 registry 分工
+### 4.6 `worker_default` 與 registry 分工
 
 | 內容 | 放哪 |
 |------|------|
-| 此專案 backend **角色** 的流程、路徑、工具邊界 | `workerDefault/backend/SKILL.md` → 複製到 `workers/<id>/SKILL.md`（自訂 kind 語意；內建 backend 亦以此為預設正文） |
+| 此專案 backend **角色** 的流程、路徑、工具邊界 | `worker_default/backend/SKILL.md` → 複製到 `workers/<id>/SKILL.md`（自訂 kind 語意；內建 backend 亦以此為預設正文） |
 | **可重用** 的後端慣例（Python 服務、API 格式、驗證） | `skills/registry/backend-*/SKILL.md`，由 `role_skills.yaml` 引用 |
-| 任務單、需求片段（測試用） | 可放 `workerDefault/fixtures/`（選用，E1 測試建立） |
+| 任務單、需求片段（測試用） | 可放 `worker_default/fixtures/`（選用，E1 測試建立） |
 
 ---
 
@@ -192,4 +192,5 @@ notes_for_reviewer: string   # 供 E3 scheduler 使用
 | 日期 | 說明 |
 |------|------|
 | 2026-06-25 | 初版：E1 backend 範圍、契約、skill 清單、階段切分 |
-| 2026-06-25 | E1 改為先 `workerDefault/` 種子與 fixture 測試，再接 run-step |
+| 2026-06-25 | E1 改為先 `worker_default/` 種子與 fixture 測試，再接 run-step |
+| 2026-06-25 | 目錄命名統一為 `worker_default/`（snake_case，對齊 `company_workspace`） |

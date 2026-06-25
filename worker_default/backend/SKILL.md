@@ -1,7 +1,7 @@
 # backend（預設後端 Worker）
 
 **kind**：`backend`（內建枚舉）  
-**模板來源**：`workerDefault/backend/` → 複製至 `projects/<id>/workers/backend/`
+**模板來源**：`worker_default/backend/` → 複製至 `projects/<id>/workers/backend/`
 
 ## 職責
 

@@ -28,7 +28,7 @@
 | [`plans/phase-a-management-v1-archived.md`](plans/phase-a-management-v1-archived.md) | 舊 Phase A（已廢止） |
 | [`reference/original-spec.txt`](reference/original-spec.txt) | 歷史原文 |
 | [`roadmap.md`](roadmap.md) | 路線圖 |
-| [`../workerDefault/README.md`](../workerDefault/README.md) | E1 預設 Worker 模板目錄 |
+| [`../worker_default/README.md`](../worker_default/README.md) | E1 預設 Worker 模板目錄 |
 | [`document-audit.md`](document-audit.md) | 衝突與待辦 |
 
 ## Cursor 規則與 Skill

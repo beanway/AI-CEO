@@ -181,7 +181,7 @@ Phase B 現況為 **管線骨架**（固定 pipeline、`complete_worker_harness_
 
 - 使用者提問 → **AI 分析** → 任務列表與順序 → 各 Worker 執行 → **驗證／代碼檢查**；
 - **規範一律 skill**（無獨立 rule 類型）；
-- 實作順序：**先 `workerDefault/` 定稿預設 backend → fixture 測試 → 再接 `run-step`**（見 [`execution-layer-v2.md`](execution-layer-v2.md) §4.0）。
+- 實作順序：**先 `worker_default/` 定稿預設 backend → fixture 測試 → 再接 `run-step`**（見 [`execution-layer-v2.md`](execution-layer-v2.md) §4.0）。
 
 細節、任務契約、backend skill 清單：[`execution-layer-v2.md`](execution-layer-v2.md)。路線圖勾選：[`../roadmap.md`](../roadmap.md) §十六。
 

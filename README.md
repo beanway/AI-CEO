@@ -31,7 +31,7 @@ python -m ai_company.main run
 | 路徑 | 說明 |
 |------|------|
 | `docs/` | 產品／設計／路線圖／src-layout |
-| `workerDefault/` | E1 預設 Worker 種子（先於專案沙盒測試） |
+| `worker_default/` | E1 預設 Worker 種子（先於專案沙盒測試） |
 | `src/ai_company/` | adapters、work_flow、modules、schemas |
 | `.cursor/skills/ai-ceo-framework/` | Cursor 開發本框架的 skill |
 | `company_workspace/` | 本機沙盒（`COMPANY_WORKSPACE_ROOT`；含 `_company/`、`projects/<id>/`） |
