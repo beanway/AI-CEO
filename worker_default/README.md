@@ -9,14 +9,20 @@
 2. **E1 測試** 先在此定稿模板，再以 `pytest` 複製到臨時專案沙盒驗證；通過後才接到 `run-step`。
 3. 日後 PM 建局（`/addworker` 等）可從此處 **種子複製** 到 `projects/<id>/workers/<id>/`（E4）。
 
+**Skill 執行環境**（三件套、不用 MCP、per-worker `skills/`）：[`SKILL_EXECUTION_ENV.md`](SKILL_EXECUTION_ENV.md)  
+**程式 runner**：`src/ai_company/modules/worker_runner/`
+
 ## 目錄
 
 ```text
 worker_default/
-├── README.md           # 本檔
-└── backend/            # kind: backend 的預設實例（id 建議同目錄名 backend）
-    ├── SKILL.md        # 自訂 kind 能力／流程／工具邊界（skill 格式）
-    └── role_skills.yaml
+├── README.md
+├── SKILL_EXECUTION_ENV.md
+├── fixtures/           # 測試用任務／需求片段
+└── backend/
+    ├── SKILL.md
+    ├── role_skills.yaml   # 過渡；E1 以 skills/ 目錄為主
+    └── skills/            # 本 worker 專用劇本（*.md）
 ```
 
 ## 與專案沙盒的對應
@@ -25,6 +31,7 @@ worker_default/
 |----------------|--------------|
 | `backend/SKILL.md` | `projects/<id>/workers/backend/SKILL.md` |
 | `backend/role_skills.yaml` | `projects/<id>/workers/backend/role_skills.yaml` |
+| `backend/skills/` | `projects/<id>/workers/backend/skills/` |
 
 另需在專案內具備：`workers.yaml` 一列 `{ id: backend, kind: backend }`、`shared/requirements.md`、任務契約（見 execution-layer-v2 §4.2）。測試用 fixture 會一併建立。
 

@@ -29,6 +29,7 @@
 | [`reference/original-spec.txt`](reference/original-spec.txt) | 歷史原文 |
 | [`roadmap.md`](roadmap.md) | 路線圖 |
 | [`../worker_default/README.md`](../worker_default/README.md) | E1 預設 Worker 模板目錄 |
+| [`../worker_default/SKILL_EXECUTION_ENV.md`](../worker_default/SKILL_EXECUTION_ENV.md) | Skill 執行環境（不用 MCP） |
 | [`document-audit.md`](document-audit.md) | 衝突與待辦 |
 
 ## Cursor 規則與 Skill

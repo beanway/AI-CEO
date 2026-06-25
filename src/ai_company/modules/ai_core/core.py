@@ -70,3 +70,16 @@ def reset_chat_backends_for_tests() -> None:
     global _generation
     _backends.clear()
     _generation = AiGenerationSettings()
+
+
+def build_generate_content_config(
+    *,
+    system_instruction: str,
+    generation: AiGenerationSettings,
+):
+    """對外封裝 GenerateContentConfig（供 worker_runner 等模組使用）。"""
+    from ai_company.modules.ai_core.internal.generation_config import (
+        build_generate_content_config as _build,
+    )
+
+    return _build(system_instruction=system_instruction, generation=generation)

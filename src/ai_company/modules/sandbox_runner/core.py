@@ -7,6 +7,10 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from ai_company.modules.sandbox_runner.internal.backend_tool_policy import (
+    validate_backend_argv,
+    validate_backend_relative_path,
+)
 from ai_company.modules.sandbox_runner.internal.tool_policy import (
     ToolPolicyError,
     is_high_risk_git,
@@ -65,6 +69,7 @@ def run_argv_in_worker_cwd(
 ) -> SubprocessRunResult:
     if not argv:
         raise ToolPolicyError("argv 不可為空")
+    validate_backend_argv(argv)
     cwd = worker_sandbox_cwd(workspace_root, project_id, worker_id)
     proc = subprocess.run(
         argv,
@@ -78,6 +83,34 @@ def run_argv_in_worker_cwd(
         stdout=proc.stdout or "",
         stderr=proc.stderr or "",
     )
+
+
+def read_file_in_backend_sandbox(
+    workspace_root: Path,
+    project_id: str,
+    worker_id: str,
+    rel_path: str,
+) -> str:
+    path = validate_backend_relative_path(
+        workspace_root, project_id, worker_id, rel_path, for_write=False
+    )
+    if not path.is_file():
+        raise ToolPolicyError(f"檔案不存在：{rel_path!r}")
+    return path.read_text(encoding="utf-8")
+
+
+def write_file_in_backend_sandbox(
+    workspace_root: Path,
+    project_id: str,
+    worker_id: str,
+    rel_path: str,
+    content: str,
+) -> None:
+    path = validate_backend_relative_path(
+        workspace_root, project_id, worker_id, rel_path, for_write=True
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
 
 
 def complete_worker_harness_step(
@@ -103,6 +136,8 @@ __all__ = [
     "WorkerStepResult",
     "complete_worker_harness_step",
     "is_high_risk_git",
+    "read_file_in_backend_sandbox",
     "run_argv_in_worker_cwd",
     "run_git_in_project_sandbox",
+    "write_file_in_backend_sandbox",
 ]

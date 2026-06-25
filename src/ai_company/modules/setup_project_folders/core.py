@@ -32,6 +32,7 @@ def ensure_worker_directories(project_root: Path, workers: list[WorkerEntry]) ->
     for entry in workers:
         worker_dir = workers_root / entry.id
         worker_dir.mkdir(parents=True, exist_ok=True)
+        (worker_dir / "skills").mkdir(parents=True, exist_ok=True)
         role_skills = worker_dir / "role_skills.yaml"
         if not role_skills.exists():
             role_skills.write_text("enabled_skill_ids: []\n", encoding="utf-8")

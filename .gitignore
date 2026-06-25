@@ -80,3 +80,6 @@ node_modules/
 company_workspace/
 /_company/
 /projects/
+
+# worker_tests 整合跑出的本機沙盒
+tests/worker_tests/_sandbox/

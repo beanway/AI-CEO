@@ -1,0 +1,11 @@
+task_id: demo-add-2026
+goal: |
+  在 workers/backend/ 新增 calc.py，實作 add(a, b) 回傳兩數之和；
+  並新增 test_calc.py，以 pytest 驗證 add(2, 3) == 5。
+acceptance_criteria:
+  - calc.py 含 add 函式
+  - pytest 通過且涵蓋 add(2, 3)
+allowed_paths:
+  - workers/backend/
+context_refs:
+  - shared/requirements.md

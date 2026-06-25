@@ -31,6 +31,7 @@ packages = ["src/ai_company"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+norecursedirs = [".git", ".venv", "node_modules", "_sandbox"]
 
 [tool.ruff]
 line-length = 100
