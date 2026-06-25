@@ -1,0 +1,6 @@
+task_id: demo-scheduler-2026
+user_goal: |
+  在 workers/backend/ 新增 calc.py 的 add(a,b)，並以 pytest 驗證 add(2,3)==5。
+  若需補規格可先由 planner 產出，本 demo 僅派 backend。
+context_refs:
+  - shared/requirements.md

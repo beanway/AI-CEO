@@ -1,0 +1,12 @@
+plan_id: demo-plan-2026
+summary: 單一 backend 子任務（calc + pytest）
+tasks:
+  - task_id: backend-calc-1
+    kind: backend
+    worker_id: backend
+    goal: |
+      在 workers/backend/ 新增 calc.py 實作 add(a,b)，並新增 test_calc.py，
+      以 pytest 驗證 add(2,3)==5。
+    acceptance_criteria:
+      - calc.py 含 add
+      - pytest 通過

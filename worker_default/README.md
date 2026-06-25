@@ -19,10 +19,14 @@ worker_default/
 ├── README.md
 ├── SKILL_EXECUTION_ENV.md
 ├── fixtures/           # 測試用任務／需求片段
-└── backend/
+├── backend/
+│   ├── SKILL.md
+│   ├── role_skills.yaml
+│   └── skills/
+└── scheduler/          # 任務分配者（kind: task_scheduler）
     ├── SKILL.md
-    ├── role_skills.yaml   # 過渡；E1 以 skills/ 目錄為主
-    └── skills/            # 本 worker 專用劇本（*.md）
+    ├── role_skills.yaml
+    └── skills/
 ```
 
 ## 與專案沙盒的對應
@@ -32,6 +36,8 @@ worker_default/
 | `backend/SKILL.md` | `projects/<id>/workers/backend/SKILL.md` |
 | `backend/role_skills.yaml` | `projects/<id>/workers/backend/role_skills.yaml` |
 | `backend/skills/` | `projects/<id>/workers/backend/skills/` |
+| `scheduler/SKILL.md` | `projects/<id>/workers/scheduler/SKILL.md` |
+| `scheduler/skills/` | `projects/<id>/workers/scheduler/skills/` |
 
 另需在專案內具備：`workers.yaml` 一列 `{ id: backend, kind: backend }`、`shared/requirements.md`、任務契約（見 execution-layer-v2 §4.2）。測試用 fixture 會一併建立。
 
@@ -47,3 +53,4 @@ worker_default/
 |------|------|
 | 2026-06-25 | 初版目錄與 E1 測試順序 |
 | 2026-06-25 | 目錄更名 `workerDefault` → `worker_default`（與 `company_workspace` 一致） |
+| 2026-06-25 | 新增 `scheduler/` 任務分配者種子（E3 起點） |
