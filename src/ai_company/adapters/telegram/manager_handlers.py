@@ -11,6 +11,7 @@ from ai_company.config import Settings
 from ai_company.schemas.commands import (
     AddSkillToCompanyCommand,
     AddSkillToProjectCommand,
+    AddWorkerCommand,
     Channel,
     CreateProjectCommand,
     ListProjectsCommand,
@@ -207,6 +208,22 @@ async def cmd_setupworkers(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await update.message.reply_text(result.message)
 
 
+async def cmd_addworker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    if not context.args:
+        await update.message.reply_text("用法：/addworker backend（自 worker_default 複製種子）")
+        return
+    template = context.args[0].strip().lower()
+    deps = AppDeps(settings=settings)
+    result = dispatch(
+        AddWorkerCommand(channel=Channel.TELEGRAM, template=template),
+        deps,
+    )
+    await update.message.reply_text(result.message)
+
+
 async def cmd_addprojectskill(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     settings: Settings = context.application.bot_data["settings"]
     if not await gate_message(update, settings):
@@ -326,6 +343,7 @@ def register_manager_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("status", cmd_status))
     app.add_handler(CommandHandler("repair", cmd_repair))
     app.add_handler(CommandHandler("setupworkers", cmd_setupworkers))
+    app.add_handler(CommandHandler("addworker", cmd_addworker))
     app.add_handler(CommandHandler("addprojectskill", cmd_addprojectskill))
     app.add_handler(CommandHandler("git", cmd_git))
     app.add_handler(CallbackQueryHandler(on_approval_callback, pattern=r"^approval:"))

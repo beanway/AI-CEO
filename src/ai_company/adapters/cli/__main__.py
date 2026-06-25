@@ -44,6 +44,8 @@ def main(argv: list[str] | None = None) -> int:
     p_pm.add_argument("text", help="使用者訊息")
     p_sw = sub.add_parser("setup-workers", help="PM 建局模板 five|three")
     p_sw.add_argument("template", choices=("five", "three"))
+    p_aw = sub.add_parser("add-worker", help="PM 從 worker_default 加入 Worker")
+    p_aw.add_argument("template", help="例：backend")
     sub.add_parser("project-status", help="專案狀態摘要")
     p_ps = sub.add_parser("add-project-skill", help="啟用專案 project_skills")
     p_ps.add_argument("skill_id")
@@ -104,6 +106,8 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_pm_chat(args.text)
     if args.command == "setup-workers":
         return cli_inbound.run_setup_workers(args.template)
+    if args.command == "add-worker":
+        return cli_inbound.run_add_worker(args.template)
     if args.command == "project-status":
         return cli_inbound.run_project_status()
     if args.command == "add-project-skill":

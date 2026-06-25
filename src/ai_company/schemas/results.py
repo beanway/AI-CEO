@@ -58,6 +58,13 @@ class SetupWorkersResult(FlowResult):
     worker_count: int | None = None
 
 
+class AddWorkerResult(FlowResult):
+    project_id: str | None = None
+    worker_id: str | None = None
+    kind: str | None = None
+    template: str | None = None
+
+
 class AddSkillToProjectResult(FlowResult):
     project_id: str | None = None
     skill_id: str | None = None

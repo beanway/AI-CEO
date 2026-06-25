@@ -7,7 +7,7 @@
 
 1. 存放 **canonical 預設後端 Worker**（`backend/`）的 skill 與設定。
 2. **E1 測試** 先在此定稿模板，再以 `pytest` 複製到臨時專案沙盒驗證；通過後才接到 `run-step`。
-3. 日後 PM 建局（`/addworker` 等）可從此處 **種子複製** 到 `projects/<id>/workers/<id>/`（E4）。
+3. PM **`/addworker backend`** 或 CLI **`add-worker backend`** 可從此處 **種子複製** 到 `projects/<id>/workers/backend/`（亦可用 `/setupworkers` 建局，但不會自動複製種子）。
 
 **Skill 執行環境**（三件套、不用 MCP、per-worker `skills/`）：[`SKILL_EXECUTION_ENV.md`](SKILL_EXECUTION_ENV.md)  
 **程式 runner**：`src/ai_company/modules/worker_runner/`

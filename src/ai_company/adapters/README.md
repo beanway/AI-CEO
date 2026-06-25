@@ -28,6 +28,7 @@
 | `/mode ceo\|pm` | `SetUserModeCommand` |
 | `/status` | `ShowProjectStatusCommand` |
 | `/setupworkers five\|three` | `SetupWorkersCommand` |
+| `/addworker backend` | `AddWorkerCommand`（`worker_default/backend/` 種子） |
 | `/addprojectskill <id>` | `AddSkillToProjectCommand` |
 | `/repair [interrupt]` | `PmRepairCommand` |
 | `/git …` | `ProjectGitCommand`（可進核准閘道） |
@@ -48,6 +49,7 @@
 | `ceo-chat` / `pm-chat` | `CeoChat` / `PmChat` |
 | `mode` | `SetUserModeCommand` |
 | `setup-workers` | `SetupWorkersCommand` |
+| `add-worker <template>` | `AddWorkerCommand`（例：`backend`） |
 | `project-status` | `ShowProjectStatusCommand` |
 | `add-project-skill` | `AddSkillToProjectCommand` |
 | `project-git` | `ProjectGitCommand` |

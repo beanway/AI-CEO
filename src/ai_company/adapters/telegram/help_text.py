@@ -15,6 +15,7 @@ MANAGER_HELP_TEXT = (
     "/mode ceo|pm — 切換對話模式\n\n"
     "專案管理（PM）\n"
     "/setupworkers five|three — 建立 workers 範本\n"
+    "/addworker backend — 從 worker_default 加入 backend Worker\n"
     "/addprojectskill <id> — 加入專案 skill\n"
     "/repair [interrupt] — PM 維修流程\n"
     "/git <子命令…> — 專案 git（例：/git status）\n\n"

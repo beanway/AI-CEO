@@ -1,5 +1,6 @@
 """Register all *__work_flow packages via each flow's run.py."""
 
+from ai_company.work_flow.add_worker__work_flow.run import register as register_add_worker
 from ai_company.work_flow.add_skill_to_company__work_flow.run import (
     register as register_add_skill_to_company,
 )
@@ -69,6 +70,7 @@ register_resolve_execution_failure(registry)
 register_list_registry_skills(registry)
 register_create_registry_skill(registry)
 register_setup_workers(registry)
+register_add_worker(registry)
 register_add_skill_to_project(registry)
 register_show_project_status(registry)
 register_show_coo_report(registry)

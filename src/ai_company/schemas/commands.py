@@ -23,6 +23,7 @@ class CommandType(str, Enum):
     SET_USER_MODE = "set_user_mode"
     PM_CHAT = "pm_chat"
     SETUP_WORKERS = "setup_workers"
+    ADD_WORKER = "add_worker"
     ADD_SKILL_TO_PROJECT = "add_skill_to_project"
     SHOW_PROJECT_STATUS = "show_project_status"
     PROJECT_GIT = "project_git"
@@ -134,6 +135,14 @@ class SetupWorkersCommand(BaseCommand):
         return self
 
 
+class AddWorkerCommand(BaseCommand):
+    """從 worker_default/<template>/ 加入單一 Worker（例：template=backend）。"""
+
+    command_type: Literal[CommandType.ADD_WORKER] = CommandType.ADD_WORKER
+    project_id: str | None = None
+    template: str = Field(min_length=1)
+
+
 class AddSkillToProjectCommand(BaseCommand):
     command_type: Literal[CommandType.ADD_SKILL_TO_PROJECT] = CommandType.ADD_SKILL_TO_PROJECT
     skill_id: str = Field(min_length=1)
@@ -214,6 +223,7 @@ Command = (
     | SetUserModeCommand
     | PmChatCommand
     | SetupWorkersCommand
+    | AddWorkerCommand
     | AddSkillToProjectCommand
     | ShowProjectStatusCommand
     | ProjectGitCommand

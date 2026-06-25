@@ -20,6 +20,7 @@ from ai_company.schemas.commands import (
     PmChatCommand,
     SetUserModeCommand,
     SetupWorkersCommand,
+    AddWorkerCommand,
     ShowGlobalConfigCommand,
     ShowProjectStatusCommand,
     SwitchProjectCommand,
@@ -203,6 +204,19 @@ def run_setup_workers(template: str) -> int:
     deps = AppDeps(settings=get_settings())
     result = dispatch(
         SetupWorkersCommand(channel=Channel.CLI, template=template),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_add_worker(template: str) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        AddWorkerCommand(channel=Channel.CLI, template=template.strip().lower()),
         deps,
     )
     if not result.success:

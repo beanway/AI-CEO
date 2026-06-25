@@ -10,12 +10,20 @@ import yaml
 from ai_company.modules.file_store import core as file_store
 from ai_company.modules.setup_project_folders import core as project_folders
 from ai_company.modules.worker_runner.internal.contracts import BackendTaskContract
-from ai_company.schemas.documents import WorkerEntry, WorkersFile
+from ai_company.modules.worker_runner.internal.default_install import (
+    copy_worker_default_into_worker_dir,
+    default_worker_entry_for_template,
+)
+from ai_company.schemas.documents import WorkersFile
 from ai_company.schemas.workspace_paths import framework_repo_root, project_dir
 
 
 def worker_default_backend_dir() -> Path:
-    return framework_repo_root() / "worker_default" / "backend"
+    from ai_company.modules.worker_runner.internal.default_install import (
+        worker_default_template_dir,
+    )
+
+    return worker_default_template_dir("backend")
 
 
 def worker_default_fixtures_dir() -> Path:
@@ -34,22 +42,11 @@ def seed_backend_worker_project(
     root = project_folders.project_dir(workspace_root, project_id)
     project_folders.ensure_project_tree(root)
 
-    workers = WorkersFile(workers=[WorkerEntry(id=worker_id, kind="backend")])
+    workers = WorkersFile(workers=[default_worker_entry_for_template("backend")])
     file_store.save_workers(workspace_root, project_id, workers)
     project_folders.ensure_worker_directories(root, workers.workers)
 
-    dest_worker = root / "workers" / worker_id
-    seed = worker_default_backend_dir()
-    for name in ("SKILL.md", "role_skills.yaml"):
-        src = seed / name
-        if src.is_file():
-            shutil.copy2(src, dest_worker / name)
-    skills_src = seed / "skills"
-    skills_dest = dest_worker / "skills"
-    if skills_src.is_dir():
-        if skills_dest.exists():
-            shutil.rmtree(skills_dest)
-        shutil.copytree(skills_src, skills_dest)
+    copy_worker_default_into_worker_dir(root, "backend")
 
     shared = root / "shared"
     shared.mkdir(parents=True, exist_ok=True)
