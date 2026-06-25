@@ -16,6 +16,8 @@ MANAGER_HELP_TEXT = (
     "專案管理（PM）\n"
     "/setupworkers five|three — 建立 workers 範本\n"
     "/addworker backend — 從 worker_default 加入 backend Worker\n"
+    "/resyncworker <template> [keeppackage] — 自種子重新同步 Worker\n"
+    "/loadfixture <scenario> — 載入 demo 場景（backend_demo、scheduler_demo）\n"
     "/addprojectskill <id> — 加入專案 skill\n"
     "/repair [interrupt] — PM 維修流程\n"
     "/git <子命令…> — 專案 git（例：/git status）\n\n"

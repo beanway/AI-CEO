@@ -46,6 +46,18 @@ def main(argv: list[str] | None = None) -> int:
     p_sw.add_argument("template", choices=("five", "three"))
     p_aw = sub.add_parser("add-worker", help="PM 從 worker_default 加入 Worker")
     p_aw.add_argument("template", help="例：backend")
+    p_rs = sub.add_parser("resync-worker", help="PM 自 worker_default 重新同步 Worker 種子")
+    p_rs.add_argument("template", help="例：backend、scheduler")
+    p_rs.add_argument(
+        "--keep-package",
+        action="store_true",
+        help="保留沙盒 package/ 自訂（僅同步 SKILL、manifest 等）",
+    )
+    p_lf = sub.add_parser(
+        "load-fixture-scenario",
+        help="載入 worker_default fixtures 場景到 pm/（例：backend_demo）",
+    )
+    p_lf.add_argument("scenario", help="場景名稱")
     sub.add_parser("project-status", help="專案狀態摘要")
     p_ps = sub.add_parser("add-project-skill", help="啟用專案 project_skills")
     p_ps.add_argument("skill_id")
@@ -108,6 +120,10 @@ def main(argv: list[str] | None = None) -> int:
         return cli_inbound.run_setup_workers(args.template)
     if args.command == "add-worker":
         return cli_inbound.run_add_worker(args.template)
+    if args.command == "resync-worker":
+        return cli_inbound.run_resync_worker(args.template, keep_package=args.keep_package)
+    if args.command == "load-fixture-scenario":
+        return cli_inbound.run_load_fixture_scenario(args.scenario)
     if args.command == "project-status":
         return cli_inbound.run_project_status()
     if args.command == "add-project-skill":

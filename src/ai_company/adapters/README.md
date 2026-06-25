@@ -29,6 +29,8 @@
 | `/status` | `ShowProjectStatusCommand` |
 | `/setupworkers five\|three` | `SetupWorkersCommand` |
 | `/addworker backend` | `AddWorkerCommand`（`worker_default/backend/` 種子） |
+| `/resyncworker <template> [keeppackage]` | `PmResyncWorkerCommand` |
+| `/loadfixture <scenario>` | `LoadFixtureScenarioCommand` |
 | `/addprojectskill <id>` | `AddSkillToProjectCommand` |
 | `/repair [interrupt]` | `PmRepairCommand` |
 | `/git …` | `ProjectGitCommand`（可進核准閘道） |
@@ -50,6 +52,8 @@
 | `mode` | `SetUserModeCommand` |
 | `setup-workers` | `SetupWorkersCommand` |
 | `add-worker <template>` | `AddWorkerCommand`（例：`backend`） |
+| `resync-worker <template>` | `PmResyncWorkerCommand`（可加 `--keep-package`） |
+| `load-fixture-scenario <name>` | `LoadFixtureScenarioCommand` |
 | `project-status` | `ShowProjectStatusCommand` |
 | `add-project-skill` | `AddSkillToProjectCommand` |
 | `project-git` | `ProjectGitCommand` |

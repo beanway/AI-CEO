@@ -25,6 +25,8 @@ from ai_company.schemas.commands import (
     ShowProjectStatusCommand,
     SwitchProjectCommand,
     PmRepairCommand,
+    PmResyncWorkerCommand,
+    LoadFixtureScenarioCommand,
     ProjectGitCommand,
     RunExecutionStepCommand,
     ResolveExecutionFailureCommand,
@@ -266,6 +268,39 @@ def run_pm_repair(*, interrupt: bool) -> int:
     deps = AppDeps(settings=get_settings())
     result = dispatch(
         PmRepairCommand(channel=Channel.CLI, interrupt=interrupt),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_resync_worker(template: str, *, keep_package: bool = False) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        PmResyncWorkerCommand(
+            channel=Channel.CLI,
+            template=template.strip().lower(),
+            force_package=not keep_package,
+        ),
+        deps,
+    )
+    if not result.success:
+        print(result.message, file=sys.stderr)
+        return 1
+    print(result.message)
+    return 0
+
+
+def run_load_fixture_scenario(scenario: str) -> int:
+    deps = AppDeps(settings=get_settings())
+    result = dispatch(
+        LoadFixtureScenarioCommand(
+            channel=Channel.CLI,
+            scenario=scenario.strip(),
+        ),
         deps,
     )
     if not result.success:

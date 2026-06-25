@@ -12,6 +12,8 @@ from ai_company.schemas.commands import (
     AddSkillToCompanyCommand,
     AddSkillToProjectCommand,
     AddWorkerCommand,
+    LoadFixtureScenarioCommand,
+    PmResyncWorkerCommand,
     Channel,
     CreateProjectCommand,
     ListProjectsCommand,
@@ -224,6 +226,48 @@ async def cmd_addworker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await update.message.reply_text(result.message)
 
 
+async def cmd_resyncworker(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    if not context.args:
+        await update.message.reply_text(
+            "用法：/resyncworker backend [keeppackage]\n"
+            "keeppackage = 保留沙盒 package/ 自訂"
+        )
+        return
+    template = context.args[0].strip().lower()
+    keep = len(context.args) > 1 and context.args[1].strip().lower() == "keeppackage"
+    deps = AppDeps(settings=settings)
+    result = dispatch(
+        PmResyncWorkerCommand(
+            channel=Channel.TELEGRAM,
+            template=template,
+            force_package=not keep,
+        ),
+        deps,
+    )
+    await update.message.reply_text(result.message)
+
+
+async def cmd_loadfixture(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    settings: Settings = context.application.bot_data["settings"]
+    if not await gate_message(update, settings):
+        return
+    if not context.args:
+        await update.message.reply_text(
+            "用法：/loadfixture backend_demo 或 scheduler_demo"
+        )
+        return
+    scenario = context.args[0].strip()
+    deps = AppDeps(settings=settings)
+    result = dispatch(
+        LoadFixtureScenarioCommand(channel=Channel.TELEGRAM, scenario=scenario),
+        deps,
+    )
+    await update.message.reply_text(result.message)
+
+
 async def cmd_addprojectskill(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     settings: Settings = context.application.bot_data["settings"]
     if not await gate_message(update, settings):
@@ -344,6 +388,8 @@ def register_manager_handlers(app: Application) -> None:
     app.add_handler(CommandHandler("repair", cmd_repair))
     app.add_handler(CommandHandler("setupworkers", cmd_setupworkers))
     app.add_handler(CommandHandler("addworker", cmd_addworker))
+    app.add_handler(CommandHandler("resyncworker", cmd_resyncworker))
+    app.add_handler(CommandHandler("loadfixture", cmd_loadfixture))
     app.add_handler(CommandHandler("addprojectskill", cmd_addprojectskill))
     app.add_handler(CommandHandler("git", cmd_git))
     app.add_handler(CallbackQueryHandler(on_approval_callback, pattern=r"^approval:"))
