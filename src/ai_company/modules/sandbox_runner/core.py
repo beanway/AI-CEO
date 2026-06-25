@@ -11,6 +11,9 @@ from ai_company.modules.sandbox_runner.internal.backend_tool_policy import (
     validate_backend_argv,
     validate_backend_relative_path,
 )
+from ai_company.modules.sandbox_runner.internal.scheduler_tool_policy import (
+    validate_scheduler_relative_path,
+)
 from ai_company.modules.sandbox_runner.internal.tool_policy import (
     ToolPolicyError,
     is_high_risk_git,
@@ -139,5 +142,7 @@ __all__ = [
     "read_file_in_backend_sandbox",
     "run_argv_in_worker_cwd",
     "run_git_in_project_sandbox",
+    "validate_scheduler_relative_path",
+    "worker_sandbox_cwd",
     "write_file_in_backend_sandbox",
 ]

@@ -8,8 +8,13 @@ from pathlib import Path
 from ai_company.schemas.documents import WorkerEntry
 from ai_company.schemas.workspace_paths import framework_repo_root
 
-# template 名稱 = worker_default 子目錄名 = 預設 worker id = 內建 kind
-SUPPORTED_DEFAULT_TEMPLATES = frozenset({"backend"})
+# template 名稱 = worker_default 子目錄名；id/kind 見 TEMPLATE_WORKER_ENTRIES
+SUPPORTED_DEFAULT_TEMPLATES = frozenset({"backend", "scheduler"})
+
+TEMPLATE_WORKER_ENTRIES: dict[str, WorkerEntry] = {
+    "backend": WorkerEntry(id="backend", kind="backend"),
+    "scheduler": WorkerEntry(id="scheduler", kind="task_scheduler"),
+}
 
 
 def worker_default_template_dir(template: str) -> Path:
@@ -24,7 +29,7 @@ def worker_default_template_dir(template: str) -> Path:
 def default_worker_entry_for_template(template: str) -> WorkerEntry:
     if template not in SUPPORTED_DEFAULT_TEMPLATES:
         raise ValueError(f"不支援的 worker_default 模板：{template!r}")
-    return WorkerEntry(id=template, kind=template)
+    return TEMPLATE_WORKER_ENTRIES[template]
 
 
 def copy_worker_default_into_worker_dir(project_root: Path, template: str) -> Path:

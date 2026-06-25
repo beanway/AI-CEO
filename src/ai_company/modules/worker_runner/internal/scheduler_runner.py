@@ -1,4 +1,4 @@
-"""backend Worker 執行：Skill harness + Agent 迴圈。"""
+"""任務分配者 Worker 執行（scripted / 未來 Gemini）。"""
 
 from __future__ import annotations
 
@@ -11,57 +11,41 @@ import yaml
 
 from ai_company.modules.sandbox_runner.core import ToolPolicyError
 from ai_company.modules.worker_runner.internal.contracts import (
-    BackendLastRun,
-    BackendTaskContract,
-    BackendTestResult,
     SchedulerIntakeContract,
+    SchedulerLastRun,
+    TaskQueuePlan,
 )
-from ai_company.modules.worker_runner.internal.default_install import (
-    SUPPORTED_DEFAULT_TEMPLATES,
-    copy_worker_default_into_worker_dir,
-    default_worker_entry_for_template,
-)
-from ai_company.modules.worker_runner.internal.gemini_agent import GeminiAgentDriver
-from ai_company.modules.worker_runner.internal.harness_tools import (
-    HarnessToolContext,
-    dispatch_tool,
+from ai_company.modules.worker_runner.internal.scheduler_harness_tools import (
+    SchedulerHarnessToolContext,
+    dispatch_scheduler_tool,
 )
 from ai_company.modules.worker_runner.internal.scripted_agent import (
-    PlannedToolCall,
     ScriptedAgentDriver,
     ScriptedAgentTurn,
 )
-from ai_company.modules.worker_runner.internal.scheduler_runner import (
-    SchedulerWorkerRunResult,
-    load_scheduler_last_run,
-    run_scheduler_worker_scripted,
-)
-from ai_company.modules.worker_runner.internal.seed import (
-    seed_backend_worker_project,
-    seed_scheduler_backend_demo_project,
-    worker_default_fixtures_dir,
-)
-from ai_company.schemas.ai_generation import AiGenerationSettings
 from ai_company.schemas.workspace_paths import project_dir
 
 DEFAULT_MAX_TURNS = 25
 
-BACKEND_SYSTEM_PREFIX = """你是專案沙盒內的後端 AI 執行者（backend Worker）。
-工作目錄為專案根（projects/<id>/）。收到任務後：
-1. 用 list_skills / read_skill 閱讀 workers/<worker_id>/skills/ 劇本並遵循步驟。
-2. 用 read_file / write_file 與 run_terminal 完成實作與測試。
-3. 測試通過後呼叫 complete_task（status=success, test_exit_code=0）。
-禁止 pip install、任意 shell、修改框架 src/。
+SCHEDULER_SYSTEM_PREFIX = """你是專案沙盒內的任務分配者（task_scheduler Worker）。
+工作目錄為專案根。收到 intake 後：
+1. 用 list_skills / read_skill 閱讀 workers/<worker_id>/skills/ 劇本。
+2. 用 read_file 讀 workers.yaml、shared/requirements.md、pm/scheduler_intake.yaml。
+3. 用 write_file 寫入 pm/task_queue.yaml 與第一個執行者的 pm/*_current_task.yaml。
+4. 規劃完成後呼叫 complete_task（status=success）。
+禁止修改執行者程式目錄、禁止 run_terminal。
 """
 
 
 @dataclass(frozen=True)
-class BackendWorkerRunResult:
+class SchedulerWorkerRunResult:
     success: bool
     task_id: str
     summary: str
     last_run_path: str
     turns_used: int
+    plan_id: str | None = None
+    tasks_planned: int = 0
     error: str | None = None
 
 
@@ -73,39 +57,44 @@ class _AgentDriver(Protocol):
     def submit_tool_results(self, results: list[tuple[str, Any]]) -> None: ...
 
 
-def _load_task(workspace_root: Path, project_id: str) -> BackendTaskContract:
-    path = project_dir(workspace_root, project_id) / "pm" / "backend_current_task.yaml"
+def _load_intake(workspace_root: Path, project_id: str) -> SchedulerIntakeContract:
+    path = project_dir(workspace_root, project_id) / "pm" / "scheduler_intake.yaml"
     if not path.is_file():
-        raise FileNotFoundError(f"缺少任務契約：{path}")
+        raise FileNotFoundError(f"缺少 intake：{path}")
     raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
-    return BackendTaskContract.model_validate(raw)
+    return SchedulerIntakeContract.model_validate(raw)
 
 
-def _build_user_message(task: BackendTaskContract, worker_id: str) -> str:
+def _build_user_message(intake: SchedulerIntakeContract, worker_id: str) -> str:
     lines = [
-        f"task_id: {task.task_id}",
+        f"task_id: {intake.task_id}",
         f"worker_id: {worker_id}",
         "",
-        "goal:",
-        task.goal.strip(),
-        "",
-        "acceptance_criteria:",
+        "user_goal:",
+        intake.user_goal.strip(),
     ]
-    lines.extend(f"- {c}" for c in task.acceptance_criteria)
-    if task.context_refs:
+    if intake.context_refs:
         lines.append("")
         lines.append("context_refs:")
-        lines.extend(f"- {r}" for r in task.context_refs)
+        lines.extend(f"- {r}" for r in intake.context_refs)
     lines.append("")
-    lines.append("請開始：先 list_skills，再依劇本執行。")
+    lines.append("請開始：先 list_skills，再依劇本分析並寫入 task_queue。")
     return "\n".join(lines)
+
+
+def _load_task_queue(workspace_root: Path, project_id: str) -> TaskQueuePlan:
+    path = project_dir(workspace_root, project_id) / "pm" / "task_queue.yaml"
+    if not path.is_file():
+        raise FileNotFoundError("缺少 pm/task_queue.yaml")
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return TaskQueuePlan.model_validate(raw)
 
 
 def _write_last_run(
     workspace_root: Path,
     project_id: str,
     worker_id: str,
-    payload: BackendLastRun,
+    payload: SchedulerLastRun,
 ) -> Path:
     path = (
         project_dir(workspace_root, project_id) / "workers" / worker_id / "last_run.json"
@@ -118,39 +107,48 @@ def _write_last_run(
 
 
 def _handle_complete_task(
-    ctx: HarnessToolContext,
-    task: BackendTaskContract,
+    ctx: SchedulerHarnessToolContext,
+    intake: SchedulerIntakeContract,
     args: dict,
-) -> BackendWorkerRunResult:
+) -> SchedulerWorkerRunResult:
     status = str(args.get("status", "failed"))
     summary = str(args.get("summary", ""))
-    test_command = str(args.get("test_command", ""))
-    test_exit = int(args.get("test_exit_code", 1))
     notes = str(args.get("notes_for_reviewer", ""))
+    plan_id: str | None = None
+    tasks_planned = 0
 
-    if status == "success" and test_exit != 0:
-        status = "failed"
-        summary = f"complete_task 宣告 success 但 test_exit_code={test_exit}"
+    if status == "success":
+        try:
+            plan = _load_task_queue(ctx.workspace_root, ctx.project_id)
+            plan_id = plan.plan_id
+            tasks_planned = len(plan.tasks)
+            if tasks_planned < 1:
+                status = "failed"
+                summary = "task_queue.yaml 無任務"
+        except Exception as exc:
+            status = "failed"
+            summary = f"無法驗證 task_queue：{exc}"
 
-    last = BackendLastRun(
-        task_id=task.task_id,
+    last = SchedulerLastRun(
+        task_id=intake.task_id,
         status=status,
         files_changed=list(ctx.files_changed),
-        test_result=BackendTestResult(command=test_command, exit_code=test_exit)
-        if test_command
-        else None,
         summary=summary,
         notes_for_reviewer=notes,
+        plan_id=plan_id,
+        tasks_planned=tasks_planned,
     )
     path = _write_last_run(ctx.workspace_root, ctx.project_id, ctx.worker_id, last)
     rel = str(path.relative_to(project_dir(ctx.workspace_root, ctx.project_id)))
     ok = status == "success"
-    return BackendWorkerRunResult(
+    return SchedulerWorkerRunResult(
         success=ok,
-        task_id=task.task_id,
+        task_id=intake.task_id,
         summary=summary,
         last_run_path=rel,
         turns_used=0,
+        plan_id=plan_id,
+        tasks_planned=tasks_planned,
         error=None if ok else summary,
     )
 
@@ -160,10 +158,10 @@ def _run_agent_loop(
     driver: _AgentDriver,
     system_instruction: str,
     user_task: str,
-    ctx: HarnessToolContext,
-    task: BackendTaskContract,
+    ctx: SchedulerHarnessToolContext,
+    intake: SchedulerIntakeContract,
     max_turns: int,
-) -> BackendWorkerRunResult:
+) -> SchedulerWorkerRunResult:
     driver.start(system_instruction, user_task)
     turns = 0
     last_error: str | None = None
@@ -194,25 +192,27 @@ def _run_agent_loop(
         tool_results: list[tuple[str, Any]] = []
         for name, args in tool_calls:
             if name == "complete_task":
-                result = _handle_complete_task(ctx, task, args)
-                return BackendWorkerRunResult(
+                result = _handle_complete_task(ctx, intake, args)
+                return SchedulerWorkerRunResult(
                     success=result.success,
                     task_id=result.task_id,
                     summary=result.summary,
                     last_run_path=result.last_run_path,
                     turns_used=turns,
+                    plan_id=result.plan_id,
+                    tasks_planned=result.tasks_planned,
                     error=result.error,
                 )
             try:
-                out = dispatch_tool(ctx, name, args)
+                out = dispatch_scheduler_tool(ctx, name, args)
             except ToolPolicyError as exc:
                 out = json.dumps({"error": str(exc)}, ensure_ascii=False)
             tool_results.append((name, out))
 
         driver.submit_tool_results(tool_results)
 
-    failed = BackendLastRun(
-        task_id=task.task_id,
+    failed = SchedulerLastRun(
+        task_id=intake.task_id,
         status="failed",
         files_changed=list(ctx.files_changed),
         summary=last_error or "超過最大輪次",
@@ -220,9 +220,9 @@ def _run_agent_loop(
     )
     path = _write_last_run(ctx.workspace_root, ctx.project_id, ctx.worker_id, failed)
     rel = str(path.relative_to(project_dir(ctx.workspace_root, ctx.project_id)))
-    return BackendWorkerRunResult(
+    return SchedulerWorkerRunResult(
         success=False,
-        task_id=task.task_id,
+        task_id=intake.task_id,
         summary=failed.summary,
         last_run_path=rel,
         turns_used=turns,
@@ -230,19 +230,19 @@ def _run_agent_loop(
     )
 
 
-def run_backend_worker_scripted(
+def run_scheduler_worker_scripted(
     workspace_root: Path,
     project_id: str,
     worker_id: str,
     turns: list[ScriptedAgentTurn],
     *,
     max_turns: int = DEFAULT_MAX_TURNS,
-) -> BackendWorkerRunResult:
+) -> SchedulerWorkerRunResult:
     """測試／示範：不依賴 LLM 的固定 tool 序列。"""
-    task = _load_task(workspace_root, project_id)
-    ctx = HarnessToolContext(workspace_root, project_id, worker_id)
-    system = BACKEND_SYSTEM_PREFIX + f"\n你的 worker_id 是 {worker_id!r}。\n"
-    user = _build_user_message(task, worker_id)
+    intake = _load_intake(workspace_root, project_id)
+    ctx = SchedulerHarnessToolContext(workspace_root, project_id, worker_id)
+    system = SCHEDULER_SYSTEM_PREFIX + f"\n你的 worker_id 是 {worker_id!r}。\n"
+    user = _build_user_message(intake, worker_id)
 
     class _ScriptedWrapper:
         def __init__(self, inner: ScriptedAgentDriver) -> None:
@@ -262,64 +262,17 @@ def run_backend_worker_scripted(
         system_instruction=system,
         user_task=user,
         ctx=ctx,
-        task=task,
+        intake=intake,
         max_turns=max_turns,
     )
 
 
-def run_backend_worker_gemini(
-    workspace_root: Path,
-    project_id: str,
-    worker_id: str,
-    *,
-    api_key: str,
-    model: str,
-    generation: AiGenerationSettings,
-    max_turns: int = DEFAULT_MAX_TURNS,
-) -> BackendWorkerRunResult:
-    """使用 Gemini function calling 執行 backend 任務。"""
-    task = _load_task(workspace_root, project_id)
-    ctx = HarnessToolContext(workspace_root, project_id, worker_id)
-    system = BACKEND_SYSTEM_PREFIX + f"\n你的 worker_id 是 {worker_id!r}。\n"
-    user = _build_user_message(task, worker_id)
-    driver = GeminiAgentDriver(api_key, model=model, generation=generation)
-    return _run_agent_loop(
-        driver=driver,
-        system_instruction=system,
-        user_task=user,
-        ctx=ctx,
-        task=task,
-        max_turns=max_turns,
-    )
-
-
-def load_last_run(
+def load_scheduler_last_run(
     workspace_root: Path, project_id: str, worker_id: str
-) -> BackendLastRun | None:
+) -> SchedulerLastRun | None:
     path = (
         project_dir(workspace_root, project_id) / "workers" / worker_id / "last_run.json"
     )
     if not path.is_file():
         return None
-    return BackendLastRun.model_validate(json.loads(path.read_text(encoding="utf-8")))
-
-
-__all__ = [
-    "BackendTaskContract",
-    "BackendWorkerRunResult",
-    "PlannedToolCall",
-    "SUPPORTED_DEFAULT_TEMPLATES",
-    "SchedulerIntakeContract",
-    "SchedulerWorkerRunResult",
-    "ScriptedAgentTurn",
-    "copy_worker_default_into_worker_dir",
-    "default_worker_entry_for_template",
-    "load_last_run",
-    "load_scheduler_last_run",
-    "run_backend_worker_gemini",
-    "run_backend_worker_scripted",
-    "run_scheduler_worker_scripted",
-    "seed_backend_worker_project",
-    "seed_scheduler_backend_demo_project",
-    "worker_default_fixtures_dir",
-]
+    return SchedulerLastRun.model_validate(json.loads(path.read_text(encoding="utf-8")))

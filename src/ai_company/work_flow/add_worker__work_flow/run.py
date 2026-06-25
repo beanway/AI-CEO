@@ -3,11 +3,7 @@ from __future__ import annotations
 from ai_company.app_deps import AppDeps
 from ai_company.modules.file_store import core as file_store
 from ai_company.modules.setup_project_folders import core as project_folders
-from ai_company.modules.worker_runner.internal.default_install import (
-    SUPPORTED_DEFAULT_TEMPLATES,
-    copy_worker_default_into_worker_dir,
-    default_worker_entry_for_template,
-)
+from ai_company.modules.worker_runner import core as worker_runner
 from ai_company.schemas.commands import AddWorkerCommand, BaseCommand, CommandType
 from ai_company.schemas.documents import WorkersFile
 from ai_company.schemas.results import AddWorkerResult
@@ -19,8 +15,8 @@ def run(command: BaseCommand, deps: AppDeps) -> AddWorkerResult:
     if not isinstance(command, AddWorkerCommand):
         return AddWorkerResult(success=False, message="指令類型錯誤", error_code="bad_command")
     template = command.template.strip().lower()
-    if template not in SUPPORTED_DEFAULT_TEMPLATES:
-        supported = ", ".join(sorted(SUPPORTED_DEFAULT_TEMPLATES))
+    if template not in worker_runner.SUPPORTED_DEFAULT_TEMPLATES:
+        supported = ", ".join(sorted(worker_runner.SUPPORTED_DEFAULT_TEMPLATES))
         return AddWorkerResult(
             success=False,
             message=f"不支援的模板 {template!r}；目前支援：{supported}",
@@ -31,7 +27,7 @@ def run(command: BaseCommand, deps: AppDeps) -> AddWorkerResult:
     except ValueError as exc:
         return AddWorkerResult(success=False, message=str(exc), error_code="no_project")
 
-    entry = default_worker_entry_for_template(template)
+    entry = worker_runner.default_worker_entry_for_template(template)
     existing = file_store.load_workers(deps.workspace_root, project_id)
     if any(w.id == entry.id for w in existing.workers):
         return AddWorkerResult(
@@ -46,7 +42,7 @@ def run(command: BaseCommand, deps: AppDeps) -> AddWorkerResult:
     project_folders.ensure_project_tree(root)
     merged = WorkersFile(workers=[*existing.workers, entry])
     project_folders.ensure_worker_directories(root, [entry])
-    copy_worker_default_into_worker_dir(root, template)
+    worker_runner.copy_worker_default_into_worker_dir(root, template)
     file_store.save_workers(deps.workspace_root, project_id, merged)
 
     return AddWorkerResult(
