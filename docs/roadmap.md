@@ -307,4 +307,25 @@ P-A1–P-A3 與一輪產品交付已完成；下列為 **刻意保留的過渡�
 - [x] 步驟 2（目錄與預設 backend 正文；見 `worker_default/`）
 - [ ] 步驟 3–7
 
-**刻意延後（E3／E4）**：AI 決定 pipeline、`/addworker`、執行期自動 find/install skill、scheduler 主導 code review。
+**刻意延後（E3／E4）**：AI 決定 pipeline、執行期自動 find/install skill、scheduler 主導 code review。  
+**`/addworker`**：已實作（E4 部分提前）；與 E-P 種子複製並存，resync 見 §十七。
+
+---
+
+## 十七、執行層 E-P — 三沙盒 Package
+
+**規格**：[`design/worker-sandbox-packages.md`](design/worker-sandbox-packages.md)  
+**計畫**：[`plans/phase-e-worker-packages.md`](plans/phase-e-worker-packages.md)
+
+| # | 步驟 | 驗收（pytest／腳本） |
+|---|------|----------------------|
+| E-P0 | 文件與決策 | 本檔 §十六與 worker-sandbox-packages 一致 |
+| E-P1 | 種子 `worker_manifest.yaml` + 各 `package/` 骨架；擴充 copy | `test_worker_default_install` + `test_worker_package_layout` |
+| E-P2 | `worker_host` + backend entrypoint | `test_worker_host_backend`、`test_backend_worker_scripted` |
+| E-P3 | scheduler 邏輯遷入 scheduler package | scheduler 相關 tests |
+| E-P4 | fixtures package 載入場景 | `test_fixtures_package` |
+| E-P5 | PM resync + repair 健檢 | `test_pm_resync_worker_flow`、`test_pm_repair_flow` |
+| E-P6 | `run-step` → worker_host | `test_run_execution_step_flow`、全量 `pytest` |
+
+- [x] E-P0（文件）
+- [ ] E-P1–E-P6

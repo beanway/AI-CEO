@@ -15,7 +15,9 @@
 | `harness-design.md` | `discussion-outcomes.md` | 摘要一致 | 否 |
 | `harness-design.md` | `roadmap.md` | 路線對齊 Harness | 否 |
 | `harness-design.md` | `execution-layer-v2.md` | §7.4 指向 v2 細節 | 否 |
-| `execution-layer-v2.md` | `run_execution_step` 等程式 | E1 尚未實作 | **預期落差**（文件領先） |
+| `harness-design.md` | `worker-sandbox-packages.md` | §5.5 三 package | 否 |
+| `execution-layer-v2.md` | `worker_runner`／未來 `worker_host` | E-P 遷移中；文件領先單體 runner | **預期過渡** |
+| `worker-sandbox-packages.md` | `worker_default/*/package/` | E-P1 尚未建立目錄 | **預期落差**（E-P0 僅文件） |
 | `src-layout.md` | `harness-design.md` | 程式分層實作產品設計 | 否 |
 | `harness-design.md` | 根目錄 `README.md` | 應指向 `docs/` | **已修正**（見下方程式碼表） |
 

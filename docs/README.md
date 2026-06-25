@@ -13,7 +13,9 @@
 4. [`plans/phase-a-src-layout.md`](plans/phase-a-src-layout.md) — Phase A 程式重構計畫
 5. [`roadmap.md`](roadmap.md) — 實作階段與檢查清單
 6. [`design/execution-layer-v2.md`](design/execution-layer-v2.md) — **執行層 v2**（真實 Worker、先 backend）
-7. [`document-audit.md`](document-audit.md) — 文件與程式碼一致性審查
+7. [`design/worker-sandbox-packages.md`](design/worker-sandbox-packages.md) — **三沙盒 package** + PM 可改程式
+8. [`plans/phase-e-worker-packages.md`](plans/phase-e-worker-packages.md) — E-P0–E-P6 分步與測試
+9. [`document-audit.md`](document-audit.md) — 文件與程式碼一致性審查
 
 ## 目錄結構
 
@@ -22,6 +24,8 @@
 | [`discussion-outcomes.md`](discussion-outcomes.md) | 產品決策與 Harness 對照摘要 |
 | [`design/harness-design.md`](design/harness-design.md) | 產品設計規格 |
 | [`design/execution-layer-v2.md`](design/execution-layer-v2.md) | 執行層 v2：AI 排程願景、E1 backend |
+| [`design/worker-sandbox-packages.md`](design/worker-sandbox-packages.md) | 三 package 架構、PM 沙盒程式 |
+| [`plans/phase-e-worker-packages.md`](plans/phase-e-worker-packages.md) | E-P 分步實作與每步 pytest |
 | [`design/src-layout.md`](design/src-layout.md) | **框架程式目錄與依賴規則** |
 | [`plans/phase-a-src-layout.md`](plans/phase-a-src-layout.md) | Phase A 分層重構（現行計畫） |
 | [`design/framework-design-v1-archived.md`](design/framework-design-v1-archived.md) | 初版設計（已廢止） |

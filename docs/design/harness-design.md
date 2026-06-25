@@ -145,6 +145,13 @@ workers:
 3. `workers/<id>/role_skills.yaml`（可選）  
 4. 自訂 kind 的 `SKILL.md` 正文（截斷規則實作時定義）
 
+### 5.5 Worker 沙盒 Package（三種子、PM 可改程式）
+
+- **種子**（框架 repo）：[`worker_default/`](../../worker_default/README.md) 下 **`backend/`、`scheduler/`、`fixtures/`** 各為獨立 package（含 `package/` + `worker_manifest.yaml`），規格 [`worker-sandbox-packages.md`](worker-sandbox-packages.md)。
+- **執行期**：複製到 `projects/<id>/workers/<id>/`；**角色邏輯在沙盒 `package/`**，PM 經專案 Git／resync／對話修改，實現自我迭代。
+- **框架**：`src/ai_company` 僅 **worker host**（載入 manifest、ToolPolicy、契約）；**禁止** Worker 產物寫入 `src/`。
+- **PM 維修**：除摘要與中斷 execution 外，擴充 **健檢** 與 **自種子 resync**（見 [`plans/phase-e-worker-packages.md`](../plans/phase-e-worker-packages.md) E-P5）。
+
 ---
 
 ## 6. Router、Session、Telegram（摘要）
@@ -181,15 +188,16 @@ Phase B 現況為 **管線骨架**（固定 pipeline、`complete_worker_harness_
 
 - 使用者提問 → **AI 分析** → 任務列表與順序 → 各 Worker 執行 → **驗證／代碼檢查**；
 - **規範一律 skill**（無獨立 rule 類型）；
-- 實作順序：**先 `worker_default/` 定稿預設 backend → fixture 測試 → 再接 `run-step`**（見 [`execution-layer-v2.md`](execution-layer-v2.md) §4.0）。
+- 實作順序：**三沙盒 package**（[`worker-sandbox-packages.md`](worker-sandbox-packages.md)）分步 [`phase-e-worker-packages.md`](../plans/phase-e-worker-packages.md)；`run-step` 在 E-P6 接 worker host。
 
-細節、任務契約、backend skill 清單：[`execution-layer-v2.md`](execution-layer-v2.md)。路線圖勾選：[`../roadmap.md`](../roadmap.md) §十六。
+細節、任務契約：[`execution-layer-v2.md`](execution-layer-v2.md)。路線圖：[`../roadmap.md`](../roadmap.md) §十六、§十七。
 
 ---
 
 ## 8. 安全與 ToolPolicy
 
 - **SandboxRunner**：Worker subprocess 的 `cwd` 為 `projects/<id>/` 根（須存在 `workers/<id>/`）；Git 亦在專案根。路徑政策仍限專案沙盒內。  
+- **沙盒 Python**：PM／Worker 可改 `workers/<id>/package/`；載入由框架 host 執行，須通過 ToolPolicy 與 manifest 校驗（見 §5.5）。
 - **Git**：預設僅 `task_scheduler`（及 PM 高風險操作經 TG 核准）。  
 - **自動安裝工具/skill**：CEO 裝 registry；PM 啟用；高風險安裝 TG 核准（可分期：先手動 YAML）。  
 - **Secrets**：僅環境變數，不寫入 `company_workspace`。

@@ -1,9 +1,11 @@
 # 執行層 v2 — 真實 Worker 與 AI 排程（產品方向）
 
 **日期**：2026-06-25  
-**狀態**：進行中（先實作 **backend Worker**）  
+**狀態**：進行中（**E-P** 三沙盒 package；先 backend 跑通）  
 **上層規格**：[`harness-design.md`](harness-design.md)  
-**路線圖勾選**：[`../roadmap.md`](../roadmap.md) §十六  
+**Package 架構（Canonical）**：[`worker-sandbox-packages.md`](worker-sandbox-packages.md)  
+**分步實作**：[`../plans/phase-e-worker-packages.md`](../plans/phase-e-worker-packages.md)  
+**路線圖勾選**：[`../roadmap.md`](../roadmap.md) §十六、§十七  
 
 本檔描述 **Phase B 骨架完成後** 的下一階段：把「寫 `.harness_step_done` 標記」換成 **沙盒內 Gemini + 工具**，並逐步把 **任務分配者** 從固定 pipeline 升級為 **AI 任務規劃與排序**。
 
@@ -51,7 +53,7 @@
 | **E3 — scheduler v2** | 提問 → 分析 → 任務列表 → 派工 | — |
 | **E4 — PM 進階** | `/addworker`、role skill 指令、與核准整合 | — |
 
-**目前焦點：E1。** 實作順序：**先 `worker_default/` 定稿預設 backend → fixture 測試 → 再接 `run-step`**（見 §4.0）。
+**目前焦點：E-P（三 package）。** 實作順序見 [`phase-e-worker-packages.md`](../plans/phase-e-worker-packages.md)：**種子 layout（E-P1）→ `worker_host`（E-P2–P3）→ fixtures（E-P4）→ PM resync／repair（E-P5）→ `run-step`（E-P6）**。§4.0 種子目錄仍為起點，但 **角色邏輯目標在沙盒 `package/`**，非單體 `worker_runner`。
 
 ---
 
@@ -148,18 +150,21 @@ notes_for_reviewer: string   # 供 E3 scheduler 使用
 
 ### 4.5 程式落點（實作時）
 
-- 種子：`worker_default/backend/`；複製邏輯可放在 `work_flow/_shared/` 或測試 helper（E1 先供 pytest 使用）。
-- 新增或擴充 `work_flow/*__work_flow`：`run_execution_step` 在 `kind == backend` 時呼叫專用 runner（非僅 `complete_worker_harness_step`）。
-- 工具：`modules/sandbox_runner` + `modules/ai_core`；skill 正文經 `skill_registry.resolve_skill_stack` 注入 prompt。
-- 測試：**優先** worker_default 種子 + fixture 專案；其次 Training 小 API 需求。
+- **種子**：`worker_default/{backend,scheduler,fixtures}/` 各含 `worker_manifest.yaml` + `package/`（見 [`worker-sandbox-packages.md`](worker-sandbox-packages.md)）。
+- **複製**：`modules/worker_runner`（過渡）或 `work_flow` 共用 helper → 專案 `workers/<id>/`；PM **resync**（E-P5）可再同步種子。
+- **執行**：`modules/worker_host`（E-P2 起）載入沙盒 entrypoint；`run_execution_step` 在 E-P6 接 host，非僅 `complete_worker_harness_step`。
+- **過渡**：現有 `modules/worker_runner` 為 E1 原型，遷移完成後刪除單體 backend／scheduler 邏輯。
+- 工具：`modules/sandbox_runner` + `modules/ai_core`；skill 正文經 `skill_registry.resolve_skill_stack` 注入 prompt（或由 package 自管 LLM 迴圈，E-P2 定稿）。
+- 測試：每步見 [`phase-e-worker-packages.md`](../plans/phase-e-worker-packages.md)。
 
 ### 4.6 `worker_default` 與 registry 分工
 
 | 內容 | 放哪 |
 |------|------|
-| 此專案 backend **角色** 的流程、路徑、工具邊界 | `worker_default/backend/SKILL.md` → 複製到 `workers/<id>/SKILL.md`（自訂 kind 語意；內建 backend 亦以此為預設正文） |
-| **可重用** 的後端慣例（Python 服務、API 格式、驗證） | `skills/registry/backend-*/SKILL.md`，由 `role_skills.yaml` 引用 |
-| 任務單、需求片段（測試用） | 可放 `worker_default/fixtures/`（選用，E1 測試建立） |
+| backend／scheduler **可演化程式** | `worker_default/<role>/package/` → 複製到 `workers/<id>/package/`（**PM 可改**） |
+| 角色流程、路徑、工具邊界（文案） | `worker_default/<role>/SKILL.md` → `workers/<id>/SKILL.md` |
+| **可重用** 慣例（Python 服務、API 格式） | `skills/registry/backend-*/SKILL.md`，由 `role_skills.yaml` 引用 |
+| 場景／demo 任務 | `worker_default/fixtures/`（**獨立 package**，見 worker-sandbox-packages §6） |
 
 ---
 
@@ -194,3 +199,4 @@ notes_for_reviewer: string   # 供 E3 scheduler 使用
 | 2026-06-25 | 初版：E1 backend 範圍、契約、skill 清單、階段切分 |
 | 2026-06-25 | E1 改為先 `worker_default/` 種子與 fixture 測試，再接 run-step |
 | 2026-06-25 | 目錄命名統一為 `worker_default/`（snake_case，對齊 `company_workspace`） |
+| 2026-06-25 | 決策：三沙盒 package + PM 可改 `workers/<id>/package/`；見 worker-sandbox-packages、phase-e-worker-packages |
