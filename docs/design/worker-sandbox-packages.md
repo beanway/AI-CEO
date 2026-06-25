@@ -108,3 +108,4 @@ projects/<project_id>/workers/backend/
 | 日期 | 說明 |
 |------|------|
 | 2026-06-25 | 三 package + PM 沙盒程式決策；過渡自 worker_runner 單體 |
+| 2026-06-25 | E-P 交付後未完成：[`plans/phase-e-worker-backlog.md`](../plans/phase-e-worker-backlog.md) |

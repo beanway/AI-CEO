@@ -144,3 +144,10 @@ pytest -q
 | 日期 | 說明 |
 |------|------|
 | 2026-06-25 | 初版分步計畫（E-P0–E-P6） |
+| 2026-06-25 | E-P 完成；未完成項見 [`phase-e-worker-backlog.md`](phase-e-worker-backlog.md) |
+
+---
+
+## E-P 之後（未完成）
+
+見專檔 **[`phase-e-worker-backlog.md`](phase-e-worker-backlog.md)**（Gemini 遷移、PM→intake、run-step 政策、TG／CLI、E1 §十六 3–7、E3）。

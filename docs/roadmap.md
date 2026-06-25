@@ -329,3 +329,5 @@ P-A1–P-A3 與一輪產品交付已完成；下列為 **刻意保留的過渡�
 
 - [x] E-P0（文件）
 - [x] E-P1–E-P6（見 commit；`pytest` 109 passed）
+
+**未完成與過渡**：[`plans/phase-e-worker-backlog.md`](plans/phase-e-worker-backlog.md)
