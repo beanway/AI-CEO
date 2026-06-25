@@ -238,32 +238,10 @@ def run_scheduler_worker_scripted(
     *,
     max_turns: int = DEFAULT_MAX_TURNS,
 ) -> SchedulerWorkerRunResult:
-    """測試／示範：不依賴 LLM 的固定 tool 序列。"""
-    intake = _load_intake(workspace_root, project_id)
-    ctx = SchedulerHarnessToolContext(workspace_root, project_id, worker_id)
-    system = SCHEDULER_SYSTEM_PREFIX + f"\n你的 worker_id 是 {worker_id!r}。\n"
-    user = _build_user_message(intake, worker_id)
+    from ai_company.modules.worker_host import core as worker_host
 
-    class _ScriptedWrapper:
-        def __init__(self, inner: ScriptedAgentDriver) -> None:
-            self._inner = inner
-
-        def start(self, system_instruction: str, user_task: str) -> None:
-            del system_instruction, user_task
-
-        def next_turn(self) -> ScriptedAgentTurn | None:
-            return self._inner.consume_turn()
-
-        def submit_tool_results(self, results: list[tuple[str, Any]]) -> None:
-            del results
-
-    return _run_agent_loop(
-        driver=_ScriptedWrapper(ScriptedAgentDriver(turns)),
-        system_instruction=system,
-        user_task=user,
-        ctx=ctx,
-        intake=intake,
-        max_turns=max_turns,
+    return worker_host.run_scheduler_scripted(
+        workspace_root, project_id, worker_id, turns, max_turns=max_turns
     )
 
 

@@ -1,0 +1,5 @@
+kind: task_scheduler
+package_dir: package
+entrypoint_module: scheduler_worker.run
+scripted_entry: run_scripted
+execution_step_entry: run_execution_step

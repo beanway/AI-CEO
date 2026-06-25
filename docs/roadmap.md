@@ -328,4 +328,4 @@ P-A1–P-A3 與一輪產品交付已完成；下列為 **刻意保留的過渡�
 | E-P6 | `run-step` → worker_host | `test_run_execution_step_flow`、全量 `pytest` |
 
 - [x] E-P0（文件）
-- [ ] E-P1–E-P6
+- [x] E-P1–E-P6（見 commit；`pytest` 109 passed）

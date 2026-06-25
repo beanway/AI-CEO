@@ -29,6 +29,8 @@ class CommandType(str, Enum):
     PROJECT_GIT = "project_git"
     RESOLVE_APPROVAL = "resolve_approval"
     PM_REPAIR = "pm_repair"
+    PM_RESYNC_WORKER = "pm_resync_worker"
+    LOAD_FIXTURE_SCENARIO = "load_fixture_scenario"
     RUN_EXECUTION_STEP = "run_execution_step"
     RESOLVE_EXECUTION_FAILURE = "resolve_execution_failure"
     LIST_REGISTRY_SKILLS = "list_registry_skills"
@@ -175,6 +177,19 @@ class PmRepairCommand(BaseCommand):
     interrupt: bool = False
 
 
+class PmResyncWorkerCommand(BaseCommand):
+    command_type: Literal[CommandType.PM_RESYNC_WORKER] = CommandType.PM_RESYNC_WORKER
+    project_id: str | None = None
+    template: str = Field(min_length=1)
+    force_package: bool = True
+
+
+class LoadFixtureScenarioCommand(BaseCommand):
+    command_type: Literal[CommandType.LOAD_FIXTURE_SCENARIO] = CommandType.LOAD_FIXTURE_SCENARIO
+    project_id: str | None = None
+    scenario: str = Field(min_length=1)
+
+
 class RunExecutionStepCommand(BaseCommand):
     command_type: Literal[CommandType.RUN_EXECUTION_STEP] = CommandType.RUN_EXECUTION_STEP
     project_id: str | None = None
@@ -229,6 +244,8 @@ Command = (
     | ProjectGitCommand
     | ResolveApprovalCommand
     | PmRepairCommand
+    | PmResyncWorkerCommand
+    | LoadFixtureScenarioCommand
     | RunExecutionStepCommand
     | ResolveExecutionFailureCommand
     | ListRegistrySkillsCommand

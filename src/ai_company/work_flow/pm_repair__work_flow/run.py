@@ -6,6 +6,7 @@ from ai_company.app_deps import AppDeps
 from ai_company.modules.execution_store import core as execution_store
 from ai_company.modules.file_store import core as file_store
 from ai_company.modules.setup_project_folders import core as project_folders
+from ai_company.modules.worker_host import core as worker_host
 from ai_company.schemas.commands import BaseCommand, CommandType, PmRepairCommand
 from ai_company.schemas.documents import ExecutionStatus
 from ai_company.schemas.results import PmRepairResult
@@ -38,6 +39,16 @@ def run(command: BaseCommand, deps: AppDeps) -> PmRepairResult:
                 interrupted_ids.append(updated.execution_id)
         running = execution_store.list_running_for_project(deps.workspace_root, project_id)
     workers = file_store.load_workers(deps.workspace_root, project_id)
+    health = worker_host.audit_workers(
+        deps.workspace_root,
+        project_id,
+        [w.id for w in workers.workers],
+    )
+    health_lines = (
+        "\n".join(f"  - {h.worker_id}: [{h.code}] {h.detail}" for h in health)
+        if health
+        else "  （無健檢問題）"
+    )
     skills = file_store.load_project_skills(deps.workspace_root, project_id)
     pm_dir = root / "pm"
     pm_count = len(list(pm_dir.iterdir())) if pm_dir.is_dir() else 0
@@ -61,6 +72,7 @@ def run(command: BaseCommand, deps: AppDeps) -> PmRepairResult:
         f"維修摘要 · 專案 {project_id}\n"
         f"pm/ 檔案：{pm_count} · shared/ 檔案：{shared_count}\n"
         f"Workers：{len(workers.workers)} · 專案 skills：{len(skills.enabled_skill_ids)}\n"
+        f"Worker 健檢（{len(health)} 項）：\n{health_lines}\n"
         f"進行中 execution：\n{run_lines}{interrupt_note}"
     )
     return PmRepairResult(
@@ -69,6 +81,7 @@ def run(command: BaseCommand, deps: AppDeps) -> PmRepairResult:
         project_id=project_id,
         running_execution_count=len(running),
         interrupted_execution_ids=interrupted_ids,
+        health_issue_count=len(health),
     )
 
 

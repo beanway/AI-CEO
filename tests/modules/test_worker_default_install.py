@@ -35,6 +35,8 @@ def test_copy_worker_default_backend_files(tmp_path):
     dest = worker_runner.copy_worker_default_into_worker_dir(root, "backend")
     assert dest.is_dir()
     assert (dest / "SKILL.md").is_file()
+    assert (dest / "worker_manifest.yaml").is_file()
+    assert (dest / "package" / "backend_worker" / "run.py").is_file()
     assert (dest / "skills" / "01_plan_implement_test.md").is_file()
 
 

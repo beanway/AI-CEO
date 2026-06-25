@@ -18,8 +18,14 @@ from ai_company.modules.worker_runner.internal.contracts import (
 )
 from ai_company.modules.worker_runner.internal.default_install import (
     SUPPORTED_DEFAULT_TEMPLATES,
+    copy_fixtures_package_into_project,
     copy_worker_default_into_worker_dir,
     default_worker_entry_for_template,
+)
+from ai_company.modules.worker_runner.internal.host_session import (
+    BackendHostSession,
+    FixturesHost,
+    SchedulerHostSession,
 )
 from ai_company.modules.worker_runner.internal.gemini_agent import GeminiAgentDriver
 from ai_company.modules.worker_runner.internal.harness_tools import (
@@ -239,31 +245,10 @@ def run_backend_worker_scripted(
     max_turns: int = DEFAULT_MAX_TURNS,
 ) -> BackendWorkerRunResult:
     """測試／示範：不依賴 LLM 的固定 tool 序列。"""
-    task = _load_task(workspace_root, project_id)
-    ctx = HarnessToolContext(workspace_root, project_id, worker_id)
-    system = BACKEND_SYSTEM_PREFIX + f"\n你的 worker_id 是 {worker_id!r}。\n"
-    user = _build_user_message(task, worker_id)
+    from ai_company.modules.worker_host import core as worker_host
 
-    class _ScriptedWrapper:
-        def __init__(self, inner: ScriptedAgentDriver) -> None:
-            self._inner = inner
-
-        def start(self, system_instruction: str, user_task: str) -> None:
-            del system_instruction, user_task
-
-        def next_turn(self) -> ScriptedAgentTurn | None:
-            return self._inner.consume_turn()
-
-        def submit_tool_results(self, results: list[tuple[str, Any]]) -> None:
-            del results
-
-    return _run_agent_loop(
-        driver=_ScriptedWrapper(ScriptedAgentDriver(turns)),
-        system_instruction=system,
-        user_task=user,
-        ctx=ctx,
-        task=task,
-        max_turns=max_turns,
+    return worker_host.run_backend_scripted(
+        workspace_root, project_id, worker_id, turns, max_turns=max_turns
     )
 
 
@@ -278,6 +263,27 @@ def run_backend_worker_gemini(
     max_turns: int = DEFAULT_MAX_TURNS,
 ) -> BackendWorkerRunResult:
     """使用 Gemini function calling 執行 backend 任務。"""
+    return _run_backend_worker_gemini_impl(
+        workspace_root,
+        project_id,
+        worker_id,
+        api_key=api_key,
+        model=model,
+        generation=generation,
+        max_turns=max_turns,
+    )
+
+
+def _run_backend_worker_gemini_impl(
+    workspace_root: Path,
+    project_id: str,
+    worker_id: str,
+    *,
+    api_key: str,
+    model: str,
+    generation: AiGenerationSettings,
+    max_turns: int = DEFAULT_MAX_TURNS,
+) -> BackendWorkerRunResult:
     task = _load_task(workspace_root, project_id)
     ctx = HarnessToolContext(workspace_root, project_id, worker_id)
     system = BACKEND_SYSTEM_PREFIX + f"\n你的 worker_id 是 {worker_id!r}。\n"
@@ -312,8 +318,12 @@ __all__ = [
     "SchedulerIntakeContract",
     "SchedulerWorkerRunResult",
     "ScriptedAgentTurn",
+    "copy_fixtures_package_into_project",
     "copy_worker_default_into_worker_dir",
     "default_worker_entry_for_template",
+    "BackendHostSession",
+    "SchedulerHostSession",
+    "FixturesHost",
     "load_last_run",
     "load_scheduler_last_run",
     "run_backend_worker_gemini",

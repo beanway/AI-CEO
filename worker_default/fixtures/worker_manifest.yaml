@@ -1,0 +1,4 @@
+kind: fixtures
+package_dir: package
+entrypoint_module: fixtures_loader.run
+load_scenario_entry: load_demo_scenario

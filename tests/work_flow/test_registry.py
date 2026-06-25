@@ -14,6 +14,8 @@ def test_registry_lists_phase_a_flows():
     assert "set_user_mode__work_flow" in ids
     assert "pm_chat__work_flow" in ids
     assert "pm_repair__work_flow" in ids
+    assert "pm_resync_worker__work_flow" in ids
+    assert "load_fixture_scenario__work_flow" in ids
     assert "setup_workers__work_flow" in ids
     assert "add_worker__work_flow" in ids
     assert "project_git__work_flow" in ids

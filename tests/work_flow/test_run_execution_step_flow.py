@@ -63,6 +63,27 @@ def test_run_step_failure_and_retry(tmp_path):
     notify.set_notify_sink(None)
 
 
+def test_run_step_backend_via_worker_host(tmp_path):
+    from ai_company.adapters.dispatch import dispatch
+    from ai_company.app_deps import AppDeps
+    from ai_company.config import Settings
+    from ai_company.modules.file_store import core as file_store
+    from ai_company.modules.worker_runner import core as worker_runner
+    from ai_company.schemas.commands import RunExecutionStepCommand
+    from ai_company.schemas.documents import ProjectRecord, ProjectsFile, WorkerEntry, WorkersFile
+    from ai_company.modules.setup_project_folders import core as project_folders
+
+    file_store.ensure_company_dirs(tmp_path)
+    pf = ProjectsFile(active_project_id="pb", projects=[ProjectRecord(id="pb", name="B")])
+    file_store.save_projects(tmp_path, pf)
+    worker_runner.seed_backend_worker_project(tmp_path, "pb")
+    deps = AppDeps(settings=Settings(company_workspace_root=tmp_path))
+    result = dispatch(RunExecutionStepCommand(project_id="pb"), deps)
+    assert result.success, result.message
+    last = worker_runner.load_last_run(tmp_path, "pb", "backend")
+    assert last is not None and last.status == "success"
+
+
 def test_full_pipeline_project_done(tmp_path):
     from ai_company.adapters.dispatch import dispatch
     from ai_company.app_deps import AppDeps

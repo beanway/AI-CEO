@@ -93,6 +93,19 @@ class PmRepairResult(FlowResult):
     project_id: str | None = None
     running_execution_count: int | None = None
     interrupted_execution_ids: list[str] = Field(default_factory=list)
+    health_issue_count: int | None = None
+
+
+class PmResyncWorkerResult(FlowResult):
+    project_id: str | None = None
+    worker_id: str | None = None
+    template: str | None = None
+
+
+class LoadFixtureScenarioResult(FlowResult):
+    project_id: str | None = None
+    scenario: str | None = None
+    files_written: list[str] = Field(default_factory=list)
 
 
 class RunExecutionStepResult(FlowResult):

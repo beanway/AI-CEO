@@ -8,6 +8,7 @@ from ai_company.modules.sandbox_runner.core import (
     ToolPolicyError,
     complete_worker_harness_step,
 )
+from ai_company.modules.worker_host import core as worker_host
 from ai_company.modules.metrics import core as metrics
 from ai_company.modules.skill_registry import core as skill_registry
 from ai_company.modules.task_scheduler import core as task_scheduler
@@ -243,6 +244,22 @@ def run(command: BaseCommand, deps: AppDeps) -> RunExecutionStepResult:
         )
 
     try:
+        if entry.kind == "backend" and worker_host.has_backend_task(
+            deps.workspace_root, project_id
+        ):
+            host_result = worker_host.run_backend_execution_step(
+                deps.workspace_root, project_id, worker_id
+            )
+            if not host_result.success:
+                raise ToolPolicyError(host_result.error or host_result.summary)
+        elif entry.kind == "task_scheduler" and worker_host.has_scheduler_intake(
+            deps.workspace_root, project_id
+        ):
+            host_result = worker_host.run_scheduler_execution_step(
+                deps.workspace_root, project_id, worker_id
+            )
+            if not host_result.success:
+                raise ToolPolicyError(host_result.error or host_result.summary)
         step = complete_worker_harness_step(deps.workspace_root, project_id, worker_id)
     except ToolPolicyError as exc:
         reason = str(exc)

@@ -15,6 +15,8 @@ from ai_company.work_flow.create_project__work_flow.run import register as regis
 from ai_company.work_flow.init_workspace__work_flow.run import register as register_init_workspace
 from ai_company.work_flow.list_projects__work_flow.run import register as register_list_projects
 from ai_company.work_flow.pm_repair__work_flow.run import register as register_pm_repair
+from ai_company.work_flow.pm_resync_worker__work_flow.run import register as register_pm_resync_worker
+from ai_company.work_flow.load_fixture_scenario__work_flow.run import register as register_load_fixture_scenario
 from ai_company.work_flow.pm_chat__work_flow.run import register as register_pm_chat
 from ai_company.work_flow.project_git__work_flow.run import register as register_project_git
 from ai_company.work_flow.resolve_approval__work_flow.run import (
@@ -62,6 +64,8 @@ register_update_global_config(registry)
 register_set_user_mode(registry)
 register_pm_chat(registry)
 register_pm_repair(registry)
+register_pm_resync_worker(registry)
+register_load_fixture_scenario(registry)
 register_project_git(registry)
 register_resolve_approval(registry)
 register_run_execution_step(registry)
